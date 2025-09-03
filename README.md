@@ -23,10 +23,9 @@ Um sistema SaaS completo desenvolvido em Django com funcionalidades de multi-ten
 ## 🛠️ Instalação e Execução
 
 ### 1. Clone o repositório
-
 ```bash
-git clone <url-do-repositorio>
-cd saas
+git clone https://github.com/silvarney/app.git
+cd app
 ```
 
 ### 2. Crie e ative o ambiente virtual
@@ -42,14 +41,8 @@ source venv/bin/activate
 ```
 
 ### 3. Instale as dependências Python
-
 ```bash
-pip install django
-pip install djangorestframework
-pip install djangorestframework-simplejwt
-pip install django-allauth
-pip install Pillow
-pip install cryptography
+pip install -r requirements.txt
 ```
 
 ### 4. Instale as dependências Node.js
@@ -152,16 +145,7 @@ EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 ```
 
-### 2. Crie o arquivo requirements.txt
-
-```bash
-echo "Django>=5.0,<6.0" > requirements.txt
-echo "djangorestframework>=3.14" >> requirements.txt
-echo "djangorestframework-simplejwt>=5.0" >> requirements.txt
-echo "django-allauth>=0.50" >> requirements.txt
-echo "Pillow>=9.0" >> requirements.txt
-echo "cryptography>=3.0" >> requirements.txt
-```
+### 2. O arquivo requirements.txt já está incluído no projeto
 
 ### 3. Crie o arquivo docker-compose.yml
 
