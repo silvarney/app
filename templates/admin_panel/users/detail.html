@@ -1,0 +1,430 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name|default:user.email }} - Admin{% endblock %}
+{% block page_title %}Detalhes do Usuário{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <a href="{% url 'admin_panel:users_list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    Usuários
+                </a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">{{ user.get_full_name|default:user.email }}</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Informações do Usuário -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center space-x-5">
+                <div class="flex-shrink-0">
+                    {% if user.avatar %}
+                    <img class="h-20 w-20 rounded-full" src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+                    {% else %}
+                    <div class="h-20 w-20 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                        <span class="text-2xl font-medium text-gray-700 dark:text-gray-300">
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        {{ user.get_full_name|default:"Sem nome" }}
+                    </h1>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ user.email }}
+                    </p>
+                    <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                        <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-calendar-alt mr-1.5"></i>
+                            Cadastrado em {{ user.date_joined|date:"d/m/Y H:i" }}
+                        </div>
+                        {% if user.phone %}
+                        <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-phone mr-1.5"></i>
+                            {{ user.phone }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium
+                        {% if user.is_active %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                        {% else %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% endif %}">
+                        {% if user.is_active %}Ativo{% else %}Inativo{% endif %}
+                    </span>
+                    {% if user.is_staff %}
+                    <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Staff
+                    </span>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                    <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100">
+                        <i class="fas fa-crown mr-1"></i>
+                        Superuser
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Informações Pessoais -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                    Informações Pessoais
+                </h3>
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Nome
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {{ user.first_name|default:"-" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Sobrenome
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {{ user.last_name|default:"-" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Email
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {{ user.email }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Telefone
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {{ user.phone|default:"-" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Status
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {{ user.status|default:"-" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Último Login
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                            {% if user.last_login %}
+                                {{ user.last_login|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Nunca fez login
+                            {% endif %}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Permissões e Roles -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                    Permissões do Sistema
+                </h3>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Status da Conta
+                        </dt>
+                        <dd class="mt-1">
+                            <div class="flex flex-wrap gap-2">
+                                {% if user.is_active %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                    Conta Ativa
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                    Conta Inativa
+                                </span>
+                                {% endif %}
+                                
+                                {% if user.is_staff %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                    Staff
+                                </span>
+                                {% endif %}
+                                
+                                {% if user.is_superuser %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100">
+                                    Superuser
+                                </span>
+                                {% endif %}
+                            </div>
+                        </dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Roles Atribuídas
+                        </dt>
+                        <dd class="mt-1">
+                            {% if user_roles %}
+                            <div class="space-y-2">
+                                {% for user_role in user_roles %}
+                                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ user_role.role.name }}
+                                        </span>
+                                        {% if user_role.account %}
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 block">
+                                            Conta: {{ user_role.account.name }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                        {% if user_role.is_active %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                        {% else %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% endif %}">
+                                        {% if user_role.is_active %}Ativo{% else %}Inativo{% endif %}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma role atribuída.</p>
+                            {% endif %}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memberships em Contas -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Memberships em Contas
+            </h3>
+            {% if memberships %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Conta
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Função
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Desde
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for membership in memberships %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <a href="{% url 'admin_panel:account_detail' membership.account.id %}" 
+                                       class="hover:text-blue-600 dark:hover:text-blue-400">
+                                        {{ membership.account.name }}
+                                    </a>
+                                </div>
+                                {% if membership.account.company_name %}
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ membership.account.company_name }}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if membership.role == 'owner' %}bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                                    {% elif membership.role == 'admin' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                    {% elif membership.role == 'manager' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% elif membership.role == 'editor' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {{ membership.get_role_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if membership.status == 'active' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% elif membership.status == 'suspended' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                                    {% else %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% endif %}">
+                                    {{ membership.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ membership.created_at|date:"d/m/Y H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500 dark:text-gray-400">Este usuário não possui memberships em nenhuma conta.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Convites Pendentes -->
+    {% if pending_invitations %}
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Convites Pendentes
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Conta
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Função
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Convidado por
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Data do Convite
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Expira em
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for invitation in pending_invitations %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ invitation.account.name }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                    {{ invitation.get_role_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                {{ invitation.invited_by.get_full_name|default:invitation.invited_by.email }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ invitation.created_at|date:"d/m/Y H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ invitation.expires_at|date:"d/m/Y H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ações -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Ações
+            </h3>
+            <div class="flex flex-wrap gap-3">
+                <button type="button" 
+                        onclick="toggleUserStatus({{ user.id }})"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white 
+                        {% if user.is_active %}bg-red-600 hover:bg-red-700 focus:ring-red-500
+                        {% else %}bg-green-600 hover:bg-green-700 focus:ring-green-500{% endif %} 
+                        focus:outline-none focus:ring-2 focus:ring-offset-2">
+                    <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %} mr-2"></i>
+                    {% if user.is_active %}Desativar Usuário{% else %}Ativar Usuário{% endif %}
+                </button>
+                
+                <a href="{% url 'admin_panel:users_list' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Voltar à Lista
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleUserStatus(userId) {
+    if (!confirm('Tem certeza que deseja alterar o status deste usuário?')) {
+        return;
+    }
+    
+    showSpinner();
+    
+    fetch(`/admin/users/${userId}/toggle-status/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            // Recarregar a página para atualizar os dados
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showToast(data.message || 'Erro ao alterar status do usuário', 'error');
+        }
+    })
+    .catch(error => {
+        hideSpinner();
+        console.error('Error:', error);
+        showToast('Erro ao alterar status do usuário', 'error');
+    });
+}
+</script>
+{% endblock %}

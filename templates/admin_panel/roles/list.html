@@ -1,0 +1,239 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Funções - Admin{% endblock %}
+{% block page_title %}Gerenciar Funções{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Funções</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Filtros -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="get" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+                <!-- Busca -->
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Buscar
+                    </label>
+                    <input type="text" 
+                           name="search" 
+                           id="search" 
+                           value="{{ search }}"
+                           placeholder="Nome da função, descrição..."
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex space-x-2">
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'admin_panel:roles_list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Funções -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    Funções ({{ page_obj.paginator.count }})
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for role in page_obj %}
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white">
+                            {{ role.name }}
+                        </h4>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if role.is_system %}bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                            {% else %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100{% endif %}">
+                            {% if role.is_system %}Sistema{% else %}Personalizada{% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if role.description %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        {{ role.description }}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Permissões:</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                                {{ role.permissions.count }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Usuários:</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                                {{ role.user_roles.count }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Criada em:</span>
+                            <span class="text-gray-500 dark:text-gray-400">
+                                {{ role.created_at|date:"d/m/Y" }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Permissões da Função -->
+                    {% if role.permissions.exists %}
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Permissões:</h5>
+                        <div class="flex flex-wrap gap-1">
+                            {% for permission in role.permissions.all|slice:":10" %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
+                                {{ permission.name }}
+                            </span>
+                            {% endfor %}
+                            {% if role.permissions.count > 10 %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-600 dark:bg-gray-500 dark:text-gray-300">
+                                +{{ role.permissions.count|add:"-10" }} mais
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Usuários com esta Função -->
+                    {% if role.user_roles.exists %}
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Usuários:</h5>
+                        <div class="flex -space-x-2">
+                            {% for user_role in role.user_roles.all|slice:":5" %}
+                            <div class="relative">
+                                {% if user_role.user.avatar %}
+                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-700" 
+                                     src="{{ user_role.user.avatar.url }}" 
+                                     alt="{{ user_role.user.get_full_name }}"
+                                     title="{{ user_role.user.get_full_name|default:user_role.user.email }}">
+                                {% else %}
+                                <div class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-700 bg-gray-300 dark:bg-gray-600 flex items-center justify-center"
+                                     title="{{ user_role.user.get_full_name|default:user_role.user.email }}">
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                        {{ user_role.user.first_name|first|upper }}{{ user_role.user.last_name|first|upper }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% if role.user_roles.count > 5 %}
+                            <div class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-700 bg-gray-100 dark:bg-gray-600 flex items-center justify-center">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                                    +{{ role.user_roles.count|add:"-5" }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-user-tag text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma função encontrada.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if page_obj.has_previous %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Anterior
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Próximo
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Mostrando
+                            <span class="font-medium">{{ page_obj.start_index }}</span>
+                            a
+                            <span class="font-medium">{{ page_obj.end_index }}</span>
+                            de
+                            <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                            resultados
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-300">
+                                    {{ num }}
+                                </span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?{% if search %}search={{ search }}&{% endif %}page={{ num }}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    {{ num }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

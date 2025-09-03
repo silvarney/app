@@ -1,0 +1,338 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ account.name }} - Configurações{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                <i class="fas fa-home w-4 h-4 mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
+                <a href="{% url 'user_panel:accounts_list' %}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
+                    Contas
+                </a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
+                <a href="{% url 'user_panel:account_detail' account.id %}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
+                    {{ account.name }}
+                </a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Configurações</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block page_title %}
+<div class="flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+        <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-cog text-indigo-600 text-xl"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Configurações da Conta</h1>
+            <p class="text-sm text-gray-500">{{ account.name }}</p>
+        </div>
+    </div>
+    
+    <a href="{% url 'user_panel:account_detail' account.id %}" 
+       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Voltar
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Informações Básicas -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                Informações Básicas
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            Nome da Conta *
+                        </label>
+                        <input type="text" name="name" id="name" value="{{ account.name }}" required
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="Digite o nome da conta">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Nome que será exibido para identificar esta conta.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="company_name" class="block text-sm font-medium text-gray-700">
+                            Nome da Empresa
+                        </label>
+                        <input type="text" name="company_name" id="company_name" value="{{ account.company_name|default:'' }}"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="Digite o nome da empresa">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Nome oficial da empresa (opcional).
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <a href="{% url 'user_panel:account_detail' account.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Informações da Conta -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                Informações da Conta
+            </h3>
+            
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">ID da Conta</dt>
+                    <dd class="mt-1 text-sm text-gray-900 font-mono">{{ account.id }}</dd>
+                </div>
+                
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Proprietário</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        <div class="flex items-center space-x-2">
+                            {% if account.owner.avatar %}
+                                <img class="w-6 h-6 rounded-full" src="{{ account.owner.avatar.url }}" alt="{{ account.owner.get_full_name }}">
+                            {% else %}
+                                <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-600 text-xs"></i>
+                                </div>
+                            {% endif %}
+                            <span>{{ account.owner.get_full_name|default:account.owner.email }}</span>
+                        </div>
+                    </dd>
+                </div>
+                
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Plano Atual</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ account.get_plan_display|default:"Básico" }}
+                        </span>
+                    </dd>
+                </div>
+                
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {% if account.is_active %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Ativa
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-times-circle mr-1"></i>
+                                Inativa
+                            </span>
+                        {% endif %}
+                    </dd>
+                </div>
+                
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Data de Criação</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ account.created_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Última Atualização</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ account.updated_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Configurações Avançadas -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                Configurações Avançadas
+            </h3>
+            
+            <div class="space-y-6">
+                <!-- Gerenciamento de Membros -->
+                <div class="flex items-start justify-between p-4 bg-blue-50 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-blue-900">
+                                Gerenciar Membros
+                            </h4>
+                            <p class="mt-1 text-sm text-blue-700">
+                                Convide novos membros, gerencie funções e permissões.
+                            </p>
+                        </div>
+                    </div>
+                    <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-cog mr-2"></i>
+                        Configurar
+                    </button>
+                </div>
+                
+                <!-- Planos e Faturamento -->
+                <div class="flex items-start justify-between p-4 bg-green-50 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-credit-card text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-green-900">
+                                Planos e Faturamento
+                            </h4>
+                            <p class="mt-1 text-sm text-green-700">
+                                Gerencie seu plano, métodos de pagamento e histórico de faturas.
+                            </p>
+                        </div>
+                    </div>
+                    <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Ver Planos
+                    </button>
+                </div>
+                
+                <!-- Integrações -->
+                <div class="flex items-start justify-between p-4 bg-purple-50 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-plug text-purple-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-purple-900">
+                                Integrações
+                            </h4>
+                            <p class="mt-1 text-sm text-purple-700">
+                                Configure integrações com serviços externos e APIs.
+                            </p>
+                        </div>
+                    </div>
+                    <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-cog mr-2"></i>
+                        Configurar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zona de Perigo -->
+    {% if account.owner == user %}
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    Zona de Perigo
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- Desativar Conta -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-pause-circle text-yellow-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-yellow-900">
+                                        Desativar Conta
+                                    </h4>
+                                    <p class="mt-1 text-sm text-yellow-700">
+                                        Desative temporariamente esta conta. Ela pode ser reativada posteriormente.
+                                    </p>
+                                </div>
+                            </div>
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                <i class="fas fa-pause mr-2"></i>
+                                Desativar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Excluir Conta -->
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-trash text-red-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-red-900">
+                                        Excluir Conta
+                                    </h4>
+                                    <p class="mt-1 text-sm text-red-700">
+                                        Exclua permanentemente esta conta e todos os dados associados. Esta ação não pode ser desfeita.
+                                    </p>
+                                </div>
+                            </div>
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                <i class="fas fa-trash mr-2"></i>
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block dashboard_js %}
+<script>
+// Validação do formulário
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const nameInput = document.getElementById('name');
+    
+    if (form && nameInput) {
+        form.addEventListener('submit', function(e) {
+            if (nameInput.value.trim().length < 2) {
+                e.preventDefault();
+                alert('O nome da conta deve ter pelo menos 2 caracteres.');
+                nameInput.focus();
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

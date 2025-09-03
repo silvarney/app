@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-gray-50" :class="{ 'dark': $store.theme.isDark }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Criar Novo Usuário</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .theme-btn {
+            @apply bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600;
+        }
+        .theme-btn.active {
+            @apply bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-200 border-primary-300 dark:border-primary-600;
+        }
+        
+        /* Loading spinner dark mode */
+        .dark #loading {
+            @apply bg-gray-900 bg-opacity-75;
+        }
+    </style>
+    
+    <!-- Custom CSS -->
+    
+<style>
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 2px;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    /* Active navigation item */
+    .nav-item-active {
+        background-color: #eff6ff;
+        border-right: 3px solid #2563eb;
+        color: #1d4ed8;
+    }
+    
+    /* Smooth transitions */
+    .nav-item {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .nav-item:hover {
+        background-color: #f8fafc;
+        transform: translateX(2px);
+    }
+</style>
+
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Plataforma SaaS moderna e responsiva">
+    <meta name="keywords" content="saas, plataforma, dashboard, multi-tenant">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased" x-data="{ sidebarOpen: false }">
+    <!-- Loading Spinner -->
+    <div id="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Toasts will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Main Content -->
+    <div class="min-h-full">
+        
+<div class="h-screen flex overflow-hidden bg-gray-100 dark:bg-gray-900" x-data="{ sidebarOpen: false }">
+    <!-- Mobile sidebar overlay -->
+    <div x-show="sidebarOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 flex z-40 md:hidden">
+        <div x-show="sidebarOpen"
+             x-transition:enter="transition ease-in-out duration-300 transform"
+             x-transition:enter-start="-translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in-out duration-300 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="-translate-x-full"
+             class="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
+            <!-- Close button -->
+            <div class="absolute top-0 right-0 -mr-12 pt-2">
+                <button @click="sidebarOpen = false" 
+                        class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <i class="fas fa-times text-white text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Sidebar content -->
+            <!-- Logo and brand -->
+<div class="flex items-center flex-shrink-0 px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-rocket text-white text-sm"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white">SaaS Platform</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Dashboard</p>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="flex-1 px-2 py-4 bg-white dark:bg-gray-800 overflow-y-auto sidebar-scroll">
+    <div class="space-y-1">
+        <!-- Dashboard Home -->
+        <a href="/admin/" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 ">
+            <i class="fas fa-home mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Dashboard
+        </a>
+
+        <!-- Analytics -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-chart-bar mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Analytics
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Gestão -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gestão</h3>
+        </div>
+
+        <!-- Users Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Usuários
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="/admin/users/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Lista de Usuários
+                </a>
+                <a href="/admin/users/create/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Adicionar Usuário
+                </a>
+                <a href="/admin/roles/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Funções e Permissões
+                </a>
+            </div>
+        </div>
+
+        <!-- Accounts Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-building mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Contas
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="/admin/accounts/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Lista de Contas
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Nova Conta
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Membros
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Management -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-file-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Conteúdo
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Financeiro -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Financeiro</h3>
+        </div>
+
+        <!-- Billing -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-credit-card mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Faturamento
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-receipt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Faturas
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-chart-line mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Relatórios
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Configurações
+                </a>
+            </div>
+        </div>
+
+        <!-- Subscriptions -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-crown mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Assinaturas
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Sistema -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sistema</h3>
+        </div>
+
+        <!-- Reports -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-chart-pie mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Relatórios
+        </a>
+
+        <!-- Settings -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Configurações
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Geral
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Segurança
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Notificações
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Aparência
+                </a>
+            </div>
+        </div>
+
+        <!-- Help & Support -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Ajuda
+        </a>
+    </div>
+</nav>
+
+<!-- Account switcher (if user has multiple accounts) -->
+
+
+<!-- Footer -->
+<div class="flex-shrink-0 border-t border-gray-200 p-4">
+    <div class="text-center">
+        <p class="text-xs text-gray-500">© 2024 SaaS Platform</p>
+        <p class="text-xs text-gray-400 mt-1">Versão 1.0.0</p>
+    </div>
+</div>
+        </div>
+        
+        <!-- Overlay -->
+        <div @click="sidebarOpen = false" class="flex-shrink-0 w-14"></div>
+    </div>
+
+    <!-- Desktop sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+        <div class="flex flex-col w-64">
+            <div class="flex flex-col h-0 flex-1 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+                <!-- Logo and brand -->
+<div class="flex items-center flex-shrink-0 px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-rocket text-white text-sm"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white">SaaS Platform</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Dashboard</p>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="flex-1 px-2 py-4 bg-white dark:bg-gray-800 overflow-y-auto sidebar-scroll">
+    <div class="space-y-1">
+        <!-- Dashboard Home -->
+        <a href="/admin/" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 ">
+            <i class="fas fa-home mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Dashboard
+        </a>
+
+        <!-- Analytics -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-chart-bar mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Analytics
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Gestão -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gestão</h3>
+        </div>
+
+        <!-- Users Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Usuários
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="/admin/users/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Lista de Usuários
+                </a>
+                <a href="/admin/users/create/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Adicionar Usuário
+                </a>
+                <a href="/admin/roles/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Funções e Permissões
+                </a>
+            </div>
+        </div>
+
+        <!-- Accounts Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-building mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Contas
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="/admin/accounts/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Lista de Contas
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Nova Conta
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Membros
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Management -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-file-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Conteúdo
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Financeiro -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Financeiro</h3>
+        </div>
+
+        <!-- Billing -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-credit-card mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Faturamento
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-receipt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Faturas
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-chart-line mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Relatórios
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Configurações
+                </a>
+            </div>
+        </div>
+
+        <!-- Subscriptions -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-crown mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Assinaturas
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Sistema -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sistema</h3>
+        </div>
+
+        <!-- Reports -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-chart-pie mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Relatórios
+        </a>
+
+        <!-- Settings -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Configurações
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Geral
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Segurança
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Notificações
+                </a>
+                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Aparência
+                </a>
+            </div>
+        </div>
+
+        <!-- Help & Support -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Ajuda
+        </a>
+    </div>
+</nav>
+
+<!-- Account switcher (if user has multiple accounts) -->
+
+
+<!-- Footer -->
+<div class="flex-shrink-0 border-t border-gray-200 p-4">
+    <div class="text-center">
+        <p class="text-xs text-gray-500">© 2024 SaaS Platform</p>
+        <p class="text-xs text-gray-400 mt-1">Versão 1.0.0</p>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+        <!-- Top navigation -->
+        <div class="relative z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow border-b border-gray-200 dark:border-gray-700">
+            <!-- Mobile menu button -->
+            <button @click="sidebarOpen = true" 
+                    class="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 md:hidden">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            
+            <!-- Breadcrumb and page title -->
+            <div class="flex-1 px-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <!-- Breadcrumb -->
+                    <nav class="hidden sm:flex" aria-label="Breadcrumb">
+                        <ol class="flex items-center space-x-2">
+                            
+    <li>
+        <a href="/admin/" class="text-gray-400 hover:text-gray-500 transition-colors">
+            <i class="fas fa-home"></i>
+        </a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <a href="/admin/users/" class="text-gray-400 hover:text-gray-500 transition-colors">Usuários</a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <span class="text-gray-500">Criar Novo Usuário</span>
+    </li>
+
+                        </ol>
+                    </nav>
+                    
+                    <!-- Page title -->
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white sm:hidden">
+                        Dashboard
+                    </h1>
+                </div>
+                
+                <!-- Top navigation actions -->
+                <div class="flex items-center space-x-4">
+                    
+                        <!-- Notifications -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" 
+                                    class="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full relative">
+                                <i class="fas fa-bell text-lg"></i>
+                                <!-- Notification badge -->
+                                <span class="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                            </button>
+                            
+                            <!-- Notifications dropdown -->
+                            <div x-show="open" 
+                                 @click.away="open = false"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                                <div class="py-1">
+                                    <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">Notificações</h3>
+                                    </div>
+                                    <div class="max-h-64 overflow-y-auto">
+                                        <!-- Notification items -->
+                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
+                                            <div class="flex items-start space-x-3">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-user text-blue-600 text-sm"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm text-gray-900 dark:text-white font-medium">Novo usuário cadastrado</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">João Silva se cadastrou na plataforma</p>
+                                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">2 minutos atrás</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+                                        <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">Ver todas as notificações</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    
+                    <!-- User menu -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                                
+                                    <span class="text-white text-sm font-medium">AU</span>
+                                
+                            </div>
+                            <div class="hidden sm:block text-left">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Admin User</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">admin@admin.com</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 dark:text-gray-500 text-xs"></i>
+                        </button>
+                        
+                        <!-- User dropdown -->
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                            <div class="py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-user mr-2"></i> Meu Perfil
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-cog mr-2"></i> Configurações
+                                </a>
+                                
+                                <!-- Theme Selector -->
+                                <div class="px-4 py-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                                            <i class="fas fa-palette mr-2"></i> Aparência
+                                        </span>
+                                    </div>
+                                    <div class="mt-2 flex items-center space-x-2">
+                                        <button onclick="setTheme('light')" 
+                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                data-theme="light"
+                                                title="Tema Claro">
+                                            <i class="fas fa-sun mr-1"></i> Claro
+                                        </button>
+                                        <button onclick="setTheme('dark')" 
+                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                data-theme="dark"
+                                                title="Tema Escuro">
+                                            <i class="fas fa-moon mr-1"></i> Escuro
+                                        </button>
+                                        <button onclick="setTheme('auto')" 
+                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                data-theme="auto"
+                                                title="Automático">
+                                            <i class="fas fa-adjust mr-1"></i> Auto
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-question-circle mr-2"></i> Ajuda
+                                </a>
+                                <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                                <a href="/logout/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <main class="flex-1 relative overflow-y-auto focus:outline-none">
+            <!-- Page header -->
+            
+                <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white hidden sm:block">
+                                Dashboard
+                            </h1>
+                            
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
+                                    Visão geral da sua conta e atividades recentes
+                                </p>
+                            
+                        </div>
+                        
+                        <!-- Page actions -->
+                        <div class="flex items-center space-x-3">
+                            
+                        </div>
+                    </div>
+                </div>
+            
+            
+            <!-- Page content -->
+            <div class="px-4 py-6 sm:px-6">
+                
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+         <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Criar Novo Usuário</h3>
+         </div>
+        <div class="px-4 py-5 sm:p-6">
+            
+
+            <form method="post" class="space-y-6">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="elahGEPMuU5WCEH0067jhmaso6kEhY7x2kj2paTfuB4GNq2svDLVrSgdE0C05s5M">
+                    
+                    <!-- Username -->
+                    <div>
+                        <label for="id_username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome de usuário *</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                               id="id_username" name="username" value="teste_erro_user_type" required>
+                        
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="id_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
+                        <input type="email" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                               id="id_email" name="email" value="teste_erro@example.com" required>
+                        
+                    </div>
+                        
+                    <!-- Name -->
+                    <div>
+                        <label for="id_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome completo *</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                               id="id_name" name="name" value="Usuario Teste Erro" required>
+                        
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div>
+                        <label for="id_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefone</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                               id="id_phone" name="phone" value="11999999999">
+                        
+                    </div>
+                    
+                    <!-- Status -->
+                    <div>
+                        <label for="id_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <select id="id_status" name="status" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="active" selected>Ativo</option>
+                            <option value="inactive" >Inativo</option>
+                            <option value="pending" >Pendente</option>
+                            <option value="suspended" >Suspenso</option>
+                        </select>
+                        
+                    </div>
+                </div>
+                
+                <!-- Password Section -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Senha</h4>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <!-- Password -->
+                        <div>
+                            <label for="id_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Nova senha *
+                            </label>
+                            <input type="password" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                                   id="id_password" name="password" required>
+                            
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Deixe em branco para gerar uma senha temporária</p>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div>
+                            <label for="id_confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Confirmar senha *
+                            </label>
+                            <input type="password" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                                   id="id_confirm_password" name="confirm_password" required>
+                            
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Confirme a nova senha</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Permissions Section -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Permissões e Tipo de Usuário</h4>
+                    <div class="space-y-6">
+                        <!-- Active User -->
+                        <div class="flex items-center">
+                            <input type="checkbox" id="id_is_active" name="is_active" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                            <label for="id_is_active" class="ml-2 block text-sm text-gray-900 dark:text-white">
+                                Usuário ativo
+                            </label>
+                        </div>
+                        
+                        
+                        <!-- User Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Tipo de Usuário</label>
+                            <div class="space-y-3">
+                                
+                                    <div class="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                        <input type="radio" id="id_user_type_0" name="user_type" value="" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 mt-1" >
+                                        <label for="id_user_type_0" class="ml-3 block text-sm cursor-pointer flex-1">
+                                            <span class="font-medium text-gray-900 dark:text-white">Usuário Comum</span>
+                                            
+                                        </label>
+                                    </div>
+                                
+                                    <div class="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                        <input type="radio" id="id_user_type_1" name="user_type" value="" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 mt-1" >
+                                        <label for="id_user_type_1" class="ml-3 block text-sm cursor-pointer flex-1">
+                                            <span class="font-medium text-gray-900 dark:text-white">Administrador</span>
+                                            
+                                        </label>
+                                    </div>
+                                
+                                    <div class="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                        <input type="radio" id="id_user_type_2" name="user_type" value="" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 mt-1" >
+                                        <label for="id_user_type_2" class="ml-3 block text-sm cursor-pointer flex-1">
+                                            <span class="font-medium text-gray-900 dark:text-white">Super Administrador</span>
+                                            
+                                        </label>
+                                    </div>
+                                
+                            </div>
+                            
+                                <div class="mt-2 text-sm text-red-600">
+                                    
+                                        Você deve selecionar um tipo de usuário.
+                                    
+                                </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Non-field errors -->
+                
+                
+                <!-- Form Actions -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div class="flex justify-end space-x-3">
+                        <a href="/admin/users/" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-times mr-2"></i> Cancelar
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                            <i class="fas fa-save mr-2"></i>
+                            Criar Usuário
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+    </div>
+    
+    <!-- Modals Container -->
+    <div id="modals-container">
+        
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Utility functions
+        window.utils = {
+            // Show loading spinner
+            showLoading: function() {
+                document.getElementById('loading').classList.remove('hidden');
+            },
+            
+            // Hide loading spinner
+            hideLoading: function() {
+                document.getElementById('loading').classList.add('hidden');
+            },
+            
+            // Show toast notification
+            showToast: function(message, type = 'info', duration = 5000) {
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                
+                const bgColor = {
+                    'success': 'bg-green-500',
+                    'error': 'bg-red-500',
+                    'warning': 'bg-yellow-500',
+                    'info': 'bg-blue-500'
+                }[type] || 'bg-blue-500';
+                
+                const icon = {
+                    'success': 'fas fa-check-circle',
+                    'error': 'fas fa-exclamation-circle',
+                    'warning': 'fas fa-exclamation-triangle',
+                    'info': 'fas fa-info-circle'
+                }[type] || 'fas fa-info-circle';
+                
+                toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 transform transition-all duration-300 translate-x-full opacity-0`;
+                toast.innerHTML = `
+                    <i class="${icon}"></i>
+                    <span class="flex-1">${message}</span>
+                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-full', 'opacity-0');
+                }, 100);
+                
+                // Auto remove
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            },
+            
+            // Format currency
+            formatCurrency: function(amount, currency = 'BRL') {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: currency
+                }).format(amount);
+            },
+            
+            // Format date
+            formatDate: function(date, options = {}) {
+                const defaultOptions = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                return new Date(date).toLocaleDateString('pt-BR', { ...defaultOptions, ...options });
+            },
+            
+            // Copy to clipboard
+            copyToClipboard: function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showToast('Copiado para a área de transferência!', 'success');
+                }).catch(() => {
+                    this.showToast('Erro ao copiar para a área de transferência', 'error');
+                });
+            },
+            
+            // Confirm dialog
+            confirm: function(message, callback) {
+                if (window.confirm(message)) {
+                    callback();
+                }
+            },
+            
+            // Debounce function
+            debounce: function(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+        
+        // Theme management
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            const isDark = theme === 'dark' || (theme === 'auto' && getSystemTheme() === 'dark');
+            
+            if (isDark) {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+            
+            // Update theme buttons
+            updateThemeButtons(theme);
+            
+            // Update Alpine.js store if available
+            if (window.Alpine && Alpine.store('theme')) {
+                Alpine.store('theme').current = theme;
+            }
+        }
+        
+        function updateThemeButtons(theme) {
+            // Wait for DOM to be ready
+            const updateButtons = () => {
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    const btnTheme = btn.getAttribute('data-theme');
+                    btn.classList.remove('active');
+                    if (btnTheme === theme) {
+                        btn.classList.add('active');
+                    }
+                });
+            };
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateButtons);
+            } else {
+                updateButtons();
+            }
+        }
+        
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
+            
+            // Update Alpine.js store if available
+            if (window.Alpine && Alpine.store('theme')) {
+                Alpine.store('theme').current = theme;
+            }
+        }
+        
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            applyTheme(savedTheme);
+        });
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            const currentTheme = localStorage.getItem('theme') || 'auto';
+            if (currentTheme === 'auto') {
+                applyTheme('auto');
+            }
+        });
+        
+        // Global Alpine.js data
+        document.addEventListener('alpine:init', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            
+            Alpine.store('theme', {
+                current: savedTheme,
+                
+                get isDark() {
+                    return this.current === 'dark' || (this.current === 'auto' && getSystemTheme() === 'dark');
+                },
+                
+                setTheme(theme) {
+                    this.current = theme;
+                    setTheme(theme);
+                }
+            });
+            
+            Alpine.store('app', {
+                sidebarOpen: false,
+                
+                toggleSidebar() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                }
+            });
+        });
+        
+        // Apply theme after Alpine is fully loaded
+        document.addEventListener('alpine:initialized', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            applyTheme(savedTheme);
+            
+            // Force update theme buttons after Alpine is ready
+            setTimeout(() => {
+                updateThemeButtons(savedTheme);
+            }, 50);
+        });
+        
+        // Handle CSRF token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Set CSRF token for all AJAX requests
+        const csrftoken = getCookie('csrftoken');
+        if (csrftoken) {
+            // For fetch API
+            window.csrfToken = csrftoken;
+            
+            // For jQuery if used
+            if (window.jQuery) {
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    
+    
+<script>
+    // Validação de senha em tempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        
+        function validatePasswords() {
+            if (password1 && password2 && password1.value && password2.value) {
+                if (password1.value !== password2.value) {
+                    password2.setCustomValidity('As senhas não coincidem');
+                    password2.classList.add('border-red-300', 'text-red-900', 'focus:ring-red-500', 'focus:border-red-500');
+                    password2.classList.remove('border-gray-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+                } else {
+                    password2.setCustomValidity('');
+                    password2.classList.remove('border-red-300', 'text-red-900', 'focus:ring-red-500', 'focus:border-red-500');
+                    password2.classList.add('border-gray-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+                }
+            }
+        }
+        
+        if (password1 && password2) {
+            password1.addEventListener('input', validatePasswords);
+            password2.addEventListener('input', validatePasswords);
+        }
+    });
+</script>
+
+</body>
+</html>

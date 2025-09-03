@@ -1,0 +1,376 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Contas - Admin{% endblock %}
+{% block page_title %}Gerenciar Contas{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Contas</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Filtros -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="get" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+                <!-- Busca -->
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Buscar
+                    </label>
+                    <input type="text" 
+                           name="search" 
+                           id="search" 
+                           value="{{ search }}"
+                           placeholder="Nome da conta, empresa, email do proprietário..."
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Status
+                    </label>
+                    <select name="status" 
+                            id="status"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="">Todos</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Plano -->
+                <div>
+                    <label for="plan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Plano
+                    </label>
+                    <select name="plan" 
+                            id="plan"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="">Todos</option>
+                        {% for value, label in plan_choices %}
+                        <option value="{{ value }}" {% if plan == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex space-x-2">
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'admin_panel:accounts_list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Contas -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    Contas ({{ page_obj.paginator.count }})
+                </h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Conta
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Proprietário
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Plano
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Membros
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Criada em
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for account in page_obj %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700" id="account-row-{{ account.id }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <a href="{% url 'admin_panel:account_detail' account.id %}" 
+                                       class="hover:text-blue-600 dark:hover:text-blue-400">
+                                        {{ account.name }}
+                                    </a>
+                                </div>
+                                {% if account.company_name %}
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ account.company_name }}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        {% if account.owner.avatar %}
+                                        <img class="h-8 w-8 rounded-full" src="{{ account.owner.avatar.url }}" alt="{{ account.owner.get_full_name }}">
+                                        {% else %}
+                                        <div class="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                {{ account.owner.first_name|first|upper }}{{ account.owner.last_name|first|upper }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <a href="{% url 'admin_panel:user_detail' account.owner.id %}" 
+                                               class="hover:text-blue-600 dark:hover:text-blue-400">
+                                                {{ account.owner.get_full_name|default:account.owner.email }}
+                                            </a>
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ account.owner.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if account.plan == 'free' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                    {% elif account.plan == 'basic' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                    {% elif account.plan == 'pro' %}bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                                    {% elif account.plan == 'enterprise' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {{ account.get_plan_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium account-status-badge
+                                    {% if account.status == 'active' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% elif account.status == 'trial' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                    {% elif account.status == 'suspended' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                                    {% elif account.status == 'cancelled' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {{ account.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ account.get_member_count }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ account.created_at|date:"d/m/Y H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex items-center space-x-2">
+                                    <a href="{% url 'admin_panel:account_detail' account.id %}" 
+                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                       title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" 
+                                                class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+                                                title="Alterar status">
+                                            <i class="fas fa-cog"></i>
+                                        </button>
+                                        <div x-show="open" 
+                                             @click.away="open = false"
+                                             x-transition:enter="transition ease-out duration-100"
+                                             x-transition:enter-start="transform opacity-0 scale-95"
+                                             x-transition:enter-end="transform opacity-100 scale-100"
+                                             x-transition:leave="transition ease-in duration-75"
+                                             x-transition:leave-start="transform opacity-100 scale-100"
+                                             x-transition:leave-end="transform opacity-0 scale-95"
+                                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-600">
+                                            <div class="py-1">
+                                                {% for value, label in status_choices %}
+                                                {% if value != account.status %}
+                                                <button onclick="changeAccountStatus({{ account.id }}, '{{ value }}')" 
+                                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                    Alterar para {{ label }}
+                                                </button>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Nenhuma conta encontrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if page_obj.has_previous %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if plan %}plan={{ plan }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Anterior
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if plan %}plan={{ plan }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Próximo
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Mostrando
+                            <span class="font-medium">{{ page_obj.start_index }}</span>
+                            a
+                            <span class="font-medium">{{ page_obj.end_index }}</span>
+                            de
+                            <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                            resultados
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if plan %}plan={{ plan }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-300">
+                                    {{ num }}
+                                </span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if plan %}plan={{ plan }}&{% endif %}page={{ num }}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    {{ num }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if plan %}plan={{ plan }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeAccountStatus(accountId, newStatus) {
+    if (!confirm('Tem certeza que deseja alterar o status desta conta?')) {
+        return;
+    }
+    
+    showSpinner();
+    
+    fetch(`/admin/accounts/${accountId}/toggle-status/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner();
+        
+        if (data.success) {
+            // Atualizar badge de status
+            const row = document.getElementById(`account-row-${accountId}`);
+            const badge = row.querySelector('.account-status-badge');
+            
+            // Remover classes antigas
+            badge.className = badge.className.replace(/bg-\w+-\d+/g, '').replace(/text-\w+-\d+/g, '');
+            
+            // Adicionar novas classes baseadas no status
+            let statusClasses = '';
+            switch(data.status) {
+                case 'active':
+                    statusClasses = 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+                    break;
+                case 'trial':
+                    statusClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100';
+                    break;
+                case 'suspended':
+                    statusClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100';
+                    break;
+                case 'cancelled':
+                    statusClasses = 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+                    break;
+                default:
+                    statusClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+            }
+            
+            badge.className += ' ' + statusClasses;
+            badge.textContent = data.status_display;
+            
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message || 'Erro ao alterar status da conta', 'error');
+        }
+    })
+    .catch(error => {
+        hideSpinner();
+        console.error('Error:', error);
+        showToast('Erro ao alterar status da conta', 'error');
+    });
+}
+</script>
+{% endblock %}

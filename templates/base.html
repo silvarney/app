@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-gray-50" :class="{ 'dark': $store.theme.isDark }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}SaaS Platform{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .theme-btn {
+            @apply bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600;
+        }
+        .theme-btn.active {
+            @apply bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-200 border-primary-300 dark:border-primary-600;
+        }
+        
+        /* Loading spinner dark mode */
+        .dark #loading {
+            @apply bg-gray-900 bg-opacity-75;
+        }
+    </style>
+    
+    <!-- Custom CSS -->
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Meta tags -->
+    <meta name="description" content="{% block description %}Plataforma SaaS moderna e responsiva{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}saas, plataforma, dashboard, multi-tenant{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased" x-data="{ sidebarOpen: false }">
+    <!-- Loading Spinner -->
+    <div id="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Toasts will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Main Content -->
+    <div class="min-h-full">
+        {% block content %}
+        <!-- Default content if no specific content is provided -->
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo à Plataforma SaaS</h1>
+                <p class="text-lg text-gray-600">Uma solução moderna e escalável para seu negócio</p>
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+    
+    <!-- Modals Container -->
+    <div id="modals-container">
+        {% block modals %}{% endblock %}
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Utility functions
+        window.utils = {
+            // Show loading spinner
+            showLoading: function() {
+                document.getElementById('loading').classList.remove('hidden');
+            },
+            
+            // Hide loading spinner
+            hideLoading: function() {
+                document.getElementById('loading').classList.add('hidden');
+            },
+            
+            // Show toast notification
+            showToast: function(message, type = 'info', duration = 5000) {
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                
+                const bgColor = {
+                    'success': 'bg-green-500',
+                    'error': 'bg-red-500',
+                    'warning': 'bg-yellow-500',
+                    'info': 'bg-blue-500'
+                }[type] || 'bg-blue-500';
+                
+                const icon = {
+                    'success': 'fas fa-check-circle',
+                    'error': 'fas fa-exclamation-circle',
+                    'warning': 'fas fa-exclamation-triangle',
+                    'info': 'fas fa-info-circle'
+                }[type] || 'fas fa-info-circle';
+                
+                toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 transform transition-all duration-300 translate-x-full opacity-0`;
+                toast.innerHTML = `
+                    <i class="${icon}"></i>
+                    <span class="flex-1">${message}</span>
+                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-full', 'opacity-0');
+                }, 100);
+                
+                // Auto remove
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            },
+            
+            // Format currency
+            formatCurrency: function(amount, currency = 'BRL') {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: currency
+                }).format(amount);
+            },
+            
+            // Format date
+            formatDate: function(date, options = {}) {
+                const defaultOptions = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                return new Date(date).toLocaleDateString('pt-BR', { ...defaultOptions, ...options });
+            },
+            
+            // Copy to clipboard
+            copyToClipboard: function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showToast('Copiado para a área de transferência!', 'success');
+                }).catch(() => {
+                    this.showToast('Erro ao copiar para a área de transferência', 'error');
+                });
+            },
+            
+            // Confirm dialog
+            confirm: function(message, callback) {
+                if (window.confirm(message)) {
+                    callback();
+                }
+            },
+            
+            // Debounce function
+            debounce: function(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+        
+        // Theme management
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            const isDark = theme === 'dark' || (theme === 'auto' && getSystemTheme() === 'dark');
+            
+            if (isDark) {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+            
+            // Update theme buttons
+            updateThemeButtons(theme);
+            
+            // Update Alpine.js store if available
+            if (window.Alpine && Alpine.store('theme')) {
+                Alpine.store('theme').current = theme;
+            }
+        }
+        
+        function updateThemeButtons(theme) {
+            // Wait for DOM to be ready
+            const updateButtons = () => {
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    const btnTheme = btn.getAttribute('data-theme');
+                    btn.classList.remove('active');
+                    if (btnTheme === theme) {
+                        btn.classList.add('active');
+                    }
+                });
+            };
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateButtons);
+            } else {
+                updateButtons();
+            }
+        }
+        
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
+            
+            // Update Alpine.js store if available
+            if (window.Alpine && Alpine.store('theme')) {
+                Alpine.store('theme').current = theme;
+            }
+        }
+        
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            applyTheme(savedTheme);
+        });
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            const currentTheme = localStorage.getItem('theme') || 'auto';
+            if (currentTheme === 'auto') {
+                applyTheme('auto');
+            }
+        });
+        
+        // Global Alpine.js data
+        document.addEventListener('alpine:init', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            
+            Alpine.store('theme', {
+                current: savedTheme,
+                
+                get isDark() {
+                    return this.current === 'dark' || (this.current === 'auto' && getSystemTheme() === 'dark');
+                },
+                
+                setTheme(theme) {
+                    this.current = theme;
+                    setTheme(theme);
+                }
+            });
+            
+            Alpine.store('app', {
+                sidebarOpen: false,
+                
+                toggleSidebar() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                }
+            });
+        });
+        
+        // Apply theme after Alpine is fully loaded
+        document.addEventListener('alpine:initialized', () => {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            applyTheme(savedTheme);
+            
+            // Force update theme buttons after Alpine is ready
+            setTimeout(() => {
+                updateThemeButtons(savedTheme);
+            }, 50);
+        });
+        
+        // Handle CSRF token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Set CSRF token for all AJAX requests
+        const csrftoken = getCookie('csrftoken');
+        if (csrftoken) {
+            // For fetch API
+            window.csrfToken = csrftoken;
+            
+            // For jQuery if used
+            if (window.jQuery) {
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

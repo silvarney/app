@@ -1,0 +1,291 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Permissões - Admin{% endblock %}
+{% block page_title %}Gerenciar Permissões{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Permissões</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Filtros -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="get" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+                <!-- Busca -->
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Buscar
+                    </label>
+                    <input type="text" 
+                           name="search" 
+                           id="search" 
+                           value="{{ search }}"
+                           placeholder="Nome da permissão, descrição, categoria..."
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                
+                <!-- Categoria -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Categoria
+                    </label>
+                    <select name="category" 
+                            id="category"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="">Todas</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex space-x-2">
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'admin_panel:permissions_list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Permissões por Categoria -->
+    {% regroup page_obj by category as permission_groups %}
+    {% for group in permission_groups %}
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-shield-alt mr-2 text-blue-500"></i>
+                    {{ group.grouper|title }} ({{ group.list|length }})
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for permission in group.list %}
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                {{ permission.name }}
+                            </h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                                {{ permission.codename }}
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                            {% if permission.category == 'users' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                            {% elif permission.category == 'accounts' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                            {% elif permission.category == 'members' %}bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                            {% elif permission.category == 'roles' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                            {% elif permission.category == 'permissions' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                            {% elif permission.category == 'dashboard' %}bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100
+                            {% elif permission.category == 'reports' %}bg-pink-100 text-pink-800 dark:bg-pink-800 dark:text-pink-100
+                            {% elif permission.category == 'settings' %}bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200
+                            {% elif permission.category == 'billing' %}bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100
+                            {% else %}bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200{% endif %}">
+                            {{ permission.category|title }}
+                        </span>
+                    </div>
+                    
+                    {% if permission.description %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {{ permission.description }}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="space-y-2">
+                        <!-- Funções que possuem esta permissão -->
+                        {% if permission.roles.exists %}
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Funções:</span>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                {% for role in permission.roles.all|slice:":3" %}
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-500">
+                                    {{ role.name }}
+                                </span>
+                                {% endfor %}
+                                {% if permission.roles.count > 3 %}
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-600 dark:bg-gray-500 dark:text-gray-300">
+                                    +{{ permission.roles.count|add:"-3" }} mais
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Usuários que possuem esta permissão diretamente -->
+                        {% if permission.user_permissions.exists %}
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Usuários diretos:</span>
+                            <div class="flex -space-x-1 mt-1">
+                                {% for user_perm in permission.user_permissions.all|slice:":5" %}
+                                <div class="relative">
+                                    {% if user_perm.user.avatar %}
+                                    <img class="h-6 w-6 rounded-full border border-white dark:border-gray-700" 
+                                         src="{{ user_perm.user.avatar.url }}" 
+                                         alt="{{ user_perm.user.get_full_name }}"
+                                         title="{{ user_perm.user.get_full_name|default:user_perm.user.email }}">
+                                    {% else %}
+                                    <div class="h-6 w-6 rounded-full border border-white dark:border-gray-700 bg-gray-300 dark:bg-gray-600 flex items-center justify-center"
+                                         title="{{ user_perm.user.get_full_name|default:user_perm.user.email }}">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                            {{ user_perm.user.first_name|first|upper }}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                {% if permission.user_permissions.count > 5 %}
+                                <div class="h-6 w-6 rounded-full border border-white dark:border-gray-700 bg-gray-100 dark:bg-gray-600 flex items-center justify-center">
+                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                                        +{{ permission.user_permissions.count|add:"-5" }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-600">
+                            <span>Criada em: {{ permission.created_at|date:"d/m/Y" }}</span>
+                            {% if permission.is_system %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100">
+                                Sistema
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6 text-center">
+            <i class="fas fa-shield-alt text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma permissão encontrada.</p>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Paginação -->
+    {% if page_obj.has_other_pages %}
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?{% if search %}search={{ search }}&{% endif %}{% if category %}category={{ category }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Anterior
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?{% if search %}search={{ search }}&{% endif %}{% if category %}category={{ category }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Próximo
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Mostrando
+                        <span class="font-medium">{{ page_obj.start_index }}</span>
+                        a
+                        <span class="font-medium">{{ page_obj.end_index }}</span>
+                        de
+                        <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                        resultados
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% if search %}search={{ search }}&{% endif %}{% if category %}category={{ category }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-300">
+                                {{ num }}
+                            </span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}{% if category %}category={{ category }}&{% endif %}page={{ num }}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                {{ num }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?{% if search %}search={{ search }}&{% endif %}{% if category %}category={{ category }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Estatísticas das Permissões -->
+<div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+            Estatísticas das Permissões
+        </h3>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ total_permissions }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Total de Permissões</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ categories|length }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Categorias</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ system_permissions }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Permissões do Sistema</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{{ custom_permissions }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Permissões Personalizadas</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

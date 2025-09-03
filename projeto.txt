@@ -1,0 +1,88 @@
+Esse é um projeto de saas que gerenciará conteudos que serão consumidos via api por sites desenvolvidos em Astro. 
+Os usuários poderam ter uma ou mais contas, assim como fazer parte de outras contas.
+Os usuários teram perfils e eles regras para acesso que podem ser personalizadas e em cada conta, ter um perfil com suas regras diferentes.
+
+Resumo Funcional do Sistema (Adaptação Python)
+1. Módulos Principais
+Usuários
+Cadastro, autenticação (JWT ou OAuth2), recuperação de senha
+Perfis: Administrador, Gerente, Membro
+Status: Ativo, Inativo, Bloqueado
+Gerenciamento de dados pessoais e permissões
+Contas
+Criação e administração de contas (empresas, organizações ou grupos)
+Vinculação de usuários a contas
+Perfis de acesso por conta
+Gerenciamento de dados da conta (nome, CNPJ, endereço, etc.)
+Permissões e Papéis
+Controle de acesso baseado em papéis (RBAC)
+Definição de permissões customizadas por módulo
+Políticas de acesso para cada funcionalidade
+Sistema de Domínios
+Endpoint para consulta de dados de domínio (ex: informações de empresa, status, etc.)
+Validação e resposta estruturada via API REST
+Gerenciamento de Usuários e Contas
+Listagem, filtro, busca e paginação de usuários e contas
+Edição, exclusão e bloqueio de usuários
+Associação/desassociação de usuários a contas
+Perfis de Acesso Personalizados
+Criação de perfis customizados por conta
+Atribuição de permissões específicas por perfil
+2. Funcionalidades Detalhadas
+Autenticação e Autorização
+Login/logout via API
+Middleware para proteção de rotas
+Refresh de tokens
+Recuperação de senha por e-mail
+Gerenciamento de Usuários
+Cadastro via API e painel administrativo
+Edição de dados e status
+Listagem com filtros avançados
+Vinculação/desvinculação a contas
+Gerenciamento de Contas
+Cadastro de novas contas
+Edição de dados cadastrais
+Listagem e busca
+Associação de usuários
+Permissões e Papéis
+CRUD de papéis (admin, gerente, membro, custom)
+CRUD de permissões (acesso, edição, exclusão, visualização)
+Atribuição de papéis e permissões a usuários
+API de Domínio
+Endpoint: /api/domain/<domain>/
+Retorna dados do domínio, status, informações cadastrais
+Validação de domínio e resposta padronizada
+Fluxo de Pagamento (Detalhado)
+Cadastro de métodos de pagamento (cartão, boleto, pix)
+Integração com gateway de pagamento (ex: Stripe, MercadoPago, Pagar.me)
+Criação de planos e assinaturas
+Cobrança recorrente e pontual
+Geração de faturas e recibos
+Notificações de pagamento (e-mail, painel)
+Controle de status de pagamento (pago, pendente, cancelado)
+Histórico de transações por usuário e conta
+Webhooks para atualização automática de status
+Painel administrativo para gestão de cobranças e inadimplência
+Perfis de Acesso
+Definição de perfis por conta
+Permissões customizadas por perfil
+Visualização e edição de perfis
+3. Estrutura Recomendada (Python/Django)
+accounts/: App para contas e perfis
+users/: App para usuários e autenticação
+permissions/: App para papéis e permissões
+domains/: App para consulta de domínios
+payments/: App para fluxo de pagamento e integração com gateways
+api/: Endpoints RESTful (Django REST Framework)
+admin/: Painel administrativo customizado
+tasks/: Tarefas assíncronas (Celery)
+4. Passo a Passo para Recriação
+Crie projeto Django e apps principais (users, accounts, permissions, domains, payments)
+Configure autenticação JWT/OAuth2
+Implemente modelos de usuário, conta, perfil, permissão, domínio e pagamento
+Implemente endpoints RESTful para todas as funcionalidades
+Configure integração com gateway de pagamento e webhooks
+Implemente painel administrativo para gestão de usuários, contas, permissões e pagamentos
+Implemente notificações (e-mail, painel)
+Implemente testes automatizados para cada módulo
+Documente a API e o fluxo de pagamento

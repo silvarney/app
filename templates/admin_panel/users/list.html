@@ -1,0 +1,385 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Usuários - Admin{% endblock %}
+{% block page_title %}Gerenciar Usuários{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Usuários</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Filtros -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="get" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+                <!-- Busca -->
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Buscar
+                    </label>
+                    <input type="text" 
+                           name="search" 
+                           id="search" 
+                           value="{{ search }}"
+                           placeholder="Nome, email..."
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Status
+                    </label>
+                    <select name="status" 
+                            id="status"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="">Todos</option>
+                        <option value="active" {% if status == 'active' %}selected{% endif %}>Ativo</option>
+                        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inativo</option>
+                    </select>
+                </div>
+                
+                <!-- Staff -->
+                <div>
+                    <label for="is_staff" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Staff
+                    </label>
+                    <select name="is_staff" 
+                            id="is_staff"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="">Todos</option>
+                        <option value="yes" {% if is_staff == 'yes' %}selected{% endif %}>Sim</option>
+                        <option value="no" {% if is_staff == 'no' %}selected{% endif %}>Não</option>
+                    </select>
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex space-x-2">
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'admin_panel:users_list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Usuários -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    Usuários ({{ page_obj.paginator.count }})
+                </h3>
+                <a href="{% url 'admin_panel:user_create' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-plus mr-2"></i>
+                    Novo Usuário
+                </a>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Usuário
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Email
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Staff
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Cadastro
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for user in page_obj %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700" id="user-row-{{ user.id }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        {% if user.avatar %}
+                                        <img class="h-10 w-10 rounded-full" src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+                                        {% else %}
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <a href="{% url 'admin_panel:user_detail' user.id %}" 
+                                               class="hover:text-blue-600 dark:hover:text-blue-400">
+                                                {{ user.get_full_name|default:"Sem nome" }}
+                                            </a>
+                                        </div>
+                                        {% if user.phone %}
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ user.phone }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-white">{{ user.email }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium user-status-badge
+                                    {% if user.is_active %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% else %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% endif %}">
+                                    {% if user.is_active %}Ativo{% else %}Inativo{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if user.is_staff %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                    <i class="fas fa-shield-alt mr-1"></i>
+                                    Staff
+                                </span>
+                                {% else %}
+                                <span class="text-sm text-gray-500 dark:text-gray-400">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ user.date_joined|date:"d/m/Y H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex items-center space-x-2">
+                                    <a href="{% url 'admin_panel:user_detail' user.id %}" 
+                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                       title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:user_edit' user.id %}" 
+                                       class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                                       title="Editar usuário">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            onclick="toggleUserStatus({{ user.id }})"
+                                            class="text-{% if user.is_active %}red{% else %}green{% endif %}-600 dark:text-{% if user.is_active %}red{% else %}green{% endif %}-400 hover:text-{% if user.is_active %}red{% else %}green{% endif %}-900 dark:hover:text-{% if user.is_active %}red{% else %}green{% endif %}-300"
+                                            title="{% if user.is_active %}Desativar{% else %}Ativar{% endif %} usuário">
+                                        <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
+                                    </button>
+                                    {% if not user.is_superuser %}
+                                    <button type="button" 
+                                            onclick="deleteUser({{ user.id }}, '{{ user.get_full_name|default:user.username }}')"
+                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                            title="Excluir usuário">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Nenhum usuário encontrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if page_obj.has_previous %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if is_staff %}is_staff={{ is_staff }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Anterior
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if is_staff %}is_staff={{ is_staff }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Próximo
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Mostrando
+                            <span class="font-medium">{{ page_obj.start_index }}</span>
+                            a
+                            <span class="font-medium">{{ page_obj.end_index }}</span>
+                            de
+                            <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                            resultados
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if is_staff %}is_staff={{ is_staff }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-300">
+                                    {{ num }}
+                                </span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if is_staff %}is_staff={{ is_staff }}&{% endif %}page={{ num }}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    {{ num }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if is_staff %}is_staff={{ is_staff }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleUserStatus(userId) {
+    if (!confirm('Tem certeza que deseja alterar o status deste usuário?')) {
+        return;
+    }
+    
+    showSpinner();
+    
+    fetch(`/admin/users/${userId}/toggle-status/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner();
+        
+        if (data.success) {
+            // Atualizar badge de status
+            const row = document.getElementById(`user-row-${userId}`);
+            const badge = row.querySelector('.user-status-badge');
+            const button = row.querySelector('button[onclick*="toggleUserStatus"]');
+            
+            if (data.is_active) {
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium user-status-badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+                badge.textContent = 'Ativo';
+                button.className = 'text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300';
+                button.title = 'Desativar usuário';
+                button.innerHTML = '<i class="fas fa-ban"></i>';
+            } else {
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium user-status-badge bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+                badge.textContent = 'Inativo';
+                button.className = 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300';
+                button.title = 'Ativar usuário';
+                button.innerHTML = '<i class="fas fa-check"></i>';
+            }
+            
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message || 'Erro ao alterar status do usuário', 'error');
+        }
+    })
+    .catch(error => {
+        hideSpinner();
+        console.error('Error:', error);
+        showToast('Erro ao alterar status do usuário', 'error');
+    });
+}
+
+function deleteUser(userId, userName) {
+    if (!confirm(`Tem certeza que deseja excluir o usuário "${userName}"?\n\nEsta ação não pode ser desfeita.`)) {
+        return;
+    }
+    
+    showSpinner();
+    
+    fetch(`/admin/users/${userId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner();
+        
+        if (data.success) {
+            // Remover linha da tabela
+            const row = document.getElementById(`user-row-${userId}`);
+            if (row) {
+                row.remove();
+            }
+            
+            showToast(data.message, 'success');
+            
+            // Recarregar página se não houver mais usuários na página atual
+            const tbody = document.querySelector('tbody');
+            const remainingRows = tbody.querySelectorAll('tr:not([style*="display: none"])');
+            if (remainingRows.length === 0) {
+                location.reload();
+            }
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        hideSpinner();
+        console.error('Error:', error);
+        showToast('Erro ao excluir usuário', 'error');
+    });
+}
+</script>
+{% endblock %}
