@@ -38,6 +38,9 @@ RUN chmod +x node_modules/.bin/* || true
 # Build Tailwind CSS com fallback
 RUN npm run build-css-prod || npx --yes tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
+# Create logs directory
+RUN mkdir -p /app/logs
+
 # Collect static files
 RUN python manage.py collectstatic --noinput
 

@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.db import connection
 
 def home_redirect(request):
     """Redireciona para o painel apropriado baseado no usuário"""
@@ -28,10 +30,21 @@ def home_redirect(request):
     else:
         return redirect('/login/')
 
+def health_check(request):
+    """Endpoint de health check para Docker"""
+    try:
+        # Testa conexão com o banco
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return JsonResponse({'status': 'healthy', 'database': 'ok'})
+    except Exception as e:
+        return JsonResponse({'status': 'unhealthy', 'error': str(e)}, status=500)
+
 from users.views import login_view, logout_view, profile_view, register_view, password_reset_view, password_reset_confirm_view
 
 urlpatterns = [
     path('', home_redirect, name='home'),
+    path('health/', health_check, name='health_check'),  # Health check para Docker
     path('django-admin/', admin.site.urls),  # Admin Django nativo
     path('login/', login_view, name='login'),         # Login direto
     path('logout/', logout_view, name='logout'),      # Logout direto
