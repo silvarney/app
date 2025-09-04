@@ -189,15 +189,11 @@ crontab -e
 ```
 saas/
 ├── Dockerfile                     # Imagem principal da aplicação
-├── docker-compose.yml            # Para desenvolvimento
-├── docker-compose.prod.yml       # Para produção
+├── docker-compose.yml            # Configuração dos serviços
 ├── requirements.txt              # Dependências Python
-├── entrypoint.sh                # Script de inicialização
-├── wait-for-it.sh               # Script para aguardar serviços
-├── .env.docker                  # Variáveis de ambiente
+├── entrypoint.sh                # Script de inicialização com verificações
+├── .env                         # Variáveis de ambiente
 ├── .env.example                 # Template de variáveis
-├── nginx/
-│   ├── nginx.conf              # Configuração principal do Nginx
 │   └── default.conf            # Configuração do servidor virtual
 └── README-Docker.md            # Este arquivo
 ```

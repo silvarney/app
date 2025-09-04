@@ -15,10 +15,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn saas_project.wsgi:application --bind 0.0.0.0:8000"
+    command: ["gunicorn", "saas_project.wsgi:application", "--bind", "0.0.0.0:8000"]
 
   postgres:
     image: postgres:15-alpine
