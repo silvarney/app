@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinatura Cancelada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Assinatura Cancelada</h1>
+    </div>
+    
+    <div class="content">
+        <p>Olá,</p>
+        
+        <p>Confirmamos o cancelamento da sua assinatura do plano <strong>{{ subscription.plan.name }}</strong> para a conta <strong>{{ account.name }}</strong>.</p>
+        
+        <div class="alert">
+            <strong>Importante:</strong> Sua assinatura permanecerá ativa até {{ subscription.current_period_end|date:"d/m/Y" }}. Após essa data, o acesso aos recursos premium será suspenso.
+        </div>
+        
+        <div class="details">
+            <h3>Detalhes da Assinatura:</h3>
+            <ul>
+                <li><strong>Plano:</strong> {{ subscription.plan.name }}</li>
+                <li><strong>Data de Cancelamento:</strong> {{ subscription.canceled_at|date:"d/m/Y H:i" }}</li>
+                <li><strong>Fim do Período Atual:</strong> {{ subscription.current_period_end|date:"d/m/Y" }}</li>
+                {% if subscription.ends_at %}
+                <li><strong>Data de Encerramento:</strong> {{ subscription.ends_at|date:"d/m/Y" }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <p>Se você mudou de ideia, pode reativar sua assinatura a qualquer momento antes da data de encerramento.</p>
+        
+        <p style="text-align: center;">
+            <a href="{{ site_url }}/user-panel/subscription/" class="btn">Gerenciar Assinatura</a>
+        </p>
+        
+        <p>Se você tiver alguma dúvida ou precisar de ajuda, não hesite em entrar em contato conosco.</p>
+        
+        <p>Obrigado por ter sido nosso cliente!</p>
+    </div>
+    
+    <div class="footer">
+        <p>Este é um email automático. Por favor, não responda a este email.</p>
+        <p>© {{ current_year }} {{ site_name }}. Todos os direitos reservados.</p>
+    </div>
+</body>
+</html>

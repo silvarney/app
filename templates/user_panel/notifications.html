@@ -1,0 +1,143 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Notificações{% endblock %}
+{% block page_title %}Notificações{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Notificações</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block user_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Suas Notificações
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Acompanhe as últimas atualizações e atividades.
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="markAllAsRead()" class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-check-double mr-2"></i>
+                        Marcar todas como lidas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Notificações -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            {% if notifications %}
+            <div class="space-y-4">
+                {% for notification in notifications %}
+                <div class="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <div class="flex-shrink-0">
+                        {% if notification.type == 'invite' %}
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                            <i class="fas fa-envelope text-blue-600 dark:text-blue-300"></i>
+                        </div>
+                        {% elif notification.type == 'role_change' %}
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-tag text-green-600 dark:text-green-300"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                            <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                                {{ notification.title }}
+                            </h4>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ notification.created_at|timesince }} atrás
+                            </span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                            {{ notification.message }}
+                        </p>
+                        {% if notification.action_url %}
+                        <div class="mt-2">
+                            <a href="{{ notification.action_url }}" class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
+                                Ver detalhes
+                                <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button onclick="markAsRead(this)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <i class="fas fa-bell-slash text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Nenhuma notificação
+                </h3>
+                <p class="text-gray-500 dark:text-gray-400">
+                    Você está em dia! Não há notificações pendentes.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function markAsRead(button) {
+    const notification = button.closest('.flex');
+    notification.style.opacity = '0.5';
+    setTimeout(() => {
+        notification.remove();
+    }, 300);
+}
+
+function markAllAsRead() {
+    const notifications = document.querySelectorAll('.space-y-4 > div');
+    notifications.forEach((notification, index) => {
+        setTimeout(() => {
+            notification.style.opacity = '0.5';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, index * 100);
+    });
+    
+    setTimeout(() => {
+        location.reload();
+    }, notifications.length * 100 + 500);
+}
+</script>
+{% endblock %}

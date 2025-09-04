@@ -284,9 +284,84 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Exclusão -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center">
+                <div class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900 mr-3">
+                    <i class="fas fa-exclamation-triangle text-orange-600 dark:text-orange-400"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Excluir Usuário</h3>
+            </div>
+            <button onclick="hideDeleteModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-4">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Tem certeza que deseja excluir o usuário <strong id="deleteUserName" class="text-gray-900 dark:text-white"></strong>?
+            </p>
+            
+            <!-- Seção de Transferência de Propriedade -->
+            <div id="transferSection" class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hidden">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mr-2"></i>
+                    <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Contas Associadas</span>
+                </div>
+                <p class="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                    Este usuário possui contas. Selecione o novo proprietário para cada conta:
+                </p>
+                <div id="accountsList" class="space-y-3">
+                    <!-- As contas serão inseridas aqui dinamicamente -->
+                </div>
+            </div>
+            
+            <!-- Seção de Confirmação de Senha -->
+            <div id="passwordSection" class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg hidden">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-lock text-red-600 dark:text-red-400 mr-2"></i>
+                    <span class="text-sm font-medium text-red-800 dark:text-red-200">Confirmação de Senha</span>
+                </div>
+                <p class="text-sm text-red-700 dark:text-red-300 mb-2">
+                    Digite sua senha para confirmar:
+                </p>
+                <input type="password" id="adminPassword" placeholder="Sua senha" 
+                       class="w-full px-3 py-2 text-sm border border-red-300 dark:border-red-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white mb-3">
+                <button id="confirmHardDeleteBtn" type="button" 
+                        class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                    <i class="fas fa-trash mr-2"></i>Confirmar Exclusão Permanente
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="flex gap-2 p-4 border-t border-gray-200 dark:border-gray-700">
+            <button id="softDeleteBtn" type="button" 
+                    class="flex-1 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors">
+                <i class="fas fa-archive mr-2"></i>Desativar
+            </button>
+            <button id="hardDeleteBtn" type="button" 
+                    class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                <i class="fas fa-trash mr-2"></i>Excluir
+            </button>
+            <button onclick="hideDeleteModal()" type="button" 
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">
+                Cancelar
+            </button>
+        </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+{{ block.super }}
 <script>
 function toggleUserStatus(userId) {
     if (!confirm('Tem certeza que deseja alterar o status deste usuário?')) {
@@ -339,11 +414,73 @@ function toggleUserStatus(userId) {
 }
 
 function deleteUser(userId, userName) {
-    if (!confirm(`Tem certeza que deseja excluir o usuário "${userName}"?\n\nEsta ação não pode ser desfeita.`)) {
-        return;
-    }
+    showDeleteModal(userId, userName);
+}
+
+function showDeleteModal(userId, userName) {
+    const modal = document.getElementById('deleteModal');
+    const userNameSpan = document.getElementById('deleteUserName');
+    const softDeleteBtn = document.getElementById('softDeleteBtn');
+    const hardDeleteBtn = document.getElementById('hardDeleteBtn');
+    const transferSection = document.getElementById('transferSection');
+    const passwordSection = document.getElementById('passwordSection');
+    
+    userNameSpan.textContent = userName;
+    
+    // Reset sections
+    transferSection.classList.add('hidden');
+    passwordSection.classList.add('hidden');
+    
+    // Verificar se usuário tem contas associadas
+    checkUserAccounts(userId).then(data => {
+        if (data && data.has_accounts) {
+            transferSection.classList.remove('hidden');
+            loadAccountUsers(data.available_users, data.accounts);
+        }
+    }).catch(error => {
+        console.error('Erro ao verificar contas:', error);
+    });
+    
+    // Configurar botões
+    softDeleteBtn.onclick = () => performSoftDelete(userId, userName);
+    hardDeleteBtn.onclick = () => showPasswordConfirmation(userId, userName);
+    
+    modal.classList.remove('hidden');
+}
+
+function hideDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    const passwordInput = document.getElementById('adminPassword');
+    const passwordSection = document.getElementById('passwordSection');
+    
+    modal.classList.add('hidden');
+    passwordInput.value = '';
+    passwordSection.classList.add('hidden');
+}
+
+function showPasswordConfirmation(userId, userName) {
+    const passwordSection = document.getElementById('passwordSection');
+    const confirmBtn = document.getElementById('confirmHardDeleteBtn');
+    const transferSection = document.getElementById('transferSection');
+    
+    // Para exclusão permanente, ocultar seção de transferência
+    // pois as contas serão excluídas junto com o usuário
+    transferSection.classList.add('hidden');
+    
+    passwordSection.classList.remove('hidden');
+    confirmBtn.onclick = () => performHardDelete(userId, userName);
+}
+
+function performSoftDelete(userId, userName) {
+    const transferUserId = document.getElementById('transferUser')?.value;
     
     showSpinner();
+    hideDeleteModal();
+    
+    const requestData = {
+        delete_type: 'soft',
+        transfer_to_user_id: transferUserId || null
+    };
     
     fetch(`/admin/users/${userId}/delete/`, {
         method: 'POST',
@@ -351,13 +488,62 @@ function deleteUser(userId, userName) {
             'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/json',
         },
+        body: JSON.stringify(requestData)
     })
     .then(response => response.json())
     .then(data => {
         hideSpinner();
         
         if (data.success) {
-            // Remover linha da tabela
+            const row = document.getElementById(`user-row-${userId}`);
+            if (row) {
+                row.style.opacity = '0.5';
+                row.querySelector('.user-status-badge').textContent = 'Deletado';
+                row.querySelector('.user-status-badge').className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium user-status-badge bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100';
+            }
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        hideSpinner();
+        console.error('Error:', error);
+        showToast('Erro ao excluir usuário', 'error');
+    });
+}
+
+function performHardDelete(userId, userName) {
+    const password = document.getElementById('adminPassword').value;
+    
+    if (!password) {
+        showToast('Digite sua senha para confirmar a exclusão permanente', 'error');
+        return;
+    }
+    
+    showSpinner();
+    hideDeleteModal();
+    
+    const requestData = {
+        delete_type: 'hard',
+        admin_password: password
+        // Para exclusão permanente, não enviamos account_transfers
+        // pois as contas serão excluídas junto com o usuário
+    };
+    
+    fetch(`/admin/users/${userId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner();
+        
+        if (data.success) {
             const row = document.getElementById(`user-row-${userId}`);
             if (row) {
                 row.remove();
@@ -379,6 +565,60 @@ function deleteUser(userId, userName) {
         hideSpinner();
         console.error('Error:', error);
         showToast('Erro ao excluir usuário', 'error');
+    });
+}
+
+function checkUserAccounts(userId) {
+    return fetch(`/admin/users/${userId}/check-accounts/`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.has_accounts) {
+            return {
+                has_accounts: true,
+                available_users: data.available_users,
+                accounts: data.accounts
+            };
+        }
+        return { has_accounts: false };
+    })
+    .catch(error => {
+        console.error('Erro ao verificar contas:', error);
+        return { has_accounts: false };
+    });
+}
+
+function loadAccountUsers(availableUsers, accounts) {
+    const accountsList = document.getElementById('accountsList');
+    accountsList.innerHTML = '';
+    
+    accounts.forEach((account, index) => {
+        const accountDiv = document.createElement('div');
+        accountDiv.className = 'p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md';
+        
+        accountDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${account.name}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Conta</span>
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">ID: ${account.id}</span>
+                    </div>
+                    <select id="transferUser_${account.id}" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" required>
+                        <option value="">Selecione o novo proprietário</option>
+                        ${availableUsers.map(user => {
+                            const prefix = user.is_same_account ? '★ ' : '';
+                            const suffix = user.is_same_account ? ' (mesma conta)' : '';
+                            return `<option value="${user.id}" ${user.is_same_account ? 'style="background-color: #dcfce7; color: #166534;"' : ''}>${prefix}${user.display_name} (${user.email})${suffix}</option>`;
+                        }).join('')}
+                    </select>
+                `;
+        
+        accountsList.appendChild(accountDiv);
     });
 }
 </script>

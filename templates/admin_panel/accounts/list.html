@@ -200,6 +200,11 @@
                                        title="Ver detalhes">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    <a href="{% url 'admin_panel:account_members' account.id %}" 
+                                       class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                       title="Gerenciar membros">
+                                        <i class="fas fa-user-friends"></i>
+                                    </a>
                                     <div class="relative" x-data="{ open: false }">
                                         <button @click="open = !open" 
                                                 class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"

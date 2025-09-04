@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gerenciamento de Contas{% endblock %}
+
+{% block extra_css %}
+<style>
+.account-card {
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    transition: all 0.3s;
+}
+
+.account-card:hover {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transform: translateY(-2px);
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #5a5c69;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.role-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.role-owner { background-color: #e74a3b; }
+.role-admin { background-color: #f39c12; }
+.role-manager { background-color: #3498db; }
+.role-member { background-color: #2ecc71; }
+.role-viewer { background-color: #95a5a6; }
+
+.status-active { color: #28a745; }
+.status-inactive { color: #6c757d; }
+.status-pending { color: #ffc107; }
+.status-suspended { color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% block account_content %}
+    {% endblock %}
+</div>
+{% endblock %}

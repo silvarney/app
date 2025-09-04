@@ -253,6 +253,7 @@
 {% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <style>
     /* Custom scrollbar for sidebar */
     .sidebar-scroll::-webkit-scrollbar {
@@ -293,6 +294,50 @@
 
 {% block extra_js %}
 <script>
+    // Spinner functions
+    window.showSpinner = function() {
+        // Remove existing spinner if any
+        const existingSpinner = document.querySelector('.loading-spinner');
+        if (existingSpinner) {
+            existingSpinner.remove();
+        }
+        
+        // Create spinner element
+        const spinner = document.createElement('div');
+        spinner.className = 'loading-spinner fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50';
+        spinner.innerHTML = `
+            <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span class="text-gray-700">Processando...</span>
+            </div>
+        `;
+        
+        document.body.appendChild(spinner);
+    };
+    
+    window.hideSpinner = function() {
+        const spinner = document.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+    };
+    
+    // Get CSRF cookie
+    window.getCookie = function(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    };
+
     // Dashboard utilities
     window.dashboard = {
         // Refresh page data
@@ -334,6 +379,73 @@
         }
     };
     
+    // Toast notification system
+    window.showToast = function(message, type = 'error') {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-4 right-4 z-50 max-w-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+        
+        // Set toast style based on type
+        if (type === 'error') {
+            toast.classList.add('bg-red-500', 'text-white');
+        } else if (type === 'success') {
+            toast.classList.add('bg-green-500', 'text-white');
+        } else if (type === 'warning') {
+            toast.classList.add('bg-yellow-500', 'text-white');
+        }
+        
+        // Toast content
+        toast.innerHTML = `
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-2"></i>
+                </div>
+                <div class="ml-2 flex-1">
+                    <p class="text-sm font-medium">${message}</p>
+                </div>
+                <div class="ml-4 flex-shrink-0">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    };
+    
+    // Permission validation for admin settings
+    window.validateAdminPermission = function(permission) {
+        // Check if user is staff (this should be set by Django template)
+        const isStaff = {{ user.is_staff|yesno:"true,false" }};
+        
+        return isStaff;
+    };
+    
     // Initialize dashboard
     document.addEventListener('DOMContentLoaded', function() {
         // Close mobile sidebar when clicking on nav items
@@ -346,12 +458,39 @@
             });
         });
         
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                Alpine.store('app').sidebarOpen = false;
+        // Validação dinâmica de permissão para links administrativos
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a[href]');
+            if (link && link.href) {
+                // URLs que requerem permissão administrativa
+                const adminUrls = [
+                    '/admin/settings/',
+                    '/admin/users/',
+                    '/admin/roles/',
+                    '/admin/permissions/',
+                    '/admin/accounts/create',
+                    '/admin/analytics/',
+                    '/admin/system/'
+                ];
+                
+                // Verifica se a URL do link requer permissão administrativa
+                const requiresPermission = adminUrls.some(adminUrl => 
+                    link.href.includes(adminUrl)
+                );
+                
+                if (requiresPermission && !validateAdminPermission()) {
+                    e.preventDefault();
+                    showToast('O usuário não tem permissão para acessar essa página.', 'error');
+                }
             }
         });
-    });
+        
+        // Handle window resize
+         window.addEventListener('resize', function() {
+             if (window.innerWidth >= 768) {
+                 Alpine.store('app').sidebarOpen = false;
+             }
+         });
+     });
 </script>
 {% endblock %}

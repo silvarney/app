@@ -28,16 +28,26 @@ def home_redirect(request):
     else:
         return redirect('/login/')
 
-from users.views import login_view, logout_view, profile_view
+from users.views import login_view, logout_view, profile_view, register_view, password_reset_view, password_reset_confirm_view
 
 urlpatterns = [
     path('', home_redirect, name='home'),
     path('django-admin/', admin.site.urls),  # Admin Django nativo
     path('login/', login_view, name='login'),         # Login direto
     path('logout/', logout_view, name='logout'),      # Logout direto
+    path('register/', register_view, name='register'), # Registro direto
+    path('password-reset/', password_reset_view, name='password_reset'), # Recuperação de senha
+    path('password-reset-confirm/<uidb64>/<token>/', password_reset_confirm_view, name='password_reset_confirm'), # Confirmação de recuperação
     path('profile/', profile_view, name='profile'),   # Profile direto
     path('auth/', include('users.urls')),             # Autenticação (manter compatibilidade)
     path('accounts/', include('allauth.urls')),       # Django Allauth URLs
-    path('admin/', include('admin_panel.urls')),      # Painel Admin customizado
-    path('app/', include('user_panel.urls')),         # Painel Usuários
+    path('admin-panel/', include('admin_panel.urls')),  # Painel Admin customizado
+    path('user-panel/', include('user_panel.urls')),  # Painel Usuários
+    path('uploads/', include('uploads.urls')),        # Sistema de Upload
+    path('api/', include('api.urls')),                # API REST
+    path('api/settings/', include('settings.urls')),  # Configurações API
+    path('payments/', include('payments.urls')),      # Pagamentos
+    path('accounts-management/', include('accounts.urls')),  # Gerenciamento de Contas
+    path('sites/', include('site_management.urls')),  # Gerenciamento de Sites
+    path('admin-panel/sites/', include('site_management.urls')),  # Gerenciamento de Sites (Admin)
 ]

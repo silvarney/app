@@ -1,0 +1,189 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Log de Atividades{% endblock %}
+{% block page_title %}Log de Atividades{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Atividades</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block user_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Suas Atividades
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Histórico das suas ações e participações no sistema.
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'user_panel:export_data' %}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-download mr-2"></i>
+                        Exportar Dados
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline de Atividades -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            {% if activities %}
+            <div class="flow-root">
+                <ul class="-mb-8">
+                    {% for activity in activities %}
+                    <li>
+                        <div class="relative pb-8">
+                            {% if not forloop.last %}
+                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600" aria-hidden="true"></span>
+                            {% endif %}
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800
+                                        {% if activity.color == 'green' %}bg-green-500
+                                        {% elif activity.color == 'blue' %}bg-blue-500
+                                        {% elif activity.color == 'yellow' %}bg-yellow-500
+                                        {% elif activity.color == 'red' %}bg-red-500
+                                        {% else %}bg-gray-500
+                                        {% endif %}">
+                                        <i class="{{ activity.icon }} text-white text-sm"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ activity.title }}
+                                        </p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ activity.description }}
+                                        </p>
+                                    </div>
+                                    <div class="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                                        <time datetime="{{ activity.timestamp|date:'c' }}">
+                                            {{ activity.timestamp|date:'d/m/Y H:i' }}
+                                        </time>
+                                        <div class="text-xs text-gray-400 dark:text-gray-500">
+                                            {{ activity.timestamp|timesince }} atrás
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <i class="fas fa-history text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Nenhuma atividade registrada
+                </h3>
+                <p class="text-gray-500 dark:text-gray-400">
+                    Suas atividades aparecerão aqui conforme você usar o sistema.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Estatísticas Rápidas -->
+    {% if activities %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-plus-circle text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Contas Criadas
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ activities|length }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-user-plus text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Participações
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ activities|length }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-clock text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Última Atividade
+                            </dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                                {% if activities %}
+                                {{ activities.0.timestamp|timesince }} atrás
+                                {% else %}
+                                Nunca
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}System Health - Admin{% endblock %}
+{% block page_title %}Saúde do Sistema{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">System Health</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Status Geral -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+                {% if health_issues %}
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Sistema com Alertas
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ health_issues|length }} problema{{ health_issues|length|pluralize }} encontrado{{ health_issues|length|pluralize }}.
+                    </p>
+                </div>
+                {% else %}
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Sistema Saudável
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Nenhum problema crítico detectado.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Verificações de Saúde -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Usuários Órfãos -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if orphaned_users > 0 %}
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Usuários Órfãos
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ orphaned_users }} usuário{{ orphaned_users|pluralize }} sem conta
+                        </p>
+                    </div>
+                </div>
+                {% if orphaned_users > 0 %}
+                <div class="mt-3">
+                    <p class="text-sm text-yellow-600 dark:text-yellow-400">
+                        Usuários que não pertencem a nenhuma conta podem indicar problemas de sincronização.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contas Vazias -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if empty_accounts > 0 %}
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Contas Vazias
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ empty_accounts }} conta{{ empty_accounts|pluralize }} sem membros
+                        </p>
+                    </div>
+                </div>
+                {% if empty_accounts > 0 %}
+                <div class="mt-3">
+                    <p class="text-sm text-yellow-600 dark:text-yellow-400">
+                        Contas sem membros podem ser removidas para limpeza.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Convites Antigos -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if old_invitations > 0 %}
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Convites Antigos
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ old_invitations }} convite{{ old_invitations|pluralize }} > 30 dias
+                        </p>
+                    </div>
+                </div>
+                {% if old_invitations > 0 %}
+                <div class="mt-3">
+                    <p class="text-sm text-yellow-600 dark:text-yellow-400">
+                        Convites antigos podem ser removidos para limpeza.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Usuários Inativos -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if inactive_users > 0 %}
+                        <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Usuários Inativos
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ inactive_users }} usuário{{ inactive_users|pluralize }} > 90 dias
+                        </p>
+                    </div>
+                </div>
+                {% if inactive_users > 0 %}
+                <div class="mt-3">
+                    <p class="text-sm text-blue-600 dark:text-blue-400">
+                        Usuários inativos há mais de 90 dias.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contas Suspensas -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if suspended_accounts > 0 %}
+                        <i class="fas fa-ban text-red-400 text-xl"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Contas Suspensas
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ suspended_accounts }} conta{{ suspended_accounts|pluralize }} suspensa{{ suspended_accounts|pluralize }}
+                        </p>
+                    </div>
+                </div>
+                {% if suspended_accounts > 0 %}
+                <div class="mt-3">
+                    <p class="text-sm text-red-600 dark:text-red-400">
+                        Contas suspensas requerem atenção.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Database Size -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-database text-gray-400 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            Banco de Dados
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Status: Operacional
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Conexão ativa e funcionando normalmente.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhes dos Problemas -->
+    {% if health_issues %}
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Detalhes dos Problemas
+            </h3>
+            <div class="space-y-4">
+                {% for issue in health_issues %}
+                <div class="border-l-4 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                {{ issue.title }}
+                            </h4>
+                            <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                                {{ issue.description }}
+                            </p>
+                            {% if issue.action %}
+                            <p class="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
+                                <strong>Ação recomendada:</strong> {{ issue.action }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ações de Manutenção -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Ações de Manutenção
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <a href="{% url 'admin_panel:export_users' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-download mr-2"></i>
+                    Exportar Usuários
+                </a>
+                <a href="{% url 'admin_panel:export_accounts' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-download mr-2"></i>
+                    Exportar Contas
+                </a>
+                <button onclick="location.reload()" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Atualizar Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

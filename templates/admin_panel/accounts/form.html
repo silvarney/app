@@ -1,0 +1,177 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_name %}{{ title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li>
+        <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-400 hover:text-gray-500 transition-colors">
+            <i class="fas fa-home"></i>
+        </a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <a href="{% url 'admin_panel:accounts_list' %}" class="text-gray-400 hover:text-gray-500 transition-colors">Contas</a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <span class="text-gray-500">{{ title }}</span>
+    </li>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Messages -->
+{% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+                <div class="flex items-center">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Form Card -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+        <p class="mt-1 text-sm text-gray-600">Preencha as informações da conta</p>
+    </div>
+    
+    <form method="post" class="px-6 py-6">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <!-- Nome -->
+            <div>
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nome *
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Email -->
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Email *
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.email.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- CNPJ -->
+            <div>
+                <label for="{{ form.cnpj.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    CNPJ
+                </label>
+                {{ form.cnpj }}
+                {% if form.cnpj.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.cnpj.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- CPF -->
+            <div>
+                <label for="{{ form.cpf.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    CPF
+                </label>
+                {{ form.cpf }}
+                {% if form.cpf.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.cpf.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Telefone -->
+            <div>
+                <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Telefone
+                </label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.phone.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Endereço -->
+            <div>
+                <label for="{{ form.address_line1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Endereço
+                </label>
+                {{ form.address_line1 }}
+                {% if form.address_line1.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.address_line1.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Proprietário -->
+            <div>
+                <label for="{{ form.owner.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Proprietário *
+                </label>
+                {{ form.owner }}
+                {% if form.owner.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.owner.help_text }}</p>
+                {% endif %}
+                {% if form.owner.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.owner.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200">
+            <a href="{% url 'admin_panel:accounts_list' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                {{ submit_text|default:"Salvar" }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control {
+        @apply mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+    }
+    
+    .form-check-input {
+        @apply h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded;
+    }
+</style>
+{% endblock %}

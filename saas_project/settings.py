@@ -61,10 +61,14 @@ INSTALLED_APPS = [
     'permissions',
     'domains',
     'payments',
+    'content',
+    'uploads',
     'api',
     'admin_panel',
     'user_panel',
     'tasks',
+    'settings',
+    'site_management',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'permissions.middleware.PermissionDeniedMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -166,6 +171,7 @@ AUTH_USER_MODEL = 'users.User'
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [

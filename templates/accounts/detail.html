@@ -1,0 +1,251 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ account.name }} - Detalhes{% endblock %}
+
+{% block account_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'accounts:list' %}">Contas</a></li>
+                <li class="breadcrumb-item active">{{ account.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0 text-gray-800">{{ account.name }}</h1>
+    </div>
+    
+    {% if can_manage %}
+        <div class="btn-group" role="group">
+            <a href="{% url 'accounts:edit' account.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i> Editar Conta
+            </a>
+            <a href="{% url 'accounts:invite_member' account.id %}" class="btn btn-sm btn-success">
+                <i class="fas fa-user-plus"></i> Convidar Membro
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <!-- Informações da Conta -->
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informações da Conta</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Nome:</label>
+                            <p class="mb-1">{{ account.name }}</p>
+                        </div>
+                        
+                        {% if account.company_name %}
+                            <div class="mb-3">
+                                <label class="font-weight-bold text-gray-600">Empresa:</label>
+                                <p class="mb-1">{{ account.company_name }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Plano:</label>
+                            <p class="mb-1">
+                                <span class="badge badge-info">{{ account.get_plan_display }}</span>
+                            </p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Status:</label>
+                            <p class="mb-1">
+                                <span class="badge badge-{{ account.status }}">{{ account.get_status_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Proprietário:</label>
+                            <p class="mb-1">{{ account.owner.get_full_name|default:account.owner.username }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Criada em:</label>
+                            <p class="mb-1">{{ account.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-gray-600">Membros:</label>
+                            <p class="mb-1">{{ account.current_users_count }}/{{ account.max_users }}</p>
+                        </div>
+                        
+                        {% if account.website %}
+                            <div class="mb-3">
+                                <label class="font-weight-bold text-gray-600">Website:</label>
+                                <p class="mb-1">
+                                    <a href="{{ account.website }}" target="_blank">{{ account.website }}</a>
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if account.description %}
+                    <div class="mt-3">
+                        <label class="font-weight-bold text-gray-600">Descrição:</label>
+                        <p class="mb-1">{{ account.description }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estatísticas -->
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Estatísticas</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <div class="h4 font-weight-bold text-primary">{{ members.count }}</div>
+                        <div class="text-gray-600">Membros Ativos</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="h4 font-weight-bold text-success">{{ account.max_storage_gb }}GB</div>
+                        <div class="text-gray-600">Armazenamento</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="h4 font-weight-bold text-info">{{ account.max_domains }}</div>
+                        <div class="text-gray-600">Domínios</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Membros -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Membros da Conta</h6>
+        {% if can_manage %}
+            <a href="{% url 'accounts:invite_member' account.id %}" class="btn btn-sm btn-success">
+                <i class="fas fa-user-plus"></i> Convidar Membro
+            </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if members %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Membro</th>
+                            <th>Função</th>
+                            <th>Status</th>
+                            <th>Entrou em</th>
+                            <th>Permissões</th>
+                            {% if can_manage %}<th>Ações</th>{% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="member-avatar mr-3">
+                                            {{ member.user.first_name|first|default:member.user.username|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="font-weight-bold">{{ member.user.get_full_name|default:member.user.username }}</div>
+                                            <div class="text-muted small">{{ member.user.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge role-{{ member.role }}">{{ member.get_role_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="status-{{ member.status }}">{{ member.get_status_display }}</span>
+                                </td>
+                                <td>{{ member.joined_at|date:"d/m/Y"|default:"-" }}</td>
+                                <td>
+                                    <div class="small">
+                                        {% if member.can_invite_users %}<span class="badge badge-secondary mr-1">Convidar</span>{% endif %}
+                                        {% if member.can_manage_billing %}<span class="badge badge-secondary mr-1">Cobrança</span>{% endif %}
+                                        {% if member.can_manage_settings %}<span class="badge badge-secondary mr-1">Configurações</span>{% endif %}
+                                        {% if member.can_view_analytics %}<span class="badge badge-secondary mr-1">Análises</span>{% endif %}
+                                    </div>
+                                </td>
+                                {% if can_manage %}
+                                    <td>
+                                        {% if not member.is_owner %}
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'accounts:edit_member' account.id member.id %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                {% if member.user != request.user %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="confirmRemoveMember('{{ member.user.get_full_name|default:member.user.username }}', '{% url 'accounts:remove_member' account.id member.id %}')">
+                                                        <i class="fas fa-user-times"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small">Proprietário</span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-2x text-gray-300 mb-3"></i>
+                <p class="text-gray-500">Nenhum membro encontrado.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Remoção de Membro -->
+<div class="modal fade" id="removeMemberModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Remoção</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja remover <strong id="memberName"></strong> da conta?</p>
+                <p class="text-warning small">O membro perderá acesso a todos os recursos da conta.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <form id="removeMemberForm" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remover Membro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmRemoveMember(memberName, removeUrl) {
+    document.getElementById('memberName').textContent = memberName;
+    document.getElementById('removeMemberForm').action = removeUrl;
+    $('#removeMemberModal').modal('show');
+}
+</script>
+{% endblock %}

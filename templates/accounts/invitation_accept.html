@@ -1,0 +1,186 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Aceitar Convite - {{ invitation.account.name }}{% endblock %}
+
+{% block account_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3 text-center">
+                <h4 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-envelope-open"></i> Convite para Conta
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="account-avatar large mx-auto mb-3">
+                        {{ invitation.account.name|first|upper }}
+                    </div>
+                    <h3 class="mb-2">{{ invitation.account.name }}</h3>
+                    {% if invitation.account.company_name %}
+                        <p class="text-gray-600 mb-0">{{ invitation.account.company_name }}</p>
+                    {% endif %}
+                </div>
+                
+                <hr>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <i class="fas fa-user-tie fa-2x text-primary mb-2"></i>
+                            <h6 class="font-weight-bold">Convidado por</h6>
+                            <p class="text-gray-600 mb-0">
+                                {{ invitation.invited_by.get_full_name|default:invitation.invited_by.username }}
+                            </p>
+                            <small class="text-gray-500">{{ invitation.invited_by.email }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <i class="fas fa-user-tag fa-2x text-success mb-2"></i>
+                            <h6 class="font-weight-bold">Sua Função</h6>
+                            <p class="mb-0">
+                                {% if invitation.role == 'owner' %}
+                                    <span class="badge badge-danger badge-lg">Proprietário</span>
+                                {% elif invitation.role == 'admin' %}
+                                    <span class="badge badge-warning badge-lg">Administrador</span>
+                                {% elif invitation.role == 'editor' %}
+                                    <span class="badge badge-info badge-lg">Editor</span>
+                                {% else %}
+                                    <span class="badge badge-secondary badge-lg">Visualizador</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if invitation.message %}
+                    <div class="alert alert-light border">
+                        <h6 class="font-weight-bold mb-2">
+                            <i class="fas fa-comment"></i> Mensagem do Convite
+                        </h6>
+                        <p class="mb-0 text-gray-700">{{ invitation.message }}</p>
+                    </div>
+                {% endif %}
+                
+                <div class="bg-light p-3 rounded mb-4">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="small text-gray-600">
+                                <strong>Plano da Conta</strong><br>
+                                {{ invitation.account.get_plan_display }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="small text-gray-600">
+                                <strong>Membros Atuais</strong><br>
+                                {{ invitation.account.members.count }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="small text-gray-600">
+                                <strong>Criada em</strong><br>
+                                {{ invitation.account.created_at|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Ao aceitar este convite:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Você se tornará membro da conta <strong>{{ invitation.account.name }}</strong></li>
+                        <li>Terá acesso às funcionalidades conforme sua função: <strong>{{ invitation.get_role_display }}</strong></li>
+                        <li>Poderá colaborar com outros membros da equipe</li>
+                        <li>Receberá notificações relacionadas à conta</li>
+                    </ul>
+                </div>
+                
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    
+                    <div class="form-group mt-4">
+                        <button type="submit" name="action" value="accept" class="btn btn-success btn-lg mr-3">
+                            <i class="fas fa-check"></i> Aceitar Convite
+                        </button>
+                        
+                        <button type="submit" name="action" value="decline" class="btn btn-outline-danger btn-lg"
+                                onclick="return confirm('Tem certeza que deseja recusar este convite?')">
+                            <i class="fas fa-times"></i> Recusar
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <small class="text-gray-500">
+                        Convite enviado em {{ invitation.created_at|date:"d/m/Y H:i" }}
+                        {% if invitation.expires_at %}
+                            • Expira em {{ invitation.expires_at|date:"d/m/Y H:i" }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Níveis de Acesso</h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-gray-600">
+                    <div class="mb-3">
+                        <span class="badge badge-danger mb-1">Proprietário</span>
+                        <p class="mb-0">Acesso total à conta, incluindo exclusão e transferência de propriedade.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-warning mb-1">Administrador</span>
+                        <p class="mb-0">Pode gerenciar membros, configurações e a maioria das funcionalidades.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-info mb-1">Editor</span>
+                        <p class="mb-0">Pode editar conteúdo e acessar funcionalidades principais.</p>
+                    </div>
+                    
+                    <div>
+                        <span class="badge badge-secondary mb-1">Visualizador</span>
+                        <p class="mb-0">Acesso somente leitura às informações da conta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Precisa de Ajuda?</h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-gray-600">
+                    <p>Se você não conhece a pessoa que enviou este convite ou suspeita que seja spam, recomendamos que recuse o convite.</p>
+                    
+                    <p class="mb-0">Para dúvidas sobre funcionalidades ou permissões, entre em contato com o suporte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge-lg {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.account-avatar.large {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+    line-height: 80px;
+}
+</style>
+{% endblock %}

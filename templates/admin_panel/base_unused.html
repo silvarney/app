@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% block admin_title %}Admin Panel{% endblock %} - SaaS Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0" 
+         :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
+        
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+            <div class="flex items-center">
+                <div class="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                    <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="ml-2 text-lg font-semibold text-gray-900">Admin</span>
+            </div>
+            <button @click="sidebarOpen = false" class="lg:hidden text-gray-500 hover:text-gray-700">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="mt-6 px-3">
+            <div class="space-y-1">
+                <!-- Dashboard -->
+                <a href="{% url 'admin_panel:dashboard' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if request.resolver_match.url_name == 'dashboard' %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if request.resolver_match.url_name == 'dashboard' %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+                    </svg>
+                    Dashboard
+                </a>
+                
+                <!-- Accounts -->
+                <a href="{% url 'admin_panel:accounts_list' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'accounts' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'accounts' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Contas
+                </a>
+                
+                <!-- Users -->
+                <a href="{% url 'admin_panel:users' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'users' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'users' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                    </svg>
+                    Usuários
+                </a>
+                
+                <!-- Permissions -->
+                <a href="{% url 'admin_panel:permissions' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'permissions' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'permissions' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Permissões
+                </a>
+                
+                <!-- Payments -->
+                <a href="{% url 'admin_panel:payments' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'payments' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'payments' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Pagamentos
+                </a>
+                
+                <!-- Plans -->
+                <a href="{% url 'admin_panel:plans' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'plans' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'plans' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Planos
+                </a>
+                
+                <!-- Analytics -->
+                <a href="{% url 'admin_panel:analytics' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'analytics' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'analytics' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Analytics
+                </a>
+                
+                <!-- Settings -->
+                <a href="{% url 'admin_panel:settings' %}" 
+                   class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 {% if 'settings' in request.resolver_match.url_name %}bg-primary-100 text-primary-700 border-r-2 border-primary-500{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if 'settings' in request.resolver_match.url_name %}text-primary-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Configurações
+                </a>
+            </div>
+        </nav>
+        
+        <!-- User Info -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+            <div class="flex items-center">
+                <div class="h-8 w-8 bg-primary-600 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium text-white">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                </div>
+                <div class="ml-3 flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
+                </div>
+                <div class="ml-2">
+                    <button class="text-gray-400 hover:text-gray-500" title="Logout">
+                        <a href="{% url 'account_logout' %}" class="block">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="lg:pl-64">
+        <!-- Top Header -->
+        <div class="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
+            <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                <!-- Mobile menu button -->
+                <button @click="sidebarOpen = true" class="lg:hidden text-gray-500 hover:text-gray-700">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                
+                <!-- Page Title -->
+                <div class="flex-1">
+                    <h1 class="text-xl font-semibold text-gray-900">
+                        {% block page_title %}Admin Panel{% endblock %}
+                    </h1>
+                </div>
+                
+                <!-- Header Actions -->
+                <div class="flex items-center space-x-4">
+                    {% block header_actions %}
+                    <!-- Notifications -->
+                    <button class="text-gray-400 hover:text-gray-500 relative">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 0 1 6 6v2.25a2.25 2.25 0 0 0 2.25 2.25H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h2.25A2.25 2.25 0 0 0 7.5 12V9.75a6 6 0 0 1 6-6Z" />
+                        </svg>
+                        <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    </button>
+                    
+                    <!-- Quick Actions -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="btn-primary">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Ações Rápidas
+                        </button>
+                        
+                        <div x-show="open" @click.away="open = false" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{% url 'admin_panel:create_account' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Nova Conta</a>
+                            <a href="{% url 'admin_panel:create_user' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Novo Usuário</a>
+                            <a href="{% url 'admin_panel:create_plan' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Novo Plano</a>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Content -->
+        <main class="flex-1">
+            <!-- Breadcrumb -->
+            {% block breadcrumb %}
+            <div class="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-4">
+                        <li>
+                            <div>
+                                <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-400 hover:text-gray-500">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </li>
+                        {% block breadcrumb_items %}
+                        {% endblock %}
+                    </ol>
+                </nav>
+            </div>
+            {% endblock %}
+            
+            <!-- Content Area -->
+            <div class="px-4 py-6 sm:px-6 lg:px-8">
+                {% block admin_content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div x-show="sidebarOpen" 
+     x-transition:enter="transition-opacity ease-linear duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition-opacity ease-linear duration-300"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+     @click="sidebarOpen = false"></div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* Animações personalizadas */
+    .sidebar-link {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .sidebar-link:hover {
+        transform: translateX(2px);
+    }
+    
+    /* Scrollbar personalizada */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Função para destacar o item ativo do menu
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        
+        sidebarLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('bg-primary-100', 'text-primary-700', 'border-r-2', 'border-primary-500');
+                link.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                
+                const icon = link.querySelector('svg');
+                if (icon) {
+                    icon.classList.add('text-primary-500');
+                    icon.classList.remove('text-gray-400', 'group-hover:text-gray-500');
+                }
+            }
+        });
+    });
+    
+    // Auto-hide mobile sidebar on route change
+    window.addEventListener('popstate', function() {
+        if (window.innerWidth < 1024) {
+            Alpine.store('sidebar', { open: false });
+        }
+    });
+</script>
+{% endblock %}

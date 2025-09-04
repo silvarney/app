@@ -1,0 +1,161 @@
+Seção no menu app:
+Dashboard
+Analytics
+Sites
+Bio
+Categorias
+Serviços
+Redes sociais
+CTA
+Blog
+Pagamentos
+- Assinaturas
+- Pagamentos
+Contas
+Membros
+Relatorios
+Configurações(apenas relacionados a ele, suas contas e sites)
+##########################################
+Seção no menu app:
+Dashboard
+Analytics
+Usuários
+Contas
+Membros
+Sites
+- Site
+- Bio
+- Categorias
+- Serviços
+- Redes sociais
+- CTA
+- Blog
+Pagamentos
+- Assinaturas
+- Pagamentos
+- Itens 
+- Tipos de Planos:
+- Itens da Assinatura
+- Extratos(lista de assinaturas e seus respectivos pagamentos)
+Relatorios
+Configurações
+
+##########################################
+Template:
+1 - Categorias de layout:
+1.1 - Nome;
+1.1 - Descrição;
+1.1 - Imagem desktop;
+1.1 - Imagem mobile;
+
+###########################################
+
+Itens:
+1 - Titulo;
+2 - Descrição;
+3 - Valor;
+
+Tipos de Planos:
+1.1 - Titulo;
+1.2 - Itens(Lista de item);
+1.3 - Descrição;
+1.4 - Valor (soma do preço de todos os item);
+1.5 - Desconto;
+1.6 - Valor Total;
+1.7 - Template(obrigatório);
+
+Itens da Assinatura:
+1. id da conta
+1. id do site
+2. id da assinatura
+3. id do item
+4. valor do item
+5. titulo do item
+6. descrição do item
+
+
+Assinaturas:
+1 - Assinatura:
+1.0 - Id do site
+1.0 - Id da conta
+1.1 - Plano selecionado (todas as informações);
+1.2 - Valor a ser pago(soma do valor de todos os itens da assinatura);
+1.3 - Desconto da assinatura;
+1.3 - Link para efetuar o pagamento;
+1.3 - Histórico de pagamentos;
+
+Pagamentos:
+1 - Pagamento:
+1.0 - Id do site
+1.0 - Id da conta
+1.0 - Id da assinatura
+1.1 - Titulo (Nome do plano);
+1.1 - lista dos itens(titulo) da assinatura;
+1.2 - Valor(soma do valor de todos os itens da assinatura);
+1.3 - Descontos;
+1.3 - Valor total(valor - desconto);
+1.3 - mes/ano do pagamento;
+
+##########################################################
+
+Sites:
+2 - Site:
+2.1 - Dominio(url limpa)(obrigatório);
+2.2 - Template(obrigatório);
+2.3 - Plano(obrigatório);
+2.4 - Data de pagamento (gerado automaticamente, proibido alteração);
+2.5 - Link de pagamento (gerado automaticamente, proibido alteração);
+2.6 - Data de contratação (apenas exibido na edição, proibido alteração);
+2.7 - Data de expiração (apenas exibido na edição, proibido alteração);
+
+3.1 - Entidades filhas:
+3.1.1 - Bio:
+3.1.1.1 - Titulo do site (obrigatório);
+3.1.1.2 - Descrição;
+3.1.1.3 - Favicon;
+3.1.1.4 - Logo (obrigatório);
+3.1.1.5 - Imagem de compartilhamento;
+3.1.1.6 - Email;
+3.1.1.7 - Whatsapp;
+3.1.1.8 - Telefone;
+3.1.1.9 - Endereço;
+3.1.1.10 - Google Maps;
+
+3.2.1 - Redes sociais:
+3.2.1.1 - Tipo (Instagram, Facebook, Youtube, Tiktok, Telegran, Web)(obrigatório);
+3.2.1.2 - Url(obrigatório);
+3.2.1.3 - Icone (duas opções, um apenas contorno e outro preenchido. Exibição de acordo com o campo tipo)(obrigatório)
+
+3.3.1 - Banners:
+3.3.1.1 - Imagem (obrigatório);
+3.3.1.1 - Link;
+3.3.1.1 - Descrição;
+
+3.4.1 - CTA:
+3.4.1.1 - Imagem;
+3.4.1.2 - Titulo;
+3.4.1.3 - Descrição;
+3.4.1.4 - Ação do botão (Abrir Whatsapp, Preencher formulário de contato);
+3.4.1.5 - Texto do botão;
+
+3.5.1.1 - Categorias
+3.5.1.1.1 - Nome (obrigatório);
+3.5.1.1.1 - Icone;
+3.5.1.1.1 - Imagem;
+
+3.6.1.1 - Serviços
+3.6.1.1.1 - Categoria (obrigatório);
+3.6.1.1.1 - Titulo (obrigatório);
+3.6.1.1.1 - Descrição;
+3.6.1.1.1 - Imagem;
+3.6.1.1.1 - Valor;
+3.6.1.1.1 - Desconto;
+
+3.7.1.1 - Blog
+3.2.1.1.1 - Titulo;
+3.2.1.1.2 - Imagem;
+3.2.1.1.3 - Url vídeo;
+3.2.1.1.4 - Texto;
+3.2.1.1.5 - Link;
+3.2.1.1.6 - Categoria;
+3.2.1.1.7 - Tags;

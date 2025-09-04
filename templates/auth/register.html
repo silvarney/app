@@ -1,0 +1,417 @@
+{% extends 'auth/base_auth.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block auth_title %}Cadastro{% endblock %}
+{% block form_title %}Crie sua conta{% endblock %}
+{% block form_subtitle %}Comece sua jornada conosco{% endblock %}
+
+{% block form_content %}
+
+<form method="post" class="space-y-6" id="registerForm">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nome
+            </label>
+            <input 
+                type="text" 
+                id="first_name" 
+                name="first_name" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                placeholder="João"
+                autocomplete="given-name"
+            >
+        </div>
+        
+        <div>
+            <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Sobrenome
+            </label>
+            <input 
+                type="text" 
+                id="last_name" 
+                name="last_name" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                placeholder="Silva"
+                autocomplete="family-name"
+            >
+        </div>
+    </div>
+
+    <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Email
+        </label>
+        <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            placeholder="seu@email.com"
+            autocomplete="email"
+        >
+        <div id="email-feedback" class="mt-1 text-sm hidden"></div>
+    </div>
+
+    <div>
+        <label for="password1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Senha
+        </label>
+        <input 
+            type="password" 
+            id="password1" 
+            name="password1" 
+            required 
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            placeholder="••••••••"
+            autocomplete="new-password"
+        >
+        <div id="password-strength" class="mt-2 hidden">
+            <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Força da senha:</div>
+            <div class="flex space-x-1">
+                <div class="h-1 w-1/4 bg-gray-200 rounded"></div>
+                <div class="h-1 w-1/4 bg-gray-200 rounded"></div>
+                <div class="h-1 w-1/4 bg-gray-200 rounded"></div>
+                <div class="h-1 w-1/4 bg-gray-200 rounded"></div>
+            </div>
+            <div id="password-feedback" class="mt-1 text-xs text-gray-600 dark:text-gray-400"></div>
+        </div>
+    </div>
+
+    <div>
+        <label for="password2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Confirmar Senha
+        </label>
+        <input 
+            type="password" 
+            id="password2" 
+            name="password2" 
+            required 
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            placeholder="••••••••"
+            autocomplete="new-password"
+        >
+        <div id="password-match" class="mt-1 text-sm hidden"></div>
+    </div>
+
+    <div>
+        <label for="company_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Nome da Empresa (Opcional)
+        </label>
+        <input 
+            type="text" 
+            id="company_name" 
+            name="company_name" 
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            placeholder="Minha Empresa Ltda"
+            autocomplete="organization"
+        >
+    </div>
+
+    <div class="flex items-start">
+        <div class="flex items-center h-5">
+            <input 
+                id="terms" 
+                name="terms" 
+                type="checkbox" 
+                required
+                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            >
+        </div>
+        <div class="ml-3 text-sm">
+            <label for="terms" class="text-gray-700 dark:text-gray-300">
+                Eu concordo com os 
+                <a href="#" class="font-medium text-primary-600 hover:text-primary-500 underline">
+                    Termos de Serviço
+                </a> 
+                e 
+                <a href="#" class="font-medium text-primary-600 hover:text-primary-500 underline">
+                    Política de Privacidade
+                </a>
+            </label>
+        </div>
+    </div>
+
+    <div class="flex items-start">
+        <div class="flex items-center h-5">
+            <input 
+                id="newsletter" 
+                name="newsletter" 
+                type="checkbox" 
+                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            >
+        </div>
+        <div class="ml-3 text-sm">
+            <label for="newsletter" class="text-gray-700 dark:text-gray-300">
+                Quero receber novidades e atualizações por email
+            </label>
+        </div>
+    </div>
+
+    <button 
+        type="submit" 
+        id="submitBtn"
+        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+        <span class="flex items-center">
+            <i class="fas fa-user-plus mr-2"></i>
+            Criar Conta
+        </span>
+    </button>
+</form>
+
+<!-- Social Registration Section -->
+{% load socialaccount %}
+<div class="mt-6">
+    <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Ou cadastre-se com</span>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-3">
+        {% if providers %}
+            {% for provider in providers %}
+                {% if provider.id == "google" %}
+                    <a href="{% provider_login_url 'google' %}" 
+                       class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span class="ml-2">Google</span>
+                    </a>
+                {% elif provider.id == "github" %}
+                    <a href="{% provider_login_url 'github' %}" 
+                       class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span class="ml-2">GitHub</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                <span class="ml-2">Google</span>
+            </a>
+            <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span class="ml-2">GitHub</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block auth_footer %}
+<div class="text-center space-y-4">
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+        Já tem uma conta?
+        <a href="{% url 'login' %}" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+            Faça login
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block hero_title %}Junte-se a nós{% endblock %}
+{% block hero_subtitle %}Crie sua conta e comece a transformar seu negócio hoje mesmo{% endblock %}
+
+{% block hero_features %}
+    <div class="flex items-center space-x-3">
+        <i class="fas fa-check-circle text-green-300"></i>
+        <span>Configuração rápida em minutos</span>
+    </div>
+    <div class="flex items-center space-x-3">
+        <i class="fas fa-check-circle text-green-300"></i>
+        <span>Suporte 24/7 especializado</span>
+    </div>
+    <div class="flex items-center space-x-3">
+        <i class="fas fa-check-circle text-green-300"></i>
+        <span>Integração com ferramentas populares</span>
+    </div>
+    <div class="flex items-center space-x-3">
+        <i class="fas fa-check-circle text-green-300"></i>
+        <span>Teste grátis por 14 dias</span>
+    </div>
+{% endblock %}
+
+{% block testimonial %}
+    <blockquote class="text-center">
+        <p class="text-lg italic opacity-90 mb-4">
+            "A plataforma mais intuitiva que já usei. Recomendo para qualquer empresa."
+        </p>
+        <footer class="text-sm opacity-75">
+            — Maria Silva, CEO da TechStart
+        </footer>
+    </blockquote>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* Password strength indicator */
+    .password-weak .strength-bar:nth-child(1) { background-color: #ef4444; }
+    .password-fair .strength-bar:nth-child(1),
+    .password-fair .strength-bar:nth-child(2) { background-color: #f59e0b; }
+    .password-good .strength-bar:nth-child(1),
+    .password-good .strength-bar:nth-child(2),
+    .password-good .strength-bar:nth-child(3) { background-color: #10b981; }
+    .password-strong .strength-bar { background-color: #059669; }
+    
+    /* Form validation styles */
+    .field-valid {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .field-invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const emailInput = document.getElementById('email');
+    const password1Input = document.getElementById('password1');
+    const password2Input = document.getElementById('password2');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Email validation
+    emailInput.addEventListener('blur', function() {
+        const email = this.value;
+        const feedback = document.getElementById('email-feedback');
+        
+        if (email) {
+            // Simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(email)) {
+                this.classList.add('field-valid');
+                this.classList.remove('field-invalid');
+                feedback.className = 'mt-1 text-sm text-green-600 hidden';
+            } else {
+                this.classList.add('field-invalid');
+                this.classList.remove('field-valid');
+                feedback.textContent = 'Por favor, insira um email válido';
+                feedback.className = 'mt-1 text-sm text-red-600';
+            }
+        }
+    });
+    
+    // Password strength indicator
+    password1Input.addEventListener('input', function() {
+        const password = this.value;
+        const strengthDiv = document.getElementById('password-strength');
+        const feedback = document.getElementById('password-feedback');
+        const bars = strengthDiv.querySelectorAll('.h-1');
+        
+        if (password.length > 0) {
+            strengthDiv.classList.remove('hidden');
+            
+            let strength = 0;
+            let messages = [];
+            
+            // Check password criteria
+            if (password.length >= 8) strength++;
+            else messages.push('pelo menos 8 caracteres');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else messages.push('uma letra minúscula');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else messages.push('uma letra maiúscula');
+            
+            if (/\d/.test(password)) strength++;
+            else messages.push('um número');
+            
+            // Reset bars
+            bars.forEach(bar => {
+                bar.className = 'h-1 w-1/4 bg-gray-200 rounded';
+            });
+            
+            // Update strength indicator
+            const strengthClasses = ['', 'password-weak', 'password-fair', 'password-good', 'password-strong'];
+            const strengthTexts = ['', 'Fraca', 'Razoável', 'Boa', 'Forte'];
+            const strengthColors = ['', 'text-red-600', 'text-yellow-600', 'text-green-600', 'text-green-700'];
+            
+            if (strength > 0) {
+                strengthDiv.className = strengthClasses[strength];
+                
+                for (let i = 0; i < strength; i++) {
+                    if (strength === 1) bars[i].classList.add('bg-red-500');
+                    else if (strength === 2) bars[i].classList.add('bg-yellow-500');
+                    else if (strength === 3) bars[i].classList.add('bg-green-500');
+                    else if (strength === 4) bars[i].classList.add('bg-green-600');
+                }
+                
+                feedback.textContent = `${strengthTexts[strength]}${messages.length > 0 ? ' - Adicione: ' + messages.join(', ') : ''}`;
+                feedback.className = `mt-1 text-xs ${strengthColors[strength]}`;
+            }
+        } else {
+            strengthDiv.classList.add('hidden');
+        }
+        
+        // Check password match
+        checkPasswordMatch();
+    });
+    
+    // Password confirmation
+    password2Input.addEventListener('input', checkPasswordMatch);
+    
+    function checkPasswordMatch() {
+        const password1 = password1Input.value;
+        const password2 = password2Input.value;
+        const matchDiv = document.getElementById('password-match');
+        
+        if (password2.length > 0) {
+            if (password1 === password2) {
+                password2Input.classList.add('field-valid');
+                password2Input.classList.remove('field-invalid');
+                matchDiv.textContent = 'Senhas coincidem';
+                matchDiv.className = 'mt-1 text-sm text-green-600';
+            } else {
+                password2Input.classList.add('field-invalid');
+                password2Input.classList.remove('field-valid');
+                matchDiv.textContent = 'Senhas não coincidem';
+                matchDiv.className = 'mt-1 text-sm text-red-600';
+            }
+        } else {
+            password2Input.classList.remove('field-valid', 'field-invalid');
+            matchDiv.className = 'mt-1 text-sm hidden';
+        }
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Criando conta...';
+    });
+});
+</script>
+{% endblock %}

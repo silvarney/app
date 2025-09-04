@@ -1,0 +1,114 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Minhas Contas{% endblock %}
+
+{% block account_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Minhas Contas</h1>
+    <a href="{% url 'accounts:create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-plus fa-sm text-white-50"></i> Nova Conta
+    </a>
+</div>
+
+{% if accounts %}
+    <div class="row">
+        {% for account in accounts %}
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card account-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">{{ account.name }}</h5>
+                                <p class="text-muted small mb-0">{{ account.company_name|default:"" }}</p>
+                            </div>
+                            <span class="badge badge-{{ account.status }} role-badge">{{ account.get_status_display }}</span>
+                        </div>
+                        
+                        {% if account.description %}
+                            <p class="card-text text-muted small">{{ account.description|truncatewords:15 }}</p>
+                        {% endif %}
+                        
+                        <div class="row text-center mt-3">
+                            <div class="col-4">
+                                <small class="text-muted">Plano</small>
+                                <div class="font-weight-bold">{{ account.get_plan_display }}</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Membros</small>
+                                <div class="font-weight-bold">{{ account.current_users_count }}/{{ account.max_users }}</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Criada</small>
+                                <div class="font-weight-bold">{{ account.created_at|date:"d/m/Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'accounts:detail' account.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </a>
+                            
+                            {% if account.owner == request.user or request.user.is_superuser %}
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'accounts:edit' account.id %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="confirmDelete('{{ account.name }}', '{% url 'accounts:delete' account.id %}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-building fa-3x text-gray-300 mb-3"></i>
+        <h4 class="text-gray-600">Nenhuma conta encontrada</h4>
+        <p class="text-gray-500 mb-4">Você ainda não possui nenhuma conta ou não é membro de nenhuma conta.</p>
+        <a href="{% url 'accounts:create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Primeira Conta
+        </a>
+    </div>
+{% endif %}
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a conta <strong id="accountName"></strong>?</p>
+                <p class="text-danger small">Esta ação não pode ser desfeita e todos os dados da conta serão perdidos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Excluir Conta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(accountName, deleteUrl) {
+    document.getElementById('accountName').textContent = accountName;
+    document.getElementById('deleteForm').action = deleteUrl;
+    $('#deleteModal').modal('show');
+}
+</script>
+{% endblock %}

@@ -1,8 +1,47 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 import os
+
+
+class UserManager(BaseUserManager):
+    """Manager customizado para filtrar usuários não deletados por padrão"""
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+    
+    def all_with_deleted(self):
+        """Retorna todos os usuários, incluindo os deletados"""
+        return super().get_queryset()
+    
+    def deleted_only(self):
+        """Retorna apenas usuários deletados"""
+        return super().get_queryset().filter(is_deleted=True)
+    
+    def create_user(self, email, username, password=None, **extra_fields):
+        """Cria e salva um usuário comum"""
+        if not email:
+            raise ValueError('O email é obrigatório')
+        
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        """Cria e salva um superusuário"""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('user_type', 'superadmin')
+        
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser deve ter is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser deve ter is_superuser=True.')
+        
+        return self.create_user(email, username, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -62,9 +101,22 @@ class User(AbstractUser):
         blank=True, 
         null=True
     )
+    is_deleted = models.BooleanField(
+        _('Deletado'), 
+        default=False,
+        help_text=_('Indica se o usuário foi deletado (soft delete)')
+    )
+    deleted_at = models.DateTimeField(
+        _('Deletado em'), 
+        blank=True, 
+        null=True
+    )
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    
+    objects = UserManager()  # Manager padrão que filtra usuários não deletados
+    all_objects = models.Manager()  # Manager que retorna todos os usuários
     
     class Meta:
         verbose_name = _('Usuário')
@@ -93,12 +145,31 @@ class User(AbstractUser):
                 img.thumbnail(output_size)
                 img.save(self.avatar.path)
     
-    def delete(self, *args, **kwargs):
-        """Override do delete para remover arquivo de avatar"""
+    def soft_delete(self):
+        """Realiza soft delete do usuário"""
+        from django.utils import timezone
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.is_active = False  # Desativa o usuário
+        self.save()
+    
+    def restore(self):
+        """Restaura um usuário deletado (soft delete)"""
+        self.is_deleted = False
+        self.deleted_at = None
+        self.is_active = True
+        self.save()
+    
+    def hard_delete(self, *args, **kwargs):
+        """Realiza exclusão permanente do usuário e remove arquivo de avatar"""
         if self.avatar:
             if os.path.isfile(self.avatar.path):
                 os.remove(self.avatar.path)
         super().delete(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        """Override do delete padrão para usar soft delete"""
+        self.soft_delete()
     
     @property
     def is_active_user(self):

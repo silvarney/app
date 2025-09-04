@@ -1,0 +1,464 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Editar {{ site.domain }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <a href="{% url 'site_management:sites_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Sites</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{% url 'site_management:site_detail' site.id %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">{{ site.domain }}</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Editar</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-3xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <p class="text-sm text-gray-500">Atualize as informações do site {{ site.domain }}</p>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            {% if site.domain %}
+                <a href="http://{{ site.domain }}" target="_blank" 
+                   class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-external-link-alt mr-2"></i>
+                    Ver Site
+                </a>
+            {% endif %}
+            
+            <a href="{% url 'site_management:site_detail' site.id %}" 
+               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-eye mr-2"></i>
+                Ver Detalhes
+            </a>
+        </div>
+    </div>
+    
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Informações Básicas -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Informações Básicas</h3>
+                <p class="text-sm text-gray-500 mt-1">Atualize as informações principais do seu site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Campo nome removido - não existe no modelo Site -->
+                
+                <!-- Domínio -->
+                <div>
+                    <label for="{{ form.domain.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.domain.label }}
+                        {% if form.domain.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-globe text-gray-400"></i>
+                        </div>
+                        {{ form.domain }}
+                    </div>
+                    {% if form.domain.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.domain.help_text }}</p>
+                    {% endif %}
+                    {% if form.domain.errors %}
+                        <div class="mt-1">
+                            {% for error in form.domain.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Descrição -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.description.label }}
+                        {% if form.description.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.description.help_text }}</p>
+                    {% endif %}
+                    {% if form.description.errors %}
+                        <div class="mt-1">
+                            {% for error in form.description.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configurações -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Configurações</h3>
+                <p class="text-sm text-gray-500 mt-1">Atualize a conta e o tipo de plano para o site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Conta -->
+                <div>
+                    <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.account.label }}
+                        {% if form.account.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-building text-gray-400"></i>
+                        </div>
+                        {{ form.account }}
+                    </div>
+                    {% if form.account.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.account.help_text }}</p>
+                    {% endif %}
+                    {% if form.account.errors %}
+                        <div class="mt-1">
+                            {% for error in form.account.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tipo de Plano -->
+                <div>
+                    <label for="{{ form.plan_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.plan_type.label }}
+                        {% if form.plan_type.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-tag text-gray-400"></i>
+                        </div>
+                        {{ form.plan_type }}
+                    </div>
+                    {% if form.plan_type.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.plan_type.help_text }}</p>
+                    {% endif %}
+                    {% if form.plan_type.errors %}
+                        <div class="mt-1">
+                            {% for error in form.plan_type.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Status -->
+                <div>
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                    {% if form.is_active.errors %}
+                        <div class="mt-1">
+                            {% for error in form.is_active.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informações do Sistema -->
+        <div class="bg-gray-50 shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Informações do Sistema</h3>
+                <p class="text-sm text-gray-500 mt-1">Dados automáticos do sistema (somente leitura)</p>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">ID do Site</dt>
+                        <dd class="mt-1 text-sm text-gray-900 font-mono">{{ site.id }}</dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Data de Criação</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ site.created_at|date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Última Atualização</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ site.updated_at|date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Criado por</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ site.created_by.get_full_name|default:site.created_by.username }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Erros Gerais do Formulário -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Erro no formulário</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Botões de Ação -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+            <a href="{% url 'site_management:site_detail' site.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Cancelar
+            </a>
+            
+            <div class="flex items-center space-x-3">
+                <button type="submit" name="action" value="save_and_continue" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar e Continuar
+                </button>
+                
+                <button type="submit" name="action" value="save" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-check mr-2"></i>
+                    Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Ações Adicionais -->
+<div class="max-w-3xl mx-auto mt-8">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Ações Adicionais</h3>
+            <p class="text-sm text-gray-500 mt-1">Outras operações disponíveis para este site</p>
+        </div>
+        <div class="px-6 py-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="{% url 'site_management:site_bio_edit' site.id %}" 
+                   class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-edit text-blue-500 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">Editar Bio</h4>
+                        <p class="text-sm text-gray-500">Atualize a biografia do site</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'site_management:site_toggle_status' site.id %}" 
+                   class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        {% if site.is_active %}
+                            <i class="fas fa-pause text-orange-500 text-xl"></i>
+                        {% else %}
+                            <i class="fas fa-play text-green-500 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">
+                            {% if site.is_active %}
+                                Desativar Site
+                            {% else %}
+                                Ativar Site
+                            {% endif %}
+                        </h4>
+                        <p class="text-sm text-gray-500">
+                            {% if site.is_active %}
+                                Tornar o site inativo
+                            {% else %}
+                                Tornar o site ativo
+                            {% endif %}
+                        </p>
+                    </div>
+                </a>
+                
+                <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-chart-bar text-purple-500 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">Estatísticas</h4>
+                        <p class="text-sm text-gray-500">Ver métricas e relatórios</p>
+                        <span class="text-xs text-gray-400">(Em breve)</span>
+                    </div>
+                </div>
+                
+                <button onclick="confirmDelete('{{ site.domain }}', '{% url 'site_management:site_delete' site.id %}')"
+                        class="flex items-center p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors text-left w-full">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-trash text-red-500 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-red-900">Excluir Site</h4>
+                        <p class="text-sm text-red-600">Remover permanentemente</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Confirmar Exclusão</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">
+                    Tem certeza que deseja excluir o site <strong id="siteName"></strong>?
+                    Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos.
+                </p>
+                
+                <div class="mt-4">
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        Digite sua senha para confirmar:
+                    </label>
+                    <input type="password" id="confirmPassword" 
+                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                           placeholder="Sua senha">
+                </div>
+            </div>
+            <div class="flex items-center justify-center space-x-3 mt-4">
+                <button onclick="closeDeleteModal()" 
+                        class="px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancelar
+                </button>
+                <button onclick="executeDelete()" 
+                        class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Excluir Site
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos personalizados para os campos do formulário */
+.form-input, .form-select, .form-textarea {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+
+.form-input[class*="pl-10"] {
+    @apply pl-10;
+}
+
+.form-checkbox {
+    @apply h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded;
+}
+
+.form-textarea {
+    @apply min-h-[100px];
+}
+</style>
+
+<script>
+let deleteUrl = '';
+
+function confirmDelete(siteName, url) {
+    document.getElementById('siteName').textContent = siteName;
+    document.getElementById('confirmPassword').value = '';
+    deleteUrl = url;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    deleteUrl = '';
+}
+
+function executeDelete() {
+    const password = document.getElementById('confirmPassword').value;
+    if (!password) {
+        alert('Por favor, digite sua senha para confirmar a exclusão.');
+        return;
+    }
+    
+    // Criar formulário para enviar a senha
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = deleteUrl;
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    
+    const passwordInput = document.createElement('input');
+    passwordInput.type = 'hidden';
+    passwordInput.name = 'password';
+    passwordInput.value = password;
+    
+    form.appendChild(csrfInput);
+    form.appendChild(passwordInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Fechar modal ao clicar fora dele
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteModal();
+    }
+});
+
+// Validação em tempo real do domínio
+document.addEventListener('DOMContentLoaded', function() {
+    const domainField = document.getElementById('{{ form.domain.id_for_label }}');
+    if (domainField) {
+        domainField.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            // Remove espaços e caracteres especiais
+            const cleanValue = value.replace(/[^a-z0-9.-]/g, '');
+            if (value !== cleanValue) {
+                this.value = cleanValue;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

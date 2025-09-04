@@ -1,0 +1,261 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Configurações de Segurança - Admin{% endblock %}
+{% block page_title %}Configurações de Segurança{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Configurações</span>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Segurança</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Configurações de Autenticação -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-shield-alt mr-2 text-gray-500"></i>
+                Configurações de Autenticação
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Força Autenticação 2FA -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="force_2fa" 
+                           id="force_2fa"
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="force_2fa" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Forçar Autenticação de Dois Fatores (2FA)
+                    </label>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Obriga todos os usuários a configurarem 2FA para acessar a plataforma.
+                </p>
+                
+                <!-- Tempo de Sessão -->
+                <div>
+                    <label for="session_timeout" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tempo Limite da Sessão (minutos)
+                    </label>
+                    <input type="number" 
+                           name="session_timeout" 
+                           id="session_timeout" 
+                           value="60"
+                           min="5"
+                           max="1440"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Tempo em minutos antes da sessão expirar por inatividade.
+                    </p>
+                </div>
+                
+                <!-- Tentativas de Login -->
+                <div>
+                    <label for="max_login_attempts" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Máximo de Tentativas de Login
+                    </label>
+                    <input type="number" 
+                           name="max_login_attempts" 
+                           id="max_login_attempts" 
+                           value="5"
+                           min="3"
+                           max="10"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Número máximo de tentativas de login antes de bloquear temporariamente.
+                    </p>
+                </div>
+                
+                <!-- Tempo de Bloqueio -->
+                <div>
+                    <label for="lockout_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Duração do Bloqueio (minutos)
+                    </label>
+                    <input type="number" 
+                           name="lockout_duration" 
+                           id="lockout_duration" 
+                           value="15"
+                           min="5"
+                           max="60"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Tempo em minutos que o usuário fica bloqueado após exceder tentativas.
+                    </p>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Configurações de Senha -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-key mr-2 text-gray-500"></i>
+                Política de Senhas
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Comprimento Mínimo -->
+                <div>
+                    <label for="min_password_length" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Comprimento Mínimo da Senha
+                    </label>
+                    <input type="number" 
+                           name="min_password_length" 
+                           id="min_password_length" 
+                           value="8"
+                           min="6"
+                           max="20"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                <!-- Exigir Caracteres Especiais -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="require_special_chars" 
+                           id="require_special_chars"
+                           checked
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="require_special_chars" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Exigir Caracteres Especiais
+                    </label>
+                </div>
+                
+                <!-- Exigir Números -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="require_numbers" 
+                           id="require_numbers"
+                           checked
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="require_numbers" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Exigir Números
+                    </label>
+                </div>
+                
+                <!-- Exigir Maiúsculas e Minúsculas -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="require_mixed_case" 
+                           id="require_mixed_case"
+                           checked
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="require_mixed_case" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Exigir Maiúsculas e Minúsculas
+                    </label>
+                </div>
+                
+                <!-- Expiração de Senha -->
+                <div>
+                    <label for="password_expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Expiração da Senha (dias)
+                    </label>
+                    <input type="number" 
+                           name="password_expiry_days" 
+                           id="password_expiry_days" 
+                           value="90"
+                           min="30"
+                           max="365"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Número de dias antes da senha expirar (0 = nunca expira).
+                    </p>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Configurações de Auditoria -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-clipboard-list mr-2 text-gray-500"></i>
+                Auditoria e Logs
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Log de Atividades -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="enable_activity_log" 
+                           id="enable_activity_log"
+                           checked
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="enable_activity_log" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Habilitar Log de Atividades
+                    </label>
+                </div>
+                
+                <!-- Retenção de Logs -->
+                <div>
+                    <label for="log_retention_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Retenção de Logs (dias)
+                    </label>
+                    <input type="number" 
+                           name="log_retention_days" 
+                           id="log_retention_days" 
+                           value="365"
+                           min="30"
+                           max="2555"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Número de dias para manter os logs de auditoria.
+                    </p>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

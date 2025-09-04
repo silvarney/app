@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembrete de Renovação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .info {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔔 Lembrete de Renovação</h1>
+    </div>
+    
+    <div class="content">
+        <p>Olá,</p>
+        
+        <p>Sua assinatura do plano <strong>{{ subscription.plan.name }}</strong> para a conta <strong>{{ account.name }}</strong> será renovada em <strong>{{ days_until_renewal }} dias</strong>.</p>
+        
+        <div class="highlight">
+            <strong>Data de Renovação:</strong> {{ subscription.current_period_end|date:"d/m/Y" }}
+        </div>
+        
+        <div class="details">
+            <h3>Detalhes da Assinatura:</h3>
+            <ul>
+                <li><strong>Plano:</strong> {{ subscription.plan.name }}</li>
+                <li><strong>Valor:</strong> R$ {{ subscription.price_snapshot|floatformat:2 }}/{{ subscription.plan.get_billing_cycle_display|lower }}</li>
+                <li><strong>Renovação Automática:</strong> {% if subscription.auto_renew %}Ativada{% else %}Desativada{% endif %}</li>
+                <li><strong>Próxima Cobrança:</strong> {{ subscription.current_period_end|date:"d/m/Y" }}</li>
+            </ul>
+        </div>
+        
+        {% if subscription.auto_renew %}
+        <div class="info">
+            <strong>Renovação Automática Ativada:</strong> Sua assinatura será renovada automaticamente. O pagamento será processado usando seu método de pagamento padrão.
+        </div>
+        {% else %}
+        <div class="info">
+            <strong>Renovação Manual:</strong> Sua assinatura não será renovada automaticamente. Você precisará renovar manualmente para continuar usando os recursos premium.
+        </div>
+        {% endif %}
+        
+        <h3>O que você pode fazer:</h3>
+        <ul>
+            <li>Verificar e atualizar suas informações de pagamento</li>
+            <li>Alterar seu plano se desejar</li>
+            {% if not subscription.auto_renew %}
+            <li>Ativar a renovação automática para maior comodidade</li>
+            {% endif %}
+            <li>Cancelar sua assinatura se não desejar continuar</li>
+        </ul>
+        
+        <p style="text-align: center;">
+            <a href="{{ site_url }}/user-panel/subscription/" class="btn">Gerenciar Assinatura</a>
+            <a href="{{ site_url }}/user-panel/subscription/payment/" class="btn btn-secondary">Atualizar Pagamento</a>
+        </p>
+        
+        {% if subscription.plan.features %}
+        <div class="details">
+            <h3>Recursos do Seu Plano:</h3>
+            <ul>
+                {% for feature in subscription.plan.features %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <p>Se você tiver alguma dúvida sobre sua assinatura ou precisar de ajuda, nossa equipe de suporte está sempre disponível para ajudá-lo.</p>
+        
+        <p>Obrigado por continuar conosco!</p>
+    </div>
+    
+    <div class="footer">
+        <p>Este é um email automático. Por favor, não responda a este email.</p>
+        <p>© {{ current_year }} {{ site_name }}. Todos os direitos reservados.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Minhas Análises{% endblock %}
+{% block page_title %}Minhas Análises{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Análises</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block user_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Suas Análises Pessoais
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Insights sobre sua participação e atividade no sistema.
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <select id="period-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30" selected>Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="365">Último ano</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas Principais -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-building text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Total de Contas
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ analytics.total_accounts }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-crown text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Contas Próprias
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ analytics.owned_accounts }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-users text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Como Membro
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ analytics.member_accounts }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                                Crescimento
+                            </dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                +{{ analytics.growth_percentage }}%
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Crescimento de Participação -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                    Crescimento de Participação
+                </h3>
+                <div class="h-64">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribuição por Papéis -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                    Distribuição por Papéis
+                </h3>
+                <div class="h-64">
+                    <canvas id="rolesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contas Mais Ativas -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Suas Contas Mais Ativas
+            </h3>
+            {% if analytics.most_active_accounts %}
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Conta
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Seu Papel
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Membros
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Última Atividade
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for account in analytics.most_active_accounts %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <div class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-white">
+                                                {{ account.name|first|upper }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ account.name }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ account.company_name|default:"Sem empresa" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                    {% if account.user_role == 'owner' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% elif account.user_role == 'admin' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
+                                    {% endif %}">
+                                    {{ account.user_role|capfirst }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                {{ account.member_count }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                    {% if account.is_active %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                    {% else %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                    {% endif %}">
+                                    {% if account.is_active %}Ativa{% else %}Inativa{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ account.last_activity|timesince }} atrás
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <i class="fas fa-chart-bar text-gray-400 text-2xl"></i>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400">
+                    Nenhuma atividade registrada ainda.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Dados dos gráficos (normalmente viriam do backend)
+const growthData = {
+    labels: {{ analytics.growth_labels|safe }},
+    datasets: [{
+        label: 'Participação em Contas',
+        data: {{ analytics.growth_data|safe }},
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4
+    }]
+};
+
+const rolesData = {
+    labels: {{ analytics.roles_labels|safe }},
+    datasets: [{
+        data: {{ analytics.roles_data|safe }},
+        backgroundColor: [
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(168, 85, 247)',
+            'rgb(245, 158, 11)'
+        ]
+    }]
+};
+
+// Configuração dos gráficos
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'bottom'
+        }
+    }
+};
+
+// Inicializar gráficos
+const growthCtx = document.getElementById('growthChart').getContext('2d');
+const growthChart = new Chart(growthCtx, {
+    type: 'line',
+    data: growthData,
+    options: chartOptions
+});
+
+const rolesCtx = document.getElementById('rolesChart').getContext('2d');
+const rolesChart = new Chart(rolesCtx, {
+    type: 'doughnut',
+    data: rolesData,
+    options: chartOptions
+});
+
+// Filtro de período
+document.getElementById('period-filter').addEventListener('change', function() {
+    const period = this.value;
+    // Aqui você faria uma requisição AJAX para atualizar os dados
+    console.log('Período selecionado:', period);
+});
+</script>
+{% endblock %}

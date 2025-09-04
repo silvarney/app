@@ -1,0 +1,199 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Editar Membro - {{ account.name }}{% endblock %}
+
+{% block account_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'accounts:list' %}">Contas</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'accounts:detail' account.id %}">{{ account.name }}</a></li>
+                <li class="breadcrumb-item active">Editar Membro</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0 text-gray-800">Editar Membro</h1>
+        <p class="text-gray-600">Alterar permissões de <strong>{{ membership.user.get_full_name|default:membership.user.username }}</strong></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informações do Membro</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            <div class="member-avatar large">
+                                {{ membership.user.get_full_name|default:membership.user.username|first|upper }}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 class="mb-1">{{ membership.user.get_full_name|default:membership.user.username }}</h5>
+                            <p class="text-gray-600 mb-2">{{ membership.user.email }}</p>
+                            
+                            <div class="small text-gray-600">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <strong>Membro desde:</strong><br>
+                                        {{ membership.joined_at|date:"d/m/Y H:i" }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Status atual:</strong><br>
+                                        {% if membership.status == 'active' %}
+                            <span class="badge badge-success">Ativo</span>
+                        {% else %}
+                            <span class="badge badge-secondary">Inativo</span>
+                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    {% if membership.user == account.owner %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Proprietário da Conta:</strong> Este usuário é o proprietário da conta e não pode ter suas permissões alteradas.
+                        </div>
+                    {% else %}
+                        <div class="form-group">
+                            <label for="{{ form.role.id_for_label }}" class="font-weight-bold">
+                                {{ form.role.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.role }}
+                            {% if form.role.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.role.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Selecione o novo nível de acesso para este membro.
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                {{ form.is_active }}
+                                <label class="custom-control-label" for="{{ form.is_active.id_for_label }}">
+                                    {{ form.is_active.label }}
+                                </label>
+                            </div>
+                            {% if form.is_active.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.is_active.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Membros inativos não podem acessar a conta.
+                            </small>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            
+                            <a href="{% url 'accounts:detail' account.id %}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informações da Conta</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="account-avatar">
+                        {{ account.name|first|upper }}
+                    </div>
+                    <h5 class="mt-2 mb-1">{{ account.name }}</h5>
+                    <p class="text-gray-600 small mb-0">{{ account.company_name|default:"Sem empresa" }}</p>
+                </div>
+                
+                <hr>
+                
+                <div class="small text-gray-600">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Plano:</span>
+                        <span class="font-weight-bold">{{ account.get_plan_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Membros:</span>
+                        <span class="font-weight-bold">{{ account.members.count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Proprietário:</span>
+                        <span class="font-weight-bold">{{ account.owner.get_full_name|default:account.owner.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Níveis de Acesso</h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-gray-600">
+                    <div class="mb-3">
+                        <span class="badge badge-danger mb-1">Proprietário</span>
+                        <p class="mb-0">Acesso total à conta, incluindo exclusão e transferência de propriedade.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-warning mb-1">Administrador</span>
+                        <p class="mb-0">Pode gerenciar membros, configurações e a maioria das funcionalidades.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-info mb-1">Editor</span>
+                        <p class="mb-0">Pode editar conteúdo e acessar funcionalidades principais.</p>
+                    </div>
+                    
+                    <div>
+                        <span class="badge badge-secondary mb-1">Visualizador</span>
+                        <p class="mb-0">Acesso somente leitura às informações da conta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if membership.user != account.owner %}
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Ações Perigosas</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-gray-600 mb-3">
+                        Estas ações são irreversíveis e devem ser usadas com cuidado.
+                    </p>
+                    
+                    <a href="{% url 'accounts:member_remove' account.id membership.id %}" 
+                       class="btn btn-outline-danger btn-sm btn-block"
+                       onclick="return confirm('Tem certeza que deseja remover este membro da conta?')">
+                        <i class="fas fa-user-times"></i> Remover Membro
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falha no Pagamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Falha no Pagamento</h1>
+    </div>
+    
+    <div class="content">
+        <p>Olá,</p>
+        
+        <p>Infelizmente, não conseguimos processar o pagamento da sua assinatura do plano <strong>{{ subscription.plan.name }}</strong> para a conta <strong>{{ account.name }}</strong>.</p>
+        
+        <div class="alert">
+            <strong>Ação Necessária:</strong> Para manter sua assinatura ativa, você precisa atualizar suas informações de pagamento ou tentar novamente.
+        </div>
+        
+        <div class="details">
+            <h3>Detalhes do Pagamento:</h3>
+            <ul>
+                <li><strong>Valor:</strong> R$ {{ payment.amount|floatformat:2 }}</li>
+                <li><strong>Data da Tentativa:</strong> {{ payment.created_at|date:"d/m/Y H:i" }}</li>
+                <li><strong>Método de Pagamento:</strong> {{ payment.get_payment_method_display }}</li>
+                {% if payment.failure_reason %}
+                <li><strong>Motivo da Falha:</strong> {{ payment.failure_reason }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        {% if subscription.status == 'past_due' %}
+        <div class="warning">
+            <strong>Status da Assinatura:</strong> Sua assinatura está em atraso. Você ainda tem acesso aos recursos, mas isso pode ser suspenso em breve se o pagamento não for processado.
+        </div>
+        {% endif %}
+        
+        <p>O que você pode fazer:</p>
+        <ul>
+            <li>Verificar se há fundos suficientes na sua conta</li>
+            <li>Atualizar suas informações de cartão de crédito</li>
+            <li>Tentar um método de pagamento diferente</li>
+            <li>Entrar em contato com seu banco se necessário</li>
+        </ul>
+        
+        <p style="text-align: center;">
+            <a href="{{ site_url }}/user-panel/subscription/payment/" class="btn btn-primary">Atualizar Pagamento</a>
+            <a href="{{ site_url }}/user-panel/subscription/" class="btn">Ver Assinatura</a>
+        </p>
+        
+        {% if payment.can_retry %}
+        <p><strong>Próxima Tentativa:</strong> Tentaremos processar o pagamento novamente automaticamente em {{ payment.next_retry_at|date:"d/m/Y" }}.</p>
+        {% endif %}
+        
+        <p>Se você continuar tendo problemas ou tiver alguma dúvida, não hesite em entrar em contato com nosso suporte.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Este é um email automático. Por favor, não responda a este email.</p>
+        <p>© {{ current_year }} {{ site_name }}. Todos os direitos reservados.</p>
+    </div>
+</body>
+</html>

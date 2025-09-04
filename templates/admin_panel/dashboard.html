@@ -140,6 +140,33 @@
         </div>
     </div>
 
+    <!-- Ações Rápidas -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                Ações Rápidas
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="{% url 'admin_panel:analytics_dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Analytics
+                </a>
+                <a href="{% url 'admin_panel:system_health' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                    <i class="fas fa-heartbeat mr-2"></i>
+                    System Health
+                </a>
+                <a href="{% url 'admin_panel:export_users' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Exportar Usuários
+                </a>
+                <a href="{% url 'admin_panel:export_accounts' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Exportar Contas
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Gráficos e Listas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Contas por Status -->
@@ -318,6 +345,23 @@
 
 {% block extra_js %}
 <script>
+// Verificar se há mensagem de erro na URL e exibir como toast
+const urlParams = new URLSearchParams(window.location.search);
+const errorMessage = urlParams.get('error');
+if (errorMessage) {
+    // Exibir toast de erro
+    if (typeof showToast === 'function') {
+        showToast(decodeURIComponent(errorMessage), 'error');
+    } else {
+        // Fallback para alert se showToast não estiver disponível
+        alert(decodeURIComponent(errorMessage));
+    }
+    
+    // Limpar o parâmetro da URL sem recarregar a página
+    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.replaceState({path: newUrl}, '', newUrl);
+}
+
 // Atualizar dados do dashboard a cada 5 minutos
 setInterval(function() {
     location.reload();

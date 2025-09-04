@@ -1,0 +1,278 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Criar Novo Site{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <a href="{% url 'site_management:sites_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Sites</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Criar Site</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <p class="text-sm text-gray-500">Preencha as informações básicas para criar seu novo site</p>
+    </div>
+    
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Informações Básicas -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Informações Básicas</h3>
+                <p class="text-sm text-gray-500 mt-1">Defina as informações principais do seu site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Campo nome removido - não existe no modelo Site -->
+                
+                <!-- Domínio -->
+                <div>
+                    <label for="{{ form.domain.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.domain.label }}
+                        {% if form.domain.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-globe text-gray-400"></i>
+                        </div>
+                        {{ form.domain }}
+                    </div>
+                    {% if form.domain.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.domain.help_text }}</p>
+                    {% endif %}
+                    {% if form.domain.errors %}
+                        <div class="mt-1">
+                            {% for error in form.domain.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Descrição -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.description.label }}
+                        {% if form.description.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.description.help_text }}</p>
+                    {% endif %}
+                    {% if form.description.errors %}
+                        <div class="mt-1">
+                            {% for error in form.description.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configurações -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Configurações</h3>
+                <p class="text-sm text-gray-500 mt-1">Defina a conta e o tipo de plano para o site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Conta -->
+                <div>
+                    <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.account.label }}
+                        {% if form.account.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-building text-gray-400"></i>
+                        </div>
+                        {{ form.account }}
+                    </div>
+                    {% if form.account.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.account.help_text }}</p>
+                    {% endif %}
+                    {% if form.account.errors %}
+                        <div class="mt-1">
+                            {% for error in form.account.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tipo de Plano -->
+                <div>
+                    <label for="{{ form.plan_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.plan_type.label }}
+                        {% if form.plan_type.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-tag text-gray-400"></i>
+                        </div>
+                        {{ form.plan_type }}
+                    </div>
+                    {% if form.plan_type.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.plan_type.help_text }}</p>
+                    {% endif %}
+                    {% if form.plan_type.errors %}
+                        <div class="mt-1">
+                            {% for error in form.plan_type.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Status Inicial -->
+                <div>
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                    {% if form.is_active.errors %}
+                        <div class="mt-1">
+                            {% for error in form.is_active.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Erros Gerais do Formulário -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Erro no formulário</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Botões de Ação -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+            <a href="{% url 'site_management:sites_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Cancelar
+            </a>
+            
+            <div class="flex items-center space-x-3">
+                <button type="submit" name="action" value="save_and_continue" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar e Continuar
+                </button>
+                
+                <button type="submit" name="action" value="save" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-check mr-2"></i>
+                    Criar Site
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Dicas e Informações Adicionais -->
+<div class="max-w-3xl mx-auto mt-8">
+    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Dicas para criar seu site</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Escolha um nome descritivo e fácil de lembrar para seu site</li>
+                        <li>O domínio deve ser único e representar bem seu negócio</li>
+                        <li>A descrição ajuda outros usuários a entenderem o propósito do site</li>
+                        <li>Você pode alterar essas informações posteriormente nas configurações</li>
+                        <li>Sites inativos não aparecem nas listagens públicas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos personalizados para os campos do formulário */
+.form-input, .form-select, .form-textarea {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+
+.form-input[class*="pl-10"] {
+    @apply pl-10;
+}
+
+.form-checkbox {
+    @apply h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded;
+}
+
+.form-textarea {
+    @apply min-h-[100px];
+}
+</style>
+
+<script>
+// Validação em tempo real do domínio
+document.addEventListener('DOMContentLoaded', function() {
+    const domainField = document.getElementById('{{ form.domain.id_for_label }}');
+    if (domainField) {
+        domainField.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            // Remove espaços e caracteres especiais
+            const cleanValue = value.replace(/[^a-z0-9.-]/g, '');
+            if (value !== cleanValue) {
+                this.value = cleanValue;
+            }
+        });
+    }
+    
+    // Auto-focus no primeiro campo
+    const firstField = document.getElementById('{{ form.domain.id_for_label }}');
+    if (firstField) {
+        firstField.focus();
+    }
+});
+</script>
+{% endblock %}

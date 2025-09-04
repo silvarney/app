@@ -28,14 +28,24 @@ class Account(models.Model):
     description = models.TextField('Descrição', blank=True)
     
     # Informações da empresa
+    email = models.EmailField('E-mail', blank=True)
     company_name = models.CharField('Nome da Empresa', max_length=200, blank=True)
-    tax_id = models.CharField(
-        'CNPJ/CPF', 
+    cnpj = models.CharField(
+        'CNPJ', 
         max_length=18, 
         blank=True,
         validators=[RegexValidator(
-            regex=r'^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$',
-            message='Digite um CNPJ ou CPF válido'
+            regex=r'^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$',
+            message='Digite um CNPJ válido (XX.XXX.XXX/XXXX-XX)'
+        )]
+    )
+    cpf = models.CharField(
+        'CPF', 
+        max_length=14, 
+        blank=True,
+        validators=[RegexValidator(
+            regex=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$',
+            message='Digite um CPF válido (XXX.XXX.XXX-XX)'
         )]
     )
     website = models.URLField('Website', blank=True)

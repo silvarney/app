@@ -77,13 +77,57 @@
                     <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Lista de Contas
                 </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:account_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Nova Conta
                 </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+            </div>
+        </div>
+        
+        <!-- Members Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
                     Membros
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="{% url 'admin_panel:all_members' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Gerenciar Membros
+                </a>
+                <a href="{% url 'admin_panel:add_member_to_account' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Adicionar Membro
+                </a>
+            </div>
+        </div>
+
+        <!-- Sites Management -->
+        <div x-data="{ open: false }">
+            <button @click="open = !open" 
+                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'sites' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <div class="flex items-center">
+                    <i class="fas fa-globe mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                    Sites
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                <a href="{% url 'site_management:sites_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md {% if request.resolver_match.url_name == 'sites_list' %}nav-item-active{% endif %}">
+                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Lista de Sites
+                </a>
+                <a href="{% url 'site_management:site_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md {% if request.resolver_match.url_name == 'site_create' %}nav-item-active{% endif %}">
+                    <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Novo Site
+                </a>
+                <a href="{% url 'site_management:sites_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                    <i class="fas fa-tags mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                    Categorias
                 </a>
             </div>
         </div>
@@ -162,19 +206,19 @@
                 <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
             </button>
             <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:admin_settings_general' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Geral
                 </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:admin_settings_security' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Segurança
                 </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:admin_settings_notifications' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Notificações
                 </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:admin_settings_appearance' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Aparência
                 </a>
@@ -191,7 +235,7 @@
 </nav>
 
 <!-- Account switcher (if user has multiple accounts) -->
-{% if user.accountmembership_set.count > 1 %}
+{% if user.memberships.count > 1 %}
 <div class="flex-shrink-0 border-t border-gray-200 p-4">
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" 
@@ -219,7 +263,7 @@
              x-transition:leave-end="transform opacity-0 scale-95"
              class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
             <div class="py-1 max-h-48 overflow-y-auto">
-                {% for membership in user.accountmembership_set.all %}
+                {% for membership in user.memberships.all %}
                     <a href="?account={{ membership.account.id }}" 
                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {% if current_account.id == membership.account.id %}bg-primary-50 text-primary-700{% endif %}">
                         <div class="flex items-center space-x-3">

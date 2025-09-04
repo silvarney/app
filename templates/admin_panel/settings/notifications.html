@@ -1,0 +1,300 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Configurações de Notificações - Admin{% endblock %}
+{% block page_title %}Configurações de Notificações{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Configurações</span>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Notificações</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <!-- Configurações de Email -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-envelope mr-2 text-gray-500"></i>
+                Configurações de Email
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Servidor SMTP -->
+                <div>
+                    <label for="smtp_host" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Servidor SMTP
+                    </label>
+                    <input type="text" 
+                           name="smtp_host" 
+                           id="smtp_host" 
+                           placeholder="smtp.gmail.com"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                <!-- Porta SMTP -->
+                <div>
+                    <label for="smtp_port" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Porta SMTP
+                    </label>
+                    <input type="number" 
+                           name="smtp_port" 
+                           id="smtp_port" 
+                           value="587"
+                           min="25"
+                           max="65535"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                <!-- Usar TLS -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="smtp_use_tls" 
+                           id="smtp_use_tls"
+                           checked
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="smtp_use_tls" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Usar TLS/SSL
+                    </label>
+                </div>
+                
+                <!-- Usuário SMTP -->
+                <div>
+                    <label for="smtp_user" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Usuário SMTP
+                    </label>
+                    <input type="email" 
+                           name="smtp_user" 
+                           id="smtp_user" 
+                           placeholder="seu-email@gmail.com"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                <!-- Senha SMTP -->
+                <div>
+                    <label for="smtp_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Senha SMTP
+                    </label>
+                    <input type="password" 
+                           name="smtp_password" 
+                           id="smtp_password" 
+                           placeholder="••••••••"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                <div class="flex justify-between">
+                    <button type="button" 
+                            class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Testar Conexão
+                    </button>
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Tipos de Notificação -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-bell mr-2 text-gray-500"></i>
+                Tipos de Notificação
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Notificações de Sistema -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-medium text-gray-900 dark:text-white">Notificações de Sistema</h4>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_new_user" 
+                               id="notify_new_user"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_new_user" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Novo usuário registrado
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_new_subscription" 
+                               id="notify_new_subscription"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_new_subscription" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Nova assinatura
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_payment_failed" 
+                               id="notify_payment_failed"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_payment_failed" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Falha no pagamento
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_subscription_cancelled" 
+                               id="notify_subscription_cancelled"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_subscription_cancelled" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Assinatura cancelada
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Notificações de Segurança -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-medium text-gray-900 dark:text-white">Notificações de Segurança</h4>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_failed_login" 
+                               id="notify_failed_login"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_failed_login" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Tentativas de login falharam
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_suspicious_activity" 
+                               id="notify_suspicious_activity"
+                               checked
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_suspicious_activity" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Atividade suspeita detectada
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="notify_password_changed" 
+                               id="notify_password_changed"
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="notify_password_changed" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Senha alterada
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Configurações de Push -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-mobile-alt mr-2 text-gray-500"></i>
+                Notificações Push
+            </h3>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Habilitar Push -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="enable_push_notifications" 
+                           id="enable_push_notifications"
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="enable_push_notifications" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Habilitar Notificações Push
+                    </label>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Permite enviar notificações push para dispositivos móveis dos usuários.
+                </p>
+                
+                <!-- Firebase Server Key -->
+                <div>
+                    <label for="firebase_server_key" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Chave do Servidor Firebase
+                    </label>
+                    <input type="password" 
+                           name="firebase_server_key" 
+                           id="firebase_server_key" 
+                           placeholder="••••••••••••••••••••••••••••••••••••••••"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Chave do servidor Firebase para envio de notificações push.
+                    </p>
+                </div>
+                
+                <!-- Frequência de Notificações -->
+                <div>
+                    <label for="notification_frequency" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Frequência Máxima de Notificações
+                    </label>
+                    <select name="notification_frequency" 
+                            id="notification_frequency"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="immediate">Imediata</option>
+                        <option value="hourly" selected>A cada hora</option>
+                        <option value="daily">Diária</option>
+                        <option value="weekly">Semanal</option>
+                    </select>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Controla a frequência máxima de notificações enviadas aos usuários.
+                    </p>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_name %}{{ title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li>
+        <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-400 hover:text-gray-500 transition-colors">
+            <i class="fas fa-home"></i>
+        </a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <a href="{% url 'admin_panel:roles_list' %}" class="text-gray-400 hover:text-gray-500 transition-colors">Funções</a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+        <span class="text-gray-500">{{ title }}</span>
+    </li>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+         <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">{{ title }}</h3>
+         </div>
+        <div class="px-4 py-5 sm:p-6">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'success' %}bg-green-50 dark:bg-green-800 border border-green-200 dark:border-green-600 text-green-800 dark:text-green-100{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-800 border border-red-200 dark:border-red-600 text-red-800 dark:text-red-100{% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-800 border border-yellow-200 dark:border-yellow-600 text-yellow-800 dark:text-yellow-100{% else %}bg-blue-50 dark:bg-blue-800 border border-blue-200 dark:border-blue-600 text-blue-800 dark:text-blue-100{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Nome -->
+                    <div>
+                        <label for="id_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome da Função *</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.name.errors %} border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500{% endif %}" 
+                               id="id_name" name="name" value="{{ form.name.value|default:'' }}" required>
+                        {% if form.name.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Código -->
+                    <div>
+                        <label for="id_codename" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código da Função *</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.codename.errors %} border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500{% endif %}" 
+                               id="id_codename" name="codename" value="{{ form.codename.value|default:'' }}" required>
+                        {% if form.codename.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.codename.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <p class="mt-2 text-sm text-gray-500">Nome único da função (ex: content_editor, admin_user)</p>
+                    </div>
+
+                    <!-- Tipo de Função -->
+                    <div>
+                        <label for="id_role_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Função</label>
+                        <select id="id_role_type" name="role_type" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.role_type.errors %} border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500{% endif %}">
+                            {% for value, label in form.role_type.field.choices %}
+                                <option value="{{ value }}" {% if form.role_type.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.role_type.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.role_type.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Prioridade -->
+                    <div>
+                        <label for="id_priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Prioridade</label>
+                        <input type="number" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.priority.errors %} border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500{% endif %}" 
+                               id="id_priority" name="priority" value="{{ form.priority.value|default:'0' }}" min="0">
+                        {% if form.priority.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.priority.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <p class="mt-2 text-sm text-gray-500">Maior número = maior prioridade</p>
+                    </div>
+
+                    <!-- Conta -->
+                    <div class="sm:col-span-2">
+                        <label for="id_account" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Conta</label>
+                        <select id="id_account" name="account" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.account.errors %} border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500{% endif %}">
+                            <option value="">Role de Sistema (sem conta específica)</option>
+                            {% for account in form.account.field.queryset %}
+                                <option value="{{ account.id }}" {% if form.account.value == account.id|stringformat:'s' %}selected{% endif %}>{{ account.name }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.account.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.account.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <p class="mt-2 text-sm text-gray-500">Deixe vazio para criar uma função de sistema</p>
+                    </div>
+                </div>
+
+                <!-- Descrição -->
+                <div>
+                    <label for="id_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+                    <textarea id="id_description" name="description" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm{% if form.description.errors %} border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500{% endif %}" placeholder="Descreva o propósito desta função...">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <div class="mt-2 text-sm text-red-600">
+                            {% for error in form.description.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Permissões -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Permissões</label>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 max-h-64 overflow-y-auto">
+                        {% if form.permissions.field.queryset %}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                {% for permission in form.permissions.field.queryset %}
+                                    <div class="flex items-center">
+                                        <input type="checkbox" 
+                                               id="id_permissions_{{ permission.id }}" 
+                                               name="permissions" 
+                                               value="{{ permission.id }}"
+                                               {% if permission.id in form.permissions.value %}checked{% endif %}
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <label for="id_permissions_{{ permission.id }}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ permission.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma permissão disponível.</p>
+                        {% endif %}
+                    </div>
+                    {% if form.permissions.errors %}
+                        <div class="mt-2 text-sm text-red-600">
+                            {% for error in form.permissions.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">{{ form.permissions.help_text }}</p>
+                </div>
+
+                <!-- Status Ativo -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           id="id_is_active" 
+                           name="is_active" 
+                           {% if form.is_active.value %}checked{% endif %}
+                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="id_is_active" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        Função ativa
+                    </label>
+                    {% if form.is_active.errors %}
+                        <div class="ml-2 text-sm text-red-600">
+                            {% for error in form.is_active.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{% url 'admin_panel:roles_list' %}" 
+                       class="bg-white dark:bg-gray-700 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="bg-indigo-600 hover:bg-indigo-700 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {% if action == 'edit' %}
+                            Atualizar Função
+                        {% else %}
+                            Criar Função
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

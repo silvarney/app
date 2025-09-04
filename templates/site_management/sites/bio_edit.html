@@ -1,0 +1,390 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Editar Bio - {{ site.domain }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <a href="{% url 'site_management:sites_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Sites</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{% url 'site_management:site_detail' site.id %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">{{ site.domain }}</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Editar Bio</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-edit text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Configure a biografia e informações adicionais do site {{ site.domain }}</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'site_management:site_detail' site.id %}" 
+               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-eye mr-2"></i>
+                Ver Site
+            </a>
+        </div>
+    </div>
+    
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Conteúdo da Bio -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Conteúdo da Bio</h3>
+                <p class="text-sm text-gray-500 mt-1">Escreva uma descrição detalhada sobre o site, seus objetivos e características</p>
+            </div>
+            <div class="px-6 py-4">
+                <div>
+                    <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.content.label }}
+                        {% if form.content.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.content.help_text }}</p>
+                    {% endif %}
+                    {% if form.content.errors %}
+                        <div class="mt-1">
+                            {% for error in form.content.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Contador de caracteres -->
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Use quebras de linha para organizar melhor o conteúdo
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <span id="charCount">0</span> caracteres
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configurações Adicionais -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Configurações</h3>
+                <p class="text-sm text-gray-500 mt-1">Opções adicionais para a bio do site</p>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <!-- Status da Bio -->
+                <div>
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                    {% if form.is_active.errors %}
+                        <div class="mt-1">
+                            {% for error in form.is_active.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Ordem de Exibição -->
+                {% if form.display_order %}
+                <div>
+                    <label for="{{ form.display_order.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.display_order.label }}
+                        {% if form.display_order.field.required %}
+                            <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-sort-numeric-up text-gray-400"></i>
+                        </div>
+                        {{ form.display_order }}
+                    </div>
+                    {% if form.display_order.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.display_order.help_text }}</p>
+                    {% endif %}
+                    {% if form.display_order.errors %}
+                        <div class="mt-1">
+                            {% for error in form.display_order.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Preview da Bio -->
+        {% if site.bio and site.bio.content %}
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Preview Atual</h3>
+                <p class="text-sm text-gray-500 mt-1">Como a bio está sendo exibida atualmente</p>
+            </div>
+            <div class="px-6 py-4">
+                <div class="prose max-w-none bg-gray-50 p-4 rounded-md">
+                    {{ site.bio.content|linebreaks }}
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-1"></i>
+                                <span>Criado: {{ site.bio.created_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            {% if site.bio.updated_at %}
+                                <div class="flex items-center">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    <span>Atualizado: {{ site.bio.updated_at|date:"d/m/Y H:i" }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {% if site.bio.is_active %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Ativa
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Inativa
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Erros Gerais do Formulário -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Erro no formulário</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Botões de Ação -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+            <a href="{% url 'site_management:site_detail' site.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar
+            </a>
+            
+            <div class="flex items-center space-x-3">
+                <button type="button" onclick="previewBio()" 
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-eye mr-2"></i>
+                    Preview
+                </button>
+                
+                <button type="submit" name="action" value="save_and_continue" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar e Continuar
+                </button>
+                
+                <button type="submit" name="action" value="save" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-check mr-2"></i>
+                    Salvar Bio
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de Preview -->
+<div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Preview da Bio</h3>
+            <button onclick="closePreviewModal()" 
+                    class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="border-t border-gray-200 pt-4">
+            <div class="prose max-w-none bg-gray-50 p-6 rounded-md min-h-[200px]" id="previewContent">
+                <!-- Conteúdo do preview será inserido aqui -->
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-end mt-6 pt-4 border-t border-gray-200">
+            <button onclick="closePreviewModal()" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                Fechar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Dicas para Escrever uma Boa Bio -->
+<div class="max-w-4xl mx-auto mt-8">
+    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-lightbulb text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Dicas para uma bio eficaz</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Seja claro e objetivo sobre o propósito do site</li>
+                        <li>Destaque os principais benefícios e diferenciais</li>
+                        <li>Use uma linguagem adequada ao seu público-alvo</li>
+                        <li>Inclua informações de contato ou como encontrar mais detalhes</li>
+                        <li>Mantenha o conteúdo atualizado e relevante</li>
+                        <li>Use quebras de linha para facilitar a leitura</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos personalizados para os campos do formulário */
+.form-textarea {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm min-h-[200px];
+}
+
+.form-checkbox {
+    @apply h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded;
+}
+
+.form-input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+
+.form-input[class*="pl-10"] {
+    @apply pl-10;
+}
+</style>
+
+<script>
+// Contador de caracteres
+document.addEventListener('DOMContentLoaded', function() {
+    const contentField = document.getElementById('{{ form.content.id_for_label }}');
+    const charCount = document.getElementById('charCount');
+    
+    if (contentField && charCount) {
+        function updateCharCount() {
+            charCount.textContent = contentField.value.length;
+        }
+        
+        // Atualizar contador inicial
+        updateCharCount();
+        
+        // Atualizar contador em tempo real
+        contentField.addEventListener('input', updateCharCount);
+        contentField.addEventListener('paste', function() {
+            setTimeout(updateCharCount, 10);
+        });
+    }
+    
+    // Auto-focus no campo de conteúdo
+    if (contentField) {
+        contentField.focus();
+    }
+});
+
+// Função de preview
+function previewBio() {
+    const content = document.getElementById('{{ form.content.id_for_label }}').value;
+    const previewContent = document.getElementById('previewContent');
+    
+    if (content.trim()) {
+        // Converter quebras de linha em parágrafos
+        const formattedContent = content.split('\n\n').map(paragraph => {
+            if (paragraph.trim()) {
+                return '<p>' + paragraph.replace(/\n/g, '<br>') + '</p>';
+            }
+            return '';
+        }).join('');
+        
+        previewContent.innerHTML = formattedContent || '<p class="text-gray-500 italic">Conteúdo vazio</p>';
+    } else {
+        previewContent.innerHTML = '<p class="text-gray-500 italic">Nenhum conteúdo para preview</p>';
+    }
+    
+    document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreviewModal() {
+    document.getElementById('previewModal').classList.add('hidden');
+}
+
+// Fechar modal ao clicar fora dele
+document.getElementById('previewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePreviewModal();
+    }
+});
+
+// Atalhos de teclado
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + P para preview
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        previewBio();
+    }
+    
+    // ESC para fechar modal
+    if (e.key === 'Escape') {
+        closePreviewModal();
+    }
+});
+</script>
+{% endblock %}

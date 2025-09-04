@@ -38,7 +38,7 @@ class AccountAdmin(admin.ModelAdmin):
             'fields': ('id', 'name', 'slug', 'description', 'owner')
         }),
         ('Informações da Empresa', {
-            'fields': ('company_name', 'tax_id', 'website', 'phone'),
+            'fields': ('company_name', 'cnpj', 'cpf', 'website', 'phone'),
             'classes': ('collapse',)
         }),
         ('Endereço', {

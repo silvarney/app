@@ -5,6 +5,31 @@ from .models import User, UserProfile
 
 
 @receiver(post_save, sender=User)
+def assign_default_role(sender, instance, created, **kwargs):
+    """Atribui automaticamente a função 'Usuário Padrão' para novos usuários"""
+    if created:
+        from permissions.models import Role, UserRole
+        
+        try:
+            # Busca a função 'Usuário Padrão' (criada pelos signals de permissions)
+            default_role = Role.objects.get(codename='standard_user')
+            
+            # Cria a associação UserRole para o novo usuário
+            UserRole.objects.get_or_create(
+                user=instance,
+                role=default_role,
+                account=None,  # Role de sistema, não específica de conta
+                defaults={
+                    'status': 'active',
+                    'assigned_by': None  # Atribuição automática do sistema
+                }
+            )
+        except Role.DoesNotExist:
+            # Se a função não existir, não faz nada (será criada pelos comandos de populate)
+            pass
+
+
+@receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     """Cria automaticamente um perfil quando um usuário é criado"""
     if created:

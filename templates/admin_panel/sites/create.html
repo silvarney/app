@@ -1,0 +1,186 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Criar Novo Site - Admin{% endblock %}
+{% block page_title %}Criar Novo Site{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'admin_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <a href="{% url 'site_management:sites_list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Sites</a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                <span class="text-gray-500 dark:text-gray-400">Criar Site</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Preencha as informações básicas para criar um novo site</p>
+    </div>
+    
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Informações Básicas -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Informações Básicas</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Defina as informações principais do site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Domínio -->
+                <div>
+                    <label for="{{ form.domain.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.domain.label }}
+                        {% if form.domain.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ form.domain }}
+                    {% if form.domain.help_text %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ form.domain.help_text }}</p>
+                    {% endif %}
+                    {% if form.domain.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.domain.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Conta -->
+                <div>
+                    <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.account.label }}
+                        {% if form.account.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ form.account }}
+                    {% if form.account.help_text %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ form.account.help_text }}</p>
+                    {% endif %}
+                    {% if form.account.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.account.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configurações do Template -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Configurações do Template</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Escolha o template e plano para o site</p>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Categoria do Template -->
+                <div>
+                    <label for="{{ form.template_category.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.template_category.label }}
+                        {% if form.template_category.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ form.template_category }}
+                    {% if form.template_category.help_text %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ form.template_category.help_text }}</p>
+                    {% endif %}
+                    {% if form.template_category.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.template_category.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tipo de Plano -->
+                <div>
+                    <label for="{{ form.plan_type.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.plan_type.label }}
+                        {% if form.plan_type.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ form.plan_type }}
+                    {% if form.plan_type.help_text %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ form.plan_type.help_text }}</p>
+                    {% endif %}
+                    {% if form.plan_type.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.plan_type.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Status</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Defina o status inicial do site</p>
+            </div>
+            <div class="px-6 py-4">
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.status.label }}
+                        {% if form.status.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ form.status }}
+                    {% if form.status.help_text %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ form.status.help_text }}</p>
+                    {% endif %}
+                    {% if form.status.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.status.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="flex items-center justify-end space-x-4 pt-6">
+            <a href="{% url 'site_management:sites_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancelar
+            </a>
+            
+            <button type="submit" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Criar Site
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Scripts para melhorar a experiência do usuário -->
+<script>
+// Adicionar classes CSS aos campos do formulário
+document.addEventListener('DOMContentLoaded', function() {
+    // Campos de texto
+    const textInputs = document.querySelectorAll('input[type="text"], input[type="url"], input[type="email"], textarea');
+    textInputs.forEach(function(input) {
+        input.classList.add('block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'dark:border-gray-600', 'rounded-md', 'shadow-sm', 'placeholder-gray-400', 'dark:placeholder-gray-500', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'dark:bg-gray-700', 'dark:text-white', 'sm:text-sm');
+    });
+    
+    // Campos select
+    const selectInputs = document.querySelectorAll('select');
+    selectInputs.forEach(function(select) {
+        select.classList.add('block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'dark:border-gray-600', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'dark:bg-gray-700', 'dark:text-white', 'sm:text-sm');
+    });
+});
+</script>
+{% endblock %}

@@ -1,42 +1,9 @@
-{% extends 'dashboard/base_dashboard.html' %}
+{% extends 'user_panel/base.html' %}
 {% load static %}
 
-{% block title %}Configurações do Perfil{% endblock %}
+{% block user_title %}Configurações do Perfil{% endblock %}
 
-{% block breadcrumb %}
-<nav class="flex" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-        <li class="inline-flex items-center">
-            <a href="{% url 'user_panel:dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                <i class="fas fa-home w-4 h-4 mr-2"></i>
-                Dashboard
-            </a>
-        </li>
-        <li>
-            <div class="flex items-center">
-                <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
-                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Configurações do Perfil</span>
-            </div>
-        </li>
-    </ol>
-</nav>
-{% endblock %}
-
-{% block page_title %}
-<div class="flex items-center space-x-3">
-    <div class="flex-shrink-0">
-        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-            <i class="fas fa-user-cog text-indigo-600 text-xl"></i>
-        </div>
-    </div>
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900">Configurações do Perfil</h1>
-        <p class="text-sm text-gray-500">Gerencie suas informações pessoais e preferências</p>
-    </div>
-</div>
-{% endblock %}
-
-{% block dashboard_content %}
+{% block user_content %}
 <div class="space-y-6">
     <!-- Informações Pessoais -->
     <div class="bg-white shadow rounded-lg">

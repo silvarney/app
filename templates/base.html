@@ -6,43 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}SaaS Platform{% endblock %}</title>
     
+    <!-- Meta tags -->
+    <meta name="description" content="{% block description %}Plataforma SaaS moderna e escalável{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}saas, plataforma, multi-tenant{% endblock %}">
+    <meta name="author" content="SaaS Platform">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% load static %}{% static 'images/favicon.ico' %}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        },
-                        secondary: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
-                            400: '#94a3b8',
-                            500: '#64748b',
-                            600: '#475569',
-                            700: '#334155',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}?v=20241201">
+    
+    <!-- Custom CSS -->
+    {% block extra_css %}{% endblock %}
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -64,16 +46,6 @@
             @apply bg-gray-900 bg-opacity-75;
         }
     </style>
-    
-    <!-- Custom CSS -->
-    {% block extra_css %}{% endblock %}
-    
-    <!-- Meta tags -->
-    <meta name="description" content="{% block description %}Plataforma SaaS moderna e responsiva{% endblock %}">
-    <meta name="keywords" content="{% block keywords %}saas, plataforma, dashboard, multi-tenant{% endblock %}">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased" x-data="{ sidebarOpen: false }">
     <!-- Loading Spinner -->

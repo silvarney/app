@@ -1,0 +1,155 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Convidar Membro - {{ account.name }}{% endblock %}
+
+{% block account_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'accounts:list' %}">Contas</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'accounts:detail' account.id %}">{{ account.name }}</a></li>
+                <li class="breadcrumb-item active">Convidar Membro</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0 text-gray-800">Convidar Novo Membro</h1>
+        <p class="text-gray-600">Convide um usuário para se juntar à conta <strong>{{ account.name }}</strong></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informações do Convite</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}" class="font-weight-bold">
+                            {{ form.email.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.email.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Digite o e-mail da pessoa que você deseja convidar.
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.role.id_for_label }}" class="font-weight-bold">
+                            {{ form.role.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.role }}
+                        {% if form.role.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.role.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Selecione o nível de acesso que o membro terá na conta.
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.message.id_for_label }}" class="font-weight-bold">
+                            {{ form.message.label }}
+                        </label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.message.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Mensagem personalizada que será incluída no e-mail de convite (opcional).
+                        </small>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Enviar Convite
+                        </button>
+                        
+                        <a href="{% url 'accounts:detail' account.id %}" class="btn btn-secondary ml-2">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informações da Conta</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="account-avatar">
+                        {{ account.name|first|upper }}
+                    </div>
+                    <h5 class="mt-2 mb-1">{{ account.name }}</h5>
+                    <p class="text-gray-600 small mb-0">{{ account.company_name|default:"Sem empresa" }}</p>
+                </div>
+                
+                <hr>
+                
+                <div class="small text-gray-600">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Plano:</span>
+                        <span class="font-weight-bold">{{ account.get_plan_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Membros:</span>
+                        <span class="font-weight-bold">{{ account.members.count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Proprietário:</span>
+                        <span class="font-weight-bold">{{ account.owner.get_full_name|default:account.owner.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Níveis de Acesso</h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-gray-600">
+                    <div class="mb-3">
+                        <span class="badge badge-danger mb-1">Proprietário</span>
+                        <p class="mb-0">Acesso total à conta, incluindo exclusão e transferência de propriedade.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-warning mb-1">Administrador</span>
+                        <p class="mb-0">Pode gerenciar membros, configurações e a maioria das funcionalidades.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge badge-info mb-1">Editor</span>
+                        <p class="mb-0">Pode editar conteúdo e acessar funcionalidades principais.</p>
+                    </div>
+                    
+                    <div>
+                        <span class="badge badge-secondary mb-1">Visualizador</span>
+                        <p class="mb-0">Acesso somente leitura às informações da conta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
