@@ -32,8 +32,11 @@ RUN npm install
 # Copy project
 COPY . /app/
 
-# Build Tailwind CSS
-RUN npm run build-css-prod || npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
+# Dar permissões de execução para binários Node.js
+RUN chmod +x node_modules/.bin/* || true
+
+# Build Tailwind CSS com fallback
+RUN npm run build-css-prod || npx --yes tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
