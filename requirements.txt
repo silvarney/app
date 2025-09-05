@@ -19,3 +19,4 @@ django-celery-beat>=2.5
 requests>=2.28
 urllib3>=1.26
 certifi>=2022.12.7
+django-filter

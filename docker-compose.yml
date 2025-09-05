@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   web:
+    container_name: app_web
     build: .
     ports:
       - "8009:8000"
@@ -18,6 +19,7 @@ services:
     command: ["gunicorn", "saas_project.wsgi:application", "--bind", "0.0.0.0:8000"]
 
   postgres:
+    container_name: app_postgres
     image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -31,6 +33,7 @@ services:
       - "5439:5432"
 
   redis:
+    container_name: app_redis
     image: redis:7-alpine
     ports:
       - "6389:6379"
@@ -39,6 +42,7 @@ services:
       - redis_data:/data
 
   celery:
+    container_name: app_celery
     build: .
     env_file:
       - .env
@@ -48,6 +52,7 @@ services:
     command: celery -A saas_project worker --loglevel=info
 
   celery-beat:
+    container_name: app_celery_beat
     build: .
     env_file:
       - .env
