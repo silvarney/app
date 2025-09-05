@@ -22,6 +22,8 @@ services:
       timeout: 10s
       retries: 3
     command: ["gunicorn", "saas_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+    networks:
+      - proxy 
 
   postgres:
     container_name: app_postgres
@@ -43,6 +45,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - proxy 
 
   redis:
     container_name: app_redis
@@ -52,6 +56,8 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    networks:
+      - proxy 
 
   celery:
     container_name: app_celery
@@ -66,6 +72,8 @@ services:
       redis:
         condition: service_started
     command: celery -A saas_project worker --loglevel=info
+    networks:
+      - proxy 
 
   celery-beat:
     container_name: app_celery_beat
@@ -80,7 +88,13 @@ services:
       redis:
         condition: service_started
     command: celery -A saas_project beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks:
+      - proxy 
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  proxy:
+    external: true
