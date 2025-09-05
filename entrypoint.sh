@@ -25,6 +25,14 @@ wait_for_service "redis" "6379" "Redis"
 
 echo "Todos os serviços estão prontos. Iniciando aplicação..."
 
+# Aguardar alguns segundos extras para garantir que o PostgreSQL terminou a inicialização
+echo "Aguardando inicialização completa do banco..."
+sleep 5
+
+# Testar conexão com o banco de dados
+echo "Testando conexão com o banco de dados..."
+python -c "import django; django.setup(); from django.db import connection; connection.ensure_connection(); print('Conexão com banco OK!')"
+
 # Executa migrações do banco de dados
 echo "Executando migrações..."
 python manage.py migrate --noinput
