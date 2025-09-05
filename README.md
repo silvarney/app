@@ -1,6 +1,6 @@
-# Sistema SaaS Django
+# Sistema App Django
 
-Um sistema SaaS completo desenvolvido em Django com funcionalidades de multi-tenancy, gerenciamento de usuários, permissões e painéis administrativos.
+Um sistema App completo desenvolvido em Django com funcionalidades de multi-tenancy, gerenciamento de usuários, permissões e painéis administrativos.
 
 ## 🚀 Funcionalidades
 
@@ -171,9 +171,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=saas_db
-      - POSTGRES_USER=saas_user
-      - POSTGRES_PASSWORD=saas_password
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
 
@@ -212,7 +212,7 @@ saas/
 ├── domains/          # Gerenciamento de domínios
 ├── payments/         # Sistema de pagamentos
 ├── permissions/      # Sistema de permissões
-├── saas_project/     # Configurações do Django
+├── app_project/      # Configurações do Django
 ├── static/           # Arquivos estáticos (CSS, JS)
 ├── tasks/            # Sistema de tarefas
 ├── templates/        # Templates HTML

@@ -24,8 +24,8 @@ from domains.models import Domain
 
 
 def admin_login_redirect(request):
-    """Redireciona /admin/login/ para /login/"""
-    return redirect('/login/')
+    """Redireciona /admin/login/ para /"""
+    return redirect('/')
 
 
 @login_required
@@ -1715,7 +1715,93 @@ def admin_settings_general(request):
     if not request.user.is_staff:
         raise PermissionDenied('Você não tem permissão para acessar esta página.')
     
-    return render(request, 'admin_panel/settings/general.html')
+    from settings.models import GlobalSetting
+    
+    if request.method == 'POST':
+        # Processar formulário de configurações gerais
+        if 'app_name' in request.POST:
+            # Salvar configurações gerais
+            app_name = request.POST.get('app_name', '')
+            base_url = request.POST.get('base_url', '')
+            timezone = request.POST.get('timezone', 'America/Sao_Paulo')
+            default_language = request.POST.get('default_language', 'pt-br')
+            maintenance_mode = request.POST.get('maintenance_mode') == 'on'
+            
+            # Atualizar ou criar configurações
+            settings_to_update = [
+                ('site_name', app_name, 'string'),
+                ('base_url', base_url, 'string'),
+                ('default_timezone', timezone, 'string'),
+                ('default_language', default_language, 'string'),
+                ('maintenance_mode', str(maintenance_mode).lower(), 'boolean'),
+            ]
+            
+            for key, value, setting_type in settings_to_update:
+                setting, created = GlobalSetting.objects.get_or_create(
+                    key=key,
+                    defaults={
+                        'value': value,
+                        'setting_type': setting_type,
+                        'category': 'general',
+                        'description': f'Configuração {key}'
+                    }
+                )
+                if not created:
+                    setting.value = value
+                    setting.save()
+            
+            messages.success(request, 'Configurações gerais salvas com sucesso!')
+        
+        # Processar formulário de configurações de email
+        elif 'from_email' in request.POST:
+            from_email = request.POST.get('from_email', '')
+            from_name = request.POST.get('from_name', '')
+            
+            # Atualizar configurações de email
+            email_settings = [
+                ('from_email', from_email, 'string'),
+                ('from_name', from_name, 'string'),
+            ]
+            
+            for key, value, setting_type in email_settings:
+                setting, created = GlobalSetting.objects.get_or_create(
+                    key=key,
+                    defaults={
+                        'value': value,
+                        'setting_type': setting_type,
+                        'category': 'email',
+                        'description': f'Configuração de email {key}'
+                    }
+                )
+                if not created:
+                    setting.value = value
+                    setting.save()
+            
+            messages.success(request, 'Configurações de email salvas com sucesso!')
+        
+        return redirect('admin_panel:admin_settings_general')
+    
+    # Buscar configurações existentes
+    try:
+        settings_dict = {}
+        settings = GlobalSetting.objects.filter(category__in=['general', 'email'])
+        for setting in settings:
+            settings_dict[setting.key] = setting.get_typed_value()
+    except Exception:
+        settings_dict = {}
+    
+    context = {
+        'settings': settings_dict,
+        'app_name': settings_dict.get('site_name', 'App Platform'),
+        'base_url': settings_dict.get('base_url', 'http://localhost:8000'),
+        'timezone': settings_dict.get('default_timezone', 'America/Sao_Paulo'),
+        'default_language': settings_dict.get('default_language', 'pt-br'),
+        'maintenance_mode': settings_dict.get('maintenance_mode', False),
+        'from_email': settings_dict.get('from_email', 'noreply@appplatform.com'),
+        'from_name': settings_dict.get('from_name', 'App Platform'),
+    }
+    
+    return render(request, 'admin_panel/settings/general.html', context)
 
 
 @login_required

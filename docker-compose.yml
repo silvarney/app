@@ -10,7 +10,7 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - DJANGO_SETTINGS_MODULE=saas_project.settings
+      - DJANGO_SETTINGS_MODULE=app_project.settings
     depends_on:
       postgres:
         condition: service_healthy
@@ -21,7 +21,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    command: ["gunicorn", "saas_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+    command: ["gunicorn", "app_project.wsgi:application", "--bind", "0.0.0.0:8000"]
     networks:
       - proxy 
 
@@ -71,7 +71,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    command: celery -A saas_project worker --loglevel=info
+    command: celery -A app_project worker --loglevel=info
     networks:
       - proxy 
 
@@ -87,7 +87,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    command: celery -A saas_project beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A app_project beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     networks:
       - proxy 
 

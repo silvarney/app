@@ -1,6 +1,7 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_migrate
 from django.dispatch import receiver
 from django.utils.text import slugify
+from django.conf import settings
 from .models import User, UserProfile
 
 
@@ -71,3 +72,41 @@ def create_default_account(sender, instance, created, **kwargs):
             owner=instance,
             status='trial'
         )
+
+
+@receiver(post_migrate)
+def create_default_superuser(sender, **kwargs):
+    """Cria automaticamente um usuário superadmin na primeira execução das migrações"""
+    if sender.name != 'users':
+        return
+    
+    # Verifica se já existe algum superusuário
+    if User.objects.filter(is_superuser=True).exists():
+        return
+    
+    # Obtém as credenciais do superusuário das variáveis de ambiente
+    superuser_email = getattr(settings, 'SUPERUSER_EMAIL', 'admin@admin.com')
+    superuser_username = getattr(settings, 'SUPERUSER_USERNAME', 'admin')
+    superuser_password = getattr(settings, 'SUPERUSER_PASSWORD', 'admin123')
+    superuser_first_name = getattr(settings, 'SUPERUSER_FIRST_NAME', 'Super')
+    superuser_last_name = getattr(settings, 'SUPERUSER_LAST_NAME', 'Admin')
+    
+    try:
+        # Cria o superusuário
+        superuser = User.objects.create_superuser(
+            email=superuser_email,
+            username=superuser_username,
+            password=superuser_password,
+            first_name=superuser_first_name,
+            last_name=superuser_last_name,
+            status='active',
+            email_verified=True
+        )
+        
+        print(f"✅ Superusuário criado com sucesso: {superuser.email}")
+        print(f"   Username: {superuser.username}")
+        print(f"   Email: {superuser.email}")
+        print(f"   ⚠️  Lembre-se de alterar a senha padrão após o primeiro login!")
+        
+    except Exception as e:
+        print(f"❌ Erro ao criar superusuário: {e}")

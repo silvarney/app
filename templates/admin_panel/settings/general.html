@@ -50,10 +50,10 @@
                     <input type="text" 
                            name="app_name" 
                            id="app_name" 
-                           value="SaaS Platform"
+                           value="{{ app_name }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        Nome que aparece no cabeçalho e títulos da aplicação.
+                        Nome que aparecerá no cabeçalho e títulos da aplicação.
                     </p>
                 </div>
                 
@@ -65,7 +65,7 @@
                     <input type="url" 
                            name="base_url" 
                            id="base_url" 
-                           value="http://127.0.0.1:8000"
+                           value="{{ base_url }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         URL base da aplicação para links externos e emails.
@@ -80,10 +80,10 @@
                     <select name="timezone" 
                             id="timezone"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="America/Sao_Paulo" selected>América/São Paulo (UTC-3)</option>
-                        <option value="UTC">UTC (UTC+0)</option>
-                        <option value="America/New_York">América/Nova York (UTC-5)</option>
-                        <option value="Europe/London">Europa/Londres (UTC+0)</option>
+                        <option value="America/Sao_Paulo" {% if timezone == 'America/Sao_Paulo' %}selected{% endif %}>América/São Paulo (UTC-3)</option>
+                        <option value="UTC" {% if timezone == 'UTC' %}selected{% endif %}>UTC (UTC+0)</option>
+                        <option value="America/New_York" {% if timezone == 'America/New_York' %}selected{% endif %}>América/Nova York (UTC-5)</option>
+                        <option value="Europe/London" {% if timezone == 'Europe/London' %}selected{% endif %}>Europa/Londres (UTC+0)</option>
                     </select>
                 </div>
                 
@@ -95,9 +95,9 @@
                     <select name="default_language" 
                             id="default_language"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="pt-br" selected>Português (Brasil)</option>
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
+                        <option value="pt-br" {% if default_language == 'pt-br' %}selected{% endif %}>Português (Brasil)</option>
+                        <option value="en" {% if default_language == 'en' %}selected{% endif %}>English</option>
+                        <option value="es" {% if default_language == 'es' %}selected{% endif %}>Español</option>
                     </select>
                 </div>
                 
@@ -106,6 +106,7 @@
                     <input type="checkbox" 
                            name="maintenance_mode" 
                            id="maintenance_mode"
+                           {% if maintenance_mode %}checked{% endif %}
                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                     <label for="maintenance_mode" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Modo de Manutenção
@@ -145,7 +146,7 @@
                     <input type="email" 
                            name="from_email" 
                            id="from_email" 
-                           value="noreply@saasplatform.com"
+                           value="{{ from_email }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
                 
@@ -157,7 +158,7 @@
                     <input type="text" 
                            name="from_name" 
                            id="from_name" 
-                           value="SaaS Platform"
+                           value="{{ from_name }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
                 

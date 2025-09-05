@@ -42,7 +42,7 @@ DB_USER=saas_user
 DB_PASSWORD=saas_password_2024
 DB_HOST=postgres
 DB_PORT=5432
-DATABASE_URL=postgresql://saas_user:saas_password_2024@postgres:5432/saas_db
+DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 ```
 
 ## Comandos Úteis

@@ -67,7 +67,7 @@ def logout_view(request):
     """View de logout"""
     logout(request)
     messages.success(request, 'Você foi desconectado com sucesso.')
-    return redirect('/login/')
+    return redirect('/')
 
 
 @login_required

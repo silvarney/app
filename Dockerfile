@@ -61,4 +61,4 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "saas_project.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app_project.wsgi:application"]

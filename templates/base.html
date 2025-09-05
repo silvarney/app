@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}SaaS Platform{% endblock %}</title>
+    <title>{% block title %}App Platform{% endblock %}</title>
     
     <!-- Meta tags -->
-    <meta name="description" content="{% block description %}Plataforma SaaS moderna e escalável{% endblock %}">
-    <meta name="keywords" content="{% block keywords %}saas, plataforma, multi-tenant{% endblock %}">
-    <meta name="author" content="SaaS Platform">
+    <meta name="description" content="{% block description %}Plataforma App moderna e escalável{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}app, plataforma, multi-tenant{% endblock %}">
+    <meta name="author" content="App Platform">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% load static %}{% static 'images/favicon.ico' %}">
@@ -34,16 +34,9 @@
     
     <!-- Custom Styles -->
     <style>
-        .theme-btn {
-            @apply bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600;
-        }
-        .theme-btn.active {
-            @apply bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-200 border-primary-300 dark:border-primary-600;
-        }
-        
         /* Loading spinner dark mode */
         .dark #loading {
-            @apply bg-gray-900 bg-opacity-75;
+            background-color: rgba(17, 24, 39, 0.75);
         }
     </style>
 </head>
@@ -59,12 +52,12 @@
     </div>
     
     <!-- Main Content -->
-    <div class="min-h-full">
+    <div class="min-h-screen">
         {% block content %}
         <!-- Default content if no specific content is provided -->
         <div class="flex items-center justify-center min-h-screen">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo à Plataforma SaaS</h1>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo à Plataforma App</h1>
                 <p class="text-lg text-gray-600">Uma solução moderna e escalável para seu negócio</p>
             </div>
         </div>

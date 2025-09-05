@@ -7,7 +7,7 @@ import os
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'saas_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app_project.settings')
 django.setup()
 
 from django.contrib.sites.models import Site

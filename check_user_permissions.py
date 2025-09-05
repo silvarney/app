@@ -3,7 +3,7 @@ import os
 import django
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'saas.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app_project.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model

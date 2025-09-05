@@ -1,5 +1,5 @@
 """
-URL configuration for saas_project project.
+URL configuration for app_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -28,7 +28,7 @@ def home_redirect(request):
         else:
             return redirect('user_panel:dashboard')
     else:
-        return redirect('/login/')
+        return redirect('/')
 
 def health_check(request):
     """Endpoint de health check para Docker"""
@@ -43,10 +43,11 @@ def health_check(request):
 from users.views import login_view, logout_view, profile_view, register_view, password_reset_view, password_reset_confirm_view
 
 urlpatterns = [
-    path('', home_redirect, name='home'),
+    path('', login_view, name='home'),
     path('health/', health_check, name='health_check'),  # Health check para Docker
-    path('django-admin/', admin.site.urls),  # Admin Django nativo
-    path('login/', login_view, name='login'),         # Login direto
+    path('admin/', admin.site.urls),  # Admin Django nativo
+    path('django-admin/', admin.site.urls),  # Admin Django nativo (compatibilidade)
+    # path('login/', login_view, name='login'),         # Login direto - REMOVIDO (login agora está na raiz)
     path('logout/', logout_view, name='logout'),      # Logout direto
     path('register/', register_view, name='register'), # Registro direto
     path('password-reset/', password_reset_view, name='password_reset'), # Recuperação de senha
