@@ -8,10 +8,12 @@ Este projeto utiliza PostgreSQL como banco de dados principal com um processo ro
 
 O script `postgres-init/init-db.sql` é executado automaticamente na primeira inicialização do container PostgreSQL e:
 
-- Cria o usuário `saas_user` se não existir
-- Cria o banco de dados `saas_db` se não existir
+- **Usa variáveis de ambiente**: Utiliza `POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB` do docker-compose.yml
+- Cria o usuário dinamicamente baseado na variável `POSTGRES_USER`
+- Cria o banco de dados dinamicamente baseado na variável `POSTGRES_DB`
 - Concede privilégios necessários ao usuário
 - Permite que o usuário crie bancos de dados (necessário para testes)
+- **Evita hardcoding**: Não usa valores fixos, garantindo flexibilidade
 
 ### 2. Healthcheck e Dependências
 
