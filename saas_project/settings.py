@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-e#4rszncp$nx#^f@=oceq
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
