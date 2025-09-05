@@ -3,7 +3,7 @@ services:
     container_name: app_web
     build: .
     ports:
-      - "8009:8000"
+      - "8009:8000"  # host:container
     env_file:
       - .env
     environment:
@@ -17,7 +17,7 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-H", "Host: app.criaremos.com", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "http://app_web:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -58,8 +58,8 @@ services:
     build: .
     env_file:
       - .env
-    environment:                
-      DJANGO_SETTINGS_MODULE: saas_project.settings
+    environment:
+      - DJANGO_SETTINGS_MODULE=saas_project.settings
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,8 +72,8 @@ services:
     build: .
     env_file:
       - .env
-    environment:                # <-- (ADICIONADO)
-      DJANGO_SETTINGS_MODULE: saas_project.settings
+    environment:
+      - DJANGO_SETTINGS_MODULE=saas_project.settings
     depends_on:
       postgres:
         condition: service_healthy
