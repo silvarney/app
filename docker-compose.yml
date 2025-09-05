@@ -10,6 +10,7 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SETTINGS_MODULE=saas_project.settings
     depends_on:
       postgres:
         condition: service_healthy
@@ -57,6 +58,8 @@ services:
     build: .
     env_file:
       - .env
+    environment:                
+      DJANGO_SETTINGS_MODULE: saas_project.settings
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,6 +72,8 @@ services:
     build: .
     env_file:
       - .env
+    environment:                # <-- (ADICIONADO)
+      DJANGO_SETTINGS_MODULE: saas_project.settings
     depends_on:
       postgres:
         condition: service_healthy
