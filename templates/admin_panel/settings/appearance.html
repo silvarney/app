@@ -1,4 +1,4 @@
-{% extends 'dashboard/base_dashboard.html' %}
+{% extends 'admin_panel/base_admin.html' %}
 {% load static %}
 
 {% block title %}Configurações de Aparência - Admin{% endblock %}
@@ -50,9 +50,9 @@
                     <select name="default_theme" 
                             id="default_theme"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="light" selected>Claro</option>
-                        <option value="dark">Escuro</option>
-                        <option value="auto">Automático (Sistema)</option>
+                        <option value="light" {% if default_theme == 'light' %}selected{% endif %}>Claro</option>
+                        <option value="dark" {% if default_theme == 'dark' %}selected{% endif %}>Escuro</option>
+                        <option value="auto" {% if default_theme == 'auto' %}selected{% endif %}>Automático (Sistema)</option>
                     </select>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         Tema padrão aplicado para novos usuários.
@@ -64,7 +64,7 @@
                     <input type="checkbox" 
                            name="allow_theme_switching" 
                            id="allow_theme_switching"
-                           checked
+                           {% if allow_theme_switching %}checked{% endif %}
                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                     <label for="allow_theme_switching" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Permitir que usuários alterem o tema
@@ -80,13 +80,13 @@
                         <input type="color" 
                                name="primary_color" 
                                id="primary_color" 
-                               value="#3B82F6"
+                               value="{{ primary_color }}"
                                class="h-10 w-20 border border-gray-300 rounded-md cursor-pointer">
                         <input type="text" 
                                name="primary_color_hex" 
                                id="primary_color_hex" 
-                               value="#3B82F6"
-                               placeholder="#3B82F6"
+                               value="{{ primary_color }}"
+                               placeholder="{{ primary_color }}"
                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     </div>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -103,13 +103,13 @@
                         <input type="color" 
                                name="secondary_color" 
                                id="secondary_color" 
-                               value="#6B7280"
+                               value="{{ secondary_color }}"
                                class="h-10 w-20 border border-gray-300 rounded-md cursor-pointer">
                         <input type="text" 
                                name="secondary_color_hex" 
                                id="secondary_color_hex" 
-                               value="#6B7280"
-                               placeholder="#6B7280"
+                               value="{{ secondary_color }}"
+                               placeholder="{{ secondary_color }}"
                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     </div>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -119,7 +119,7 @@
                 
                 <div class="flex justify-end">
                     <button type="submit" 
-                            class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                            class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors">
                         <i class="fas fa-save mr-2"></i>
                         Salvar Configurações
                     </button>
@@ -238,6 +238,7 @@
                     <input type="checkbox" 
                            name="sidebar_collapsed_default" 
                            id="sidebar_collapsed_default"
+                           {% if sidebar_collapsed_default %}checked{% endif %}
                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                     <label for="sidebar_collapsed_default" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Sidebar colapsada por padrão
@@ -249,7 +250,7 @@
                     <input type="checkbox" 
                            name="show_breadcrumbs" 
                            id="show_breadcrumbs"
-                           checked
+                           {% if show_breadcrumbs %}checked{% endif %}
                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                     <label for="show_breadcrumbs" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Mostrar breadcrumbs de navegação
@@ -264,9 +265,9 @@
                     <select name="ui_density" 
                             id="ui_density"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="compact">Compacta</option>
-                        <option value="normal" selected>Normal</option>
-                        <option value="comfortable">Confortável</option>
+                        <option value="compact" {% if ui_density == 'compact' %}selected{% endif %}>Compacta</option>
+                        <option value="normal" {% if ui_density == 'normal' %}selected{% endif %}>Normal</option>
+                        <option value="comfortable" {% if ui_density == 'comfortable' %}selected{% endif %}>Confortável</option>
                     </select>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         Controla o espaçamento e tamanho dos elementos da interface.
@@ -278,7 +279,7 @@
                     <input type="checkbox" 
                            name="enable_animations" 
                            id="enable_animations"
-                           checked
+                           {% if enable_animations %}checked{% endif %}
                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                     <label for="enable_animations" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Habilitar animações da interface
@@ -319,10 +320,10 @@
                         </div>
                     </div>
                     <div class="mt-4 flex space-x-2">
-                        <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm transition-colors">
+                        <button class="preview-primary-btn px-4 py-2 rounded-md text-sm transition-colors">
                             Botão Primário
                         </button>
-                        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm transition-colors">
+                        <button class="preview-secondary-btn px-4 py-2 rounded-md text-sm transition-colors">
                             Botão Secundário
                         </button>
                     </div>
@@ -336,26 +337,100 @@
     </div>
 </div>
 
+<style>
+:root {
+    --primary-color: {{ primary_color|default:'#2563eb' }};
+    --secondary-color: {{ secondary_color|default:'#6b7280' }};
+}
+
+/* Aplicar cores dinâmicas aos botões e elementos */
+.bg-primary-600, .btn-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-primary-700, .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 85%, black) !important;
+}
+
+.text-primary-600 {
+    color: var(--primary-color) !important;
+}
+
+.text-primary-700 {
+    color: color-mix(in srgb, var(--primary-color) 85%, black) !important;
+}
+
+.border-primary-500, .focus\:border-primary-500:focus {
+    border-color: var(--primary-color) !important;
+}
+
+.ring-primary-500, .focus\:ring-primary-500:focus {
+    --tw-ring-color: var(--primary-color) !important;
+}
+
+.bg-primary-50 {
+    background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+}
+
+.bg-primary-100 {
+    background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+}
+
+/* Preview dos botões com cores atualizadas */
+.preview-primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.preview-primary-btn:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 85%, black);
+}
+
+.preview-secondary-btn {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.preview-secondary-btn:hover {
+    background-color: color-mix(in srgb, var(--secondary-color) 85%, black);
+}
+</style>
+
 <script>
-// Sincronizar color picker com input de texto
+// Sincronizar color picker com input de texto e aplicar cores em tempo real
+function updateColors() {
+    const primaryColor = document.getElementById('primary_color').value;
+    const secondaryColor = document.getElementById('secondary_color').value;
+    
+    document.documentElement.style.setProperty('--primary-color', primaryColor);
+    document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+}
+
 document.getElementById('primary_color').addEventListener('change', function() {
     document.getElementById('primary_color_hex').value = this.value;
+    updateColors();
 });
 
 document.getElementById('primary_color_hex').addEventListener('input', function() {
     if (/^#[0-9A-F]{6}$/i.test(this.value)) {
         document.getElementById('primary_color').value = this.value;
+        updateColors();
     }
 });
 
 document.getElementById('secondary_color').addEventListener('change', function() {
     document.getElementById('secondary_color_hex').value = this.value;
+    updateColors();
 });
 
 document.getElementById('secondary_color_hex').addEventListener('input', function() {
     if (/^#[0-9A-F]{6}$/i.test(this.value)) {
         document.getElementById('secondary_color').value = this.value;
+        updateColors();
     }
 });
+
+// Aplicar cores iniciais
+document.addEventListener('DOMContentLoaded', updateColors);
 </script>
 {% endblock %}

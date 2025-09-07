@@ -1828,7 +1828,83 @@ def admin_settings_appearance(request):
     if not request.user.is_staff:
         raise PermissionDenied('Você não tem permissão para acessar esta página.')
     
-    return render(request, 'admin_panel/settings/appearance.html')
+    from settings.models import GlobalSetting
+    
+    if request.method == 'POST':
+        # Processar configurações de tema
+        if 'default_theme' in request.POST:
+            theme_settings = [
+                ('default_theme', request.POST.get('default_theme', 'light'), 'string'),
+                ('allow_theme_switching', str(request.POST.get('allow_theme_switching') == 'on').lower(), 'boolean'),
+                ('primary_color', request.POST.get('primary_color', '#3B82F6'), 'string'),
+                ('secondary_color', request.POST.get('secondary_color', '#6B7280'), 'string'),
+            ]
+            
+            for key, value, setting_type in theme_settings:
+                setting, created = GlobalSetting.objects.get_or_create(
+                    key=key,
+                    defaults={
+                        'value': value,
+                        'setting_type': setting_type,
+                        'category': 'appearance',
+                        'description': f'Configuração de aparência {key}'
+                    }
+                )
+                if not created:
+                    setting.value = value
+                    setting.save()
+            
+            messages.success(request, 'Configurações de tema salvas com sucesso!')
+        
+        # Processar configurações de layout
+        elif 'sidebar_collapsed_default' in request.POST or 'show_breadcrumbs' in request.POST or 'ui_density' in request.POST or 'enable_animations' in request.POST:
+            layout_settings = [
+                ('sidebar_collapsed_default', str(request.POST.get('sidebar_collapsed_default') == 'on').lower(), 'boolean'),
+                ('show_breadcrumbs', str(request.POST.get('show_breadcrumbs') == 'on').lower(), 'boolean'),
+                ('ui_density', request.POST.get('ui_density', 'normal'), 'string'),
+                ('enable_animations', str(request.POST.get('enable_animations') == 'on').lower(), 'boolean'),
+            ]
+            
+            for key, value, setting_type in layout_settings:
+                setting, created = GlobalSetting.objects.get_or_create(
+                    key=key,
+                    defaults={
+                        'value': value,
+                        'setting_type': setting_type,
+                        'category': 'appearance',
+                        'description': f'Configuração de layout {key}'
+                    }
+                )
+                if not created:
+                    setting.value = value
+                    setting.save()
+            
+            messages.success(request, 'Configurações de layout salvas com sucesso!')
+        
+        return redirect('admin_panel:admin_settings_appearance')
+    
+    # Buscar configurações existentes
+    try:
+        settings_dict = {}
+        settings = GlobalSetting.objects.filter(category='appearance')
+        for setting in settings:
+            settings_dict[setting.key] = setting.get_typed_value()
+    except Exception:
+        settings_dict = {}
+    
+    context = {
+        'settings': settings_dict,
+        'default_theme': settings_dict.get('default_theme', 'light'),
+        'allow_theme_switching': settings_dict.get('allow_theme_switching', True),
+        'primary_color': settings_dict.get('primary_color', '#3B82F6'),
+        'secondary_color': settings_dict.get('secondary_color', '#6B7280'),
+        'sidebar_collapsed_default': settings_dict.get('sidebar_collapsed_default', False),
+        'show_breadcrumbs': settings_dict.get('show_breadcrumbs', True),
+        'ui_density': settings_dict.get('ui_density', 'normal'),
+        'enable_animations': settings_dict.get('enable_animations', True),
+    }
+    
+    return render(request, 'admin_panel/settings/appearance.html', context)
 
 
 class AccountForm(forms.ModelForm):

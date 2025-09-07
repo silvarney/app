@@ -1,0 +1,214 @@
+<!-- Logo and brand -->
+<div class="flex items-center flex-shrink-0 px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-rocket text-white text-sm"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white">SaaS Platform</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% if current_account %}{{ current_account.name }}{% else %}Dashboard{% endif %}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="flex-1 px-2 py-4 bg-white dark:bg-gray-800 overflow-y-auto sidebar-scroll">
+    <div class="space-y-1">
+        <!-- Dashboard Home -->
+        <a href="{% url 'user_panel:dashboard' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'dashboard' %}nav-item-active{% endif %}">
+            <i class="fas fa-home mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Dashboard
+        </a>
+
+        <!-- Analytics -->
+        <a href="{% url 'user_panel:user_analytics' %}"
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'user_analytics' %}nav-item-active{% endif %}">
+            <i class="fas fa-chart-bar mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Analytics
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Sites -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sites</h3>
+        </div>
+        
+        <a href="{% url 'site_management:sites_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'sites_list' %}nav-item-active{% endif %}">
+            <i class="fas fa-globe mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Site
+        </a>
+        
+        <a href="{% url 'user_panel:bio_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'bio' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-user mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Bio
+        </a>
+        
+        <a href="{% url 'user_panel:categories_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'categories' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-tags mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Categorias
+        </a>
+        
+        <a href="{% url 'user_panel:services_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'services' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-cogs mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Serviços
+        </a>
+        
+        <a href="{% url 'user_panel:social_networks_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'social' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-share-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Redes sociais
+        </a>
+        
+        <a href="{% url 'user_panel:cta_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'cta' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-mouse-pointer mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            CTA
+        </a>
+        
+        <a href="{% url 'user_panel:blog_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'blog' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-blog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Blog
+        </a>
+        
+        <a href="{% url 'user_panel:banners_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'banners' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-image mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Banners
+        </a>
+
+        <!-- Content Management -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-file-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Conteúdo
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Pagamentos -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pagamentos</h3>
+        </div>
+        
+        <a href="{% url 'user_panel:items_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'items' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-box mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Itens
+        </a>
+        
+        <a href="{% url 'user_panel:plan_types_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'plan_types' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-layer-group mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Tipos de Planos
+        </a>
+        
+        <a href="{% url 'user_panel:subscription_items_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'subscription_items' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-list-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Itens da Assinatura
+        </a>
+        
+        <a href="{% url 'user_panel:extracts_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'extracts' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-file-invoice mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Extratos
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        
+        <!-- Section: Conta -->
+        <div class="px-2 py-2">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Conta</h3>
+        </div>
+
+        <!-- Members (only if user can manage account) -->
+        {% if can_manage_account %}
+        <a href="{% url 'user_panel:members_list' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'members' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+            <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Membros
+        </a>
+        {% endif %}
+
+        <!-- Settings -->
+        <a href="{% url 'user_panel:settings' %}" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'settings' %}nav-item-active{% endif %}">
+            <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Configurações
+        </a>
+
+        <!-- Help & Support -->
+        <a href="#" 
+           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            Ajuda
+        </a>
+    </div>
+</nav>
+
+<!-- Account switcher (if user has multiple accounts) -->
+{% if user.memberships.count > 1 %}
+<div class="flex-shrink-0 border-t border-gray-200 p-4">
+    <div x-data="{ open: false }" class="relative">
+        <button @click="open = !open" 
+                class="w-full flex items-center justify-between p-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-building text-primary-600 text-xs"></i>
+                </div>
+                <div class="text-left">
+                    <p class="font-medium">{% if current_account %}{{ current_account.name|truncatechars:20 }}{% else %}Selecionar Conta{% endif %}</p>
+                    <p class="text-xs text-gray-500">Trocar conta</p>
+                </div>
+            </div>
+            <i class="fas fa-chevron-up text-gray-400 transform transition-transform" :class="{ 'rotate-180': open }"></i>
+        </button>
+        
+        <!-- Account switcher dropdown -->
+        <div x-show="open" 
+             @click.away="open = false"
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="transform opacity-0 scale-95"
+             x-transition:enter-end="transform opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="transform opacity-100 scale-100"
+             x-transition:leave-end="transform opacity-0 scale-95"
+             class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+            <div class="py-1 max-h-48 overflow-y-auto">
+                {% for membership in user.memberships.all %}
+                    <a href="?account={{ membership.account.id }}" 
+                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {% if current_account.id == membership.account.id %}bg-primary-50 text-primary-700{% endif %}">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-4 h-4 bg-primary-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-building text-primary-600 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">{{ membership.account.name }}</p>
+                                <p class="text-xs text-gray-500">{{ membership.get_role_display }}</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Footer -->
+<div class="flex-shrink-0 border-t border-gray-200 p-4">
+    <div class="text-center">
+        <p class="text-xs text-gray-500">© 2024 SaaS Platform</p>
+        <p class="text-xs text-gray-400 mt-1">Versão 1.0.0</p>
+    </div>
+</div>

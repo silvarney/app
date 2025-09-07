@@ -1,0 +1,233 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}Relatórios - Dashboard{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard de Relatórios</h1>
+            <p class="mt-2 text-gray-600">Visão geral das suas contas e membros</p>
+        </div>
+
+        <!-- Estatísticas Gerais -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total de Contas</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ total_accounts }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total de Membros</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ total_members }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Crescimento</dt>
+                            <dd class="text-lg font-medium text-gray-900">+12%</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Atividade</dt>
+                            <dd class="text-lg font-medium text-gray-900">Alta</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Crescimento de Contas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Crescimento de Contas</h3>
+                <canvas id="accountsChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Crescimento de Membros -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Crescimento de Membros</h3>
+                <canvas id="membersChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Distribuição de Papéis -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribuição de Papéis</h3>
+                <div class="space-y-4">
+                    {% for role in role_distribution %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">{{ role.role|capfirst }}</span>
+                        <span class="text-sm text-gray-500">{{ role.count }} membros</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-500">Nenhum dado disponível</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Contas Mais Ativas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Contas Mais Ativas</h3>
+                <div class="space-y-4">
+                    {% for account in top_accounts %}
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ account.name }}</p>
+                            <p class="text-xs text-gray-500">{{ account.company_name|default:"Sem empresa" }}</p>
+                        </div>
+                        <span class="text-sm text-gray-500">{{ account.member_count }} membros</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-500">Nenhuma conta encontrada</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Links Rápidos -->
+        <div class="mt-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Relatórios Detalhados</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <a href="{% url 'user_panel:reports_accounts' %}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="text-center">
+                            <svg class="mx-auto h-8 w-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900">Relatório de Contas</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'user_panel:reports_members' %}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="text-center">
+                            <svg class="mx-auto h-8 w-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900">Relatório de Membros</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'user_panel:reports_activity' %}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="text-center">
+                            <svg class="mx-auto h-8 w-8 text-yellow-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900">Atividades</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'user_panel:reports_export' %}?type=accounts" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="text-center">
+                            <svg class="mx-auto h-8 w-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900">Exportar Dados</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Gráfico de Crescimento de Contas
+const accountsData = {{ accounts_growth|safe }};
+const accountsCtx = document.getElementById('accountsChart').getContext('2d');
+new Chart(accountsCtx, {
+    type: 'line',
+    data: {
+        labels: accountsData.map(item => item.month),
+        datasets: [{
+            label: 'Contas Criadas',
+            data: accountsData.map(item => item.count),
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Gráfico de Crescimento de Membros
+const membersData = {{ members_growth|safe }};
+const membersCtx = document.getElementById('membersChart').getContext('2d');
+new Chart(membersCtx, {
+    type: 'line',
+    data: {
+        labels: membersData.map(item => item.month),
+        datasets: [{
+            label: 'Membros Adicionados',
+            data: membersData.map(item => item.count),
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

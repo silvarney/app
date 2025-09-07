@@ -1,0 +1,180 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}Excluir Assinatura{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <!-- Header -->
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Excluir Assinatura</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">Esta ação não pode ser desfeita</p>
+            </div>
+            <div>
+                <a href="{% url 'user_panel:subscriptions_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="px-4 py-5 sm:p-6">
+        <!-- Aviso -->
+        <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Atenção!</h3>
+                    <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                        <p>Você está prestes a excluir permanentemente esta assinatura. Esta ação:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Não pode ser desfeita</li>
+                            <li>Removerá todos os dados relacionados</li>
+                            <li>Pode afetar pagamentos associados</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações da Assinatura -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Informações da Assinatura</h4>
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Site</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ subscription.site.domain }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Conta</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ subscription.account.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                    <dd class="mt-1">
+                        {% if subscription.status == 'active' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Ativo</span>
+                        {% elif subscription.status == 'inactive' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">Inativo</span>
+                        {% elif subscription.status == 'suspended' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Suspenso</span>
+                        {% elif subscription.status == 'canceled' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">Cancelado</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Valor Total</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">R$ {{ subscription.total_value|floatformat:2 }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Criado em</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ subscription.created_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Expira em</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                        {% if subscription.expires_at %}
+                            {{ subscription.expires_at|date:"d/m/Y H:i" }}
+                        {% else %}
+                            Sem data de expiração
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Estatísticas relacionadas -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Dados relacionados</h3>
+                    <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                        <p>Esta assinatura possui:</p>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>{{ subscription.subscription_items.count }} item(ns) de assinatura</li>
+                            <li>{{ subscription.payments.count }} pagamento(s) associado(s)</li>
+                        </ul>
+                        <p class="mt-2">Todos estes dados também serão removidos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de confirmação -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Confirmação por texto -->
+            <div>
+                <label for="confirm_text" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Para confirmar a exclusão, digite <strong>EXCLUIR</strong> no campo abaixo:
+                </label>
+                <div class="mt-1">
+                    <input type="text" id="confirm_text" name="confirm_text" required class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white sm:text-sm" placeholder="Digite EXCLUIR para confirmar">
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'user_panel:subscriptions_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" id="delete-button" disabled class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Excluir Assinatura
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Script para validação -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmInput = document.getElementById('confirm_text');
+        const deleteButton = document.getElementById('delete-button');
+        
+        confirmInput.addEventListener('input', function() {
+            if (this.value.trim().toUpperCase() === 'EXCLUIR') {
+                deleteButton.disabled = false;
+                deleteButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                deleteButton.disabled = true;
+                deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+        
+        // Prevenir envio acidental
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (confirmInput.value.trim().toUpperCase() !== 'EXCLUIR') {
+                e.preventDefault();
+                alert('Por favor, digite EXCLUIR para confirmar a exclusão.');
+                return false;
+            }
+            
+            if (!confirm('Tem certeza de que deseja excluir esta assinatura? Esta ação não pode ser desfeita.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

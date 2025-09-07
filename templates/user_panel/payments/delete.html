@@ -1,0 +1,181 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <!-- Header -->
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">{{ page_title }}</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">Confirme a exclusão do pagamento</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'user_panel:payments_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aviso de exclusão -->
+    <div class="px-4 py-5 sm:p-6">
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Atenção!</h3>
+                    <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                        <p>Esta ação não pode ser desfeita. O pagamento será permanentemente removido do sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do pagamento -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Informações do Pagamento</h4>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Título</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">{{ object.title }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                    <dd class="mt-1">
+                        {% if object.status == 'paid' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Pago</span>
+                        {% elif object.status == 'pending' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Pendente</span>
+                        {% elif object.status == 'failed' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">Falhou</span>
+                        {% elif object.status == 'canceled' %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">Cancelado</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                {% if object.subscription %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Site da Assinatura</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.subscription.site.domain }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Conta da Assinatura</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.subscription.account.name }}</dd>
+                    </div>
+                {% endif %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Valor</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">R$ {{ object.value|floatformat:2 }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Desconto</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">R$ {{ object.discount|floatformat:2 }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Valor Total</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">R$ {{ object.total_value|floatformat:2 }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Período</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.payment_month|stringformat:"02d" }}/{{ object.payment_year }}</dd>
+                </div>
+                {% if object.due_date %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Data de Vencimento</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.due_date|date:"d/m/Y" }}</dd>
+                    </div>
+                {% endif %}
+                {% if object.payment_date %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Data de Pagamento</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.payment_date|date:"d/m/Y" }}</dd>
+                    </div>
+                {% endif %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Criado em</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.created_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Última atualização</dt>
+                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.updated_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                {% if object.notes %}
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Observações</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.notes|linebreaks }}</dd>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Estatísticas relacionadas -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-4">Impacto da Exclusão</h4>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">1</div>
+                    <div class="text-sm text-blue-800 dark:text-blue-200">Pagamento será removido</div>
+                </div>
+                {% if object.subscription %}
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ object.subscription.payment_set.count|add:"-1" }}</div>
+                        <div class="text-sm text-blue-800 dark:text-blue-200">Pagamentos restantes na assinatura</div>
+                    </div>
+                {% endif %}
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ {{ object.total_value|floatformat:2 }}</div>
+                    <div class="text-sm text-blue-800 dark:text-blue-200">Valor que será removido</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de confirmação -->
+        <form method="post" id="deleteForm">
+            {% csrf_token %}
+            <div class="flex items-center justify-end space-x-3">
+                <a href="{% url 'user_panel:payments_list' %}" class="bg-white dark:bg-gray-700 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <a href="{% url 'user_panel:payments_edit' object.id %}" class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Editar ao invés de excluir
+                </a>
+                <button type="submit" class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" id="confirmDelete">
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deleteForm');
+    const confirmButton = document.getElementById('confirmDelete');
+    
+    if (form && confirmButton) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (confirm('Tem certeza que deseja excluir este pagamento? Esta ação não pode ser desfeita.')) {
+                // Desabilita o botão para evitar duplo clique
+                confirmButton.disabled = true;
+                confirmButton.textContent = 'Excluindo...';
+                
+                // Submete o formulário
+                form.submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

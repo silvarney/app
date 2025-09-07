@@ -62,6 +62,6 @@ urlpatterns = [
     path('api/settings/', include('settings.urls')),  # Configurações API
     path('payments/', include('payments.urls')),      # Pagamentos
     path('accounts-management/', include('accounts.urls')),  # Gerenciamento de Contas
-    path('sites/', include('site_management.urls')),  # Gerenciamento de Sites
+    path('sites/', include('site_management.urls')),  # Gerenciamento de Sites (compatibilidade)
     path('admin-panel/sites/', include('site_management.urls')),  # Gerenciamento de Sites (Admin)
 ]

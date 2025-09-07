@@ -161,41 +161,9 @@
                              x-transition:leave-end="transform opacity-0 scale-95"
                              class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                             <div class="py-1">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <a href="{% url 'user_panel:profile_settings' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-user mr-2"></i> Meu Perfil
                                 </a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <i class="fas fa-cog mr-2"></i> Configurações
-                                </a>
-                                
-                                <!-- Theme Selector -->
-                                <div class="px-4 py-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">
-                                            <i class="fas fa-palette mr-2"></i> Aparência
-                                        </span>
-                                    </div>
-                                    <div class="mt-2 flex items-center space-x-2">
-                                        <button onclick="setTheme('light')" 
-                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                                                data-theme="light"
-                                                title="Tema Claro">
-                                            <i class="fas fa-sun mr-1"></i> Claro
-                                        </button>
-                                        <button onclick="setTheme('dark')" 
-                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                                                data-theme="dark"
-                                                title="Tema Escuro">
-                                            <i class="fas fa-moon mr-1"></i> Escuro
-                                        </button>
-                                        <button onclick="setTheme('auto')" 
-                                                class="theme-btn flex-1 px-3 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                                                data-theme="auto"
-                                                title="Automático">
-                                            <i class="fas fa-adjust mr-1"></i> Auto
-                                        </button>
-                                    </div>
-                                </div>
                                 
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-question-circle mr-2"></i> Ajuda

@@ -1,0 +1,131 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Editar CTA{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{% url 'user_panel:cta_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">CTA</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Editar CTA</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'user_panel:cta_list' %}" 
+               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar para CTA
+            </a>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Editar CTA</h1>
+        <p class="mt-2 text-sm text-gray-700">
+            Edite as informações do Call-to-Action
+        </p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <form method="post" class="space-y-6 p-6">
+            {% csrf_token %}
+            
+            <!-- Título -->
+            <div>
+                <label for="id_title" class="block text-sm font-medium text-gray-700">
+                    Título *
+                </label>
+                <div class="mt-1">
+                    <input type="text" 
+                           name="title" 
+                           id="id_title"
+                           value="{{ cta.title|default:'' }}"
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                           placeholder="Digite o título do CTA"
+                           required>
+                </div>
+            </div>
+
+            <!-- Descrição -->
+            <div>
+                <label for="id_description" class="block text-sm font-medium text-gray-700">
+                    Descrição
+                </label>
+                <div class="mt-1">
+                    <textarea name="description" 
+                              id="id_description"
+                              rows="3"
+                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              placeholder="Digite a descrição do CTA">{{ cta.description|default:'' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Texto do Botão -->
+            <div>
+                <label for="id_button_text" class="block text-sm font-medium text-gray-700">
+                    Texto do Botão *
+                </label>
+                <div class="mt-1">
+                    <input type="text" 
+                           name="button_text" 
+                           id="id_button_text"
+                           value="{{ cta.button_text|default:'' }}"
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                           placeholder="Ex: Clique Aqui, Saiba Mais, etc."
+                           required>
+                </div>
+            </div>
+
+            <!-- URL do Link -->
+            <div>
+                <label for="id_link_url" class="block text-sm font-medium text-gray-700">
+                    URL do Link *
+                </label>
+                <div class="mt-1">
+                    <input type="url" 
+                           name="link_url" 
+                           id="id_link_url"
+                           value="{{ cta.link_url|default:'' }}"
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                           placeholder="https://exemplo.com"
+                           required>
+                </div>
+            </div>
+
+            <!-- Ativo -->
+            <div class="flex items-center">
+                <input type="checkbox" 
+                       name="is_active" 
+                       id="id_is_active"
+                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                       {% if cta.is_active %}checked{% endif %}>
+                <label for="id_is_active" class="ml-2 block text-sm text-gray-900">
+                    Ativo
+                </label>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'user_panel:cta_list' %}" 
+                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

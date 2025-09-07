@@ -6,7 +6,7 @@
         </div>
         <div>
             <h1 class="text-lg font-bold text-gray-900 dark:text-white">SaaS Platform</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400">{% if current_account %}{{ current_account.name }}{% else %}Dashboard{% endif %}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% if user.is_staff %}Admin Panel{% else %}{% if current_account %}{{ current_account.name }}{% else %}Dashboard{% endif %}{% endif %}</p>
         </div>
     </div>
 </div>
@@ -15,222 +15,283 @@
 <nav class="flex-1 px-2 py-4 bg-white dark:bg-gray-800 overflow-y-auto sidebar-scroll">
     <div class="space-y-1">
         <!-- Dashboard Home -->
-        <a href="{% url 'admin_panel:dashboard' %}" 
+        <a href="{% if user.is_staff %}{% url 'admin_panel:dashboard' %}{% else %}{% url 'user_panel:dashboard' %}{% endif %}" 
            class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'dashboard' %}nav-item-active{% endif %}">
             <i class="fas fa-home mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
             Dashboard
         </a>
 
         <!-- Analytics -->
-        <a href="#" 
-           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+        <a href="{% if user.is_staff %}{% url 'admin_panel:analytics' %}{% else %}{% url 'user_panel:user_analytics' %}{% endif %}"
+                   class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'user_analytics' or request.resolver_match.url_name == 'analytics' %}nav-item-active{% endif %}">
             <i class="fas fa-chart-bar mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
             Analytics
         </a>
 
         <!-- Divider -->
         <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-        
-        <!-- Section: Gestão -->
-        <div class="px-2 py-2">
-            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gestão</h3>
-        </div>
 
-        <!-- Users Management -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                <div class="flex items-center">
-                    <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Usuários
-                </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'admin_panel:users_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Lista de Usuários
-                </a>
-                <a href="{% url 'admin_panel:user_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Adicionar Usuário
-                </a>
-                <a href="{% url 'admin_panel:roles_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-user-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Funções e Permissões
-                </a>
+        {% if user.is_staff %}
+            <!-- MENU ADMIN -->
+            <!-- Section: Gestão -->
+            <div class="px-2 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gestão</h3>
             </div>
-        </div>
 
-        <!-- Accounts Management -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                <div class="flex items-center">
-                    <i class="fas fa-building mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Contas
+            <!-- Users Management -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                        Usuários
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+                </button>
+                <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{% url 'admin_panel:users_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Lista de Usuários
+                    </a>
+                    <a href="{% url 'admin_panel:user_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Adicionar Usuário
+                    </a>
+                    <a href="{% url 'admin_panel:roles_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-user-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Funções e Permissões
+                    </a>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'admin_panel:accounts_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Lista de Contas
-                </a>
-                <a href="{% url 'admin_panel:account_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Nova Conta
-                </a>
             </div>
-        </div>
-        
-        <!-- Members Management -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                <div class="flex items-center">
-                    <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Membros
+
+            <!-- Accounts Management -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-building mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                        Contas
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+                </button>
+                <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{% url 'admin_panel:accounts_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Lista de Contas
+                    </a>
+                    <a href="{% url 'admin_panel:account_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Nova Conta
+                    </a>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'admin_panel:all_members' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Gerenciar Membros
-                </a>
-                <a href="{% url 'admin_panel:add_member_to_account' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Adicionar Membro
-                </a>
             </div>
-        </div>
-
-        <!-- Sites Management -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'sites' in request.resolver_match.url_name %}nav-item-active{% endif %}">
-                <div class="flex items-center">
-                    <i class="fas fa-globe mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Sites
+            
+            <!-- Members Management -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-friends mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                        Membros
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+                </button>
+                <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{% url 'admin_panel:all_members' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-users mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Gerenciar Membros
+                    </a>
+                    <a href="{% url 'admin_panel:add_member_to_account' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-user-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Adicionar Membro
+                    </a>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'site_management:sites_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md {% if request.resolver_match.url_name == 'sites_list' %}nav-item-active{% endif %}">
-                    <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Lista de Sites
-                </a>
-                <a href="{% url 'site_management:site_create' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md {% if request.resolver_match.url_name == 'site_create' %}nav-item-active{% endif %}">
-                    <i class="fas fa-plus mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Novo Site
-                </a>
-                <a href="{% url 'site_management:sites_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-tags mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Categorias
-                </a>
             </div>
-        </div>
 
-        <!-- Content Management -->
-        <a href="#" 
-           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-            <i class="fas fa-file-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-            Conteúdo
-        </a>
+            <!-- Divider -->
+            <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+            
+            <!-- Section: Sistema -->
+            <div class="px-2 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sistema</h3>
+            </div>
 
-        <!-- Divider -->
-        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-        
-        <!-- Section: Financeiro -->
-        <div class="px-2 py-2">
-            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Financeiro</h3>
-        </div>
+            <!-- Reports -->
+            <a href="#" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-chart-pie mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Relatórios
+            </a>
 
-        <!-- Billing -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                <div class="flex items-center">
-                    <i class="fas fa-credit-card mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Faturamento
+            <!-- Settings -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                        Configurações
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+                </button>
+                <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{% url 'admin_panel:admin_settings_general' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Geral
+                    </a>
+                    <a href="{% url 'admin_panel:admin_settings_security' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Segurança
+                    </a>
+                    <a href="{% url 'admin_panel:admin_settings_notifications' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Notificações
+                    </a>
+                    <a href="{% url 'admin_panel:admin_settings_appearance' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Aparência
+                    </a>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-receipt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Faturas
-                </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-chart-line mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Relatórios
-                </a>
-                <a href="#" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Configurações
-                </a>
             </div>
-        </div>
 
-        <!-- Subscriptions -->
-        <a href="#" 
-           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-            <i class="fas fa-crown mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-            Assinaturas
-        </a>
+            <!-- Help & Support -->
+            <a href="#" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Ajuda
+            </a>
 
-        <!-- Divider -->
-        <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-        
-        <!-- Section: Sistema -->
-        <div class="px-2 py-2">
-            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sistema</h3>
-        </div>
+        {% else %}
+            <!-- MENU USUÁRIO COMUM -->
+            <!-- Section: Sites -->
+            <div class="px-2 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sites</h3>
+            </div>
+            
+            <a href="{% url 'site_management:sites_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'sites_list' %}nav-item-active{% endif %}">
+                <i class="fas fa-globe mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Site
+            </a>
+            
+            <a href="{% url 'user_panel:bio_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'bio' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-user mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Bio
+            </a>
+            
+            <a href="{% url 'user_panel:categories_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'categories' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-tags mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Categorias
+            </a>
+            
+            <a href="{% url 'user_panel:services_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'services' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-cogs mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Serviços
+            </a>
+            
+            <a href="{% url 'user_panel:social_networks_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'social' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-share-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Redes sociais
+            </a>
+            
+            <a href="{% url 'user_panel:cta_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'cta' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-mouse-pointer mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                CTA
+            </a>
+            
+            <a href="{% url 'user_panel:blog_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'blog' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-blog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Blog
+            </a>
+            
+            <a href="{% url 'user_panel:banners_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'banners' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-image mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Banners
+            </a>
 
-        <!-- Reports -->
-        <a href="#" 
-           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-            <i class="fas fa-chart-pie mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-            Relatórios
-        </a>
+            <!-- Divider -->
+            <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+            
+            <!-- Section: Pagamentos -->
+            <div class="px-2 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pagamentos</h3>
+            </div>
+            
+            <a href="{% url 'user_panel:items_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'items' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-box mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Itens
+            </a>
+            
+            <a href="{% url 'user_panel:plan_types_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'plan_types' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-layer-group mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Tipos de Planos
+            </a>
+            
+            <a href="{% url 'user_panel:subscription_items_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'subscription_items' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-list-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Itens da Assinatura
+            </a>
+            
+            <a href="{% url 'user_panel:extracts_list' %}" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if 'extracts' in request.resolver_match.url_name %}nav-item-active{% endif %}">
+                <i class="fas fa-file-invoice mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Extratos
+            </a>
 
-        <!-- Settings -->
-        <div x-data="{ open: false }">
-            <button @click="open = !open" 
-                    class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                <div class="flex items-center">
-                    <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-                    Configurações
+            <!-- Divider -->
+            <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+            
+            <!-- Section: Configurações -->
+            <div class="px-2 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Configurações</h3>
+            </div>
+
+            <!-- Settings -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="nav-item group w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-cog mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                        Configurações
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
+                </button>
+                <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{% url 'user_panel:user_settings_general' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Geral
+                    </a>
+                    <a href="{% url 'user_panel:user_settings_security' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Segurança
+                    </a>
+                    <a href="{% url 'user_panel:user_settings_notifications' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Notificações
+                    </a>
+                    <a href="{% url 'user_panel:user_settings_appearance' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
+                        Aparência
+                    </a>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
-            </button>
-            <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'admin_panel:admin_settings_general' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-sliders-h mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Geral
-                </a>
-                <a href="{% url 'admin_panel:admin_settings_security' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-shield-alt mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Segurança
-                </a>
-                <a href="{% url 'admin_panel:admin_settings_notifications' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-bell mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Notificações
-                </a>
-                <a href="{% url 'admin_panel:admin_settings_appearance' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
-                    <i class="fas fa-palette mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Aparência
-                </a>
             </div>
-        </div>
 
-        <!-- Help & Support -->
-        <a href="#" 
-           class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-            <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
-            Ajuda
-        </a>
+            <!-- Help & Support -->
+            <a href="#" 
+               class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-question-circle mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+                Ajuda
+            </a>
+        {% endif %}
     </div>
 </nav>
 

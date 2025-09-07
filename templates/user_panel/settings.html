@@ -84,7 +84,7 @@
                     
                     <div v-for="setting in userSettings" :key="setting.key" class="setting-item">
                         <div class="flex-1">
-                            <div class="setting-label">{{ setting.name|default:setting.key }}</div>
+                            <div class="setting-label">{{ setting.name || setting.key }}</div>
                             <div v-if="setting.description" class="setting-description">{{ setting.description }}</div>
                         </div>
                         <div class="setting-control">
@@ -156,7 +156,7 @@
                     
                     <div v-for="setting in accountSettings" :key="setting.key" class="setting-item">
                         <div class="flex-1">
-                            <div class="setting-label">{{ setting.name|default:setting.key }}</div>
+                            <div class="setting-label">{{ setting.name || setting.key }}</div>
                             <div v-if="setting.description" class="setting-description">{{ setting.description }}</div>
                         </div>
                         <div class="setting-control">
@@ -194,7 +194,7 @@
                     
                     <div v-for="setting in globalSettings" :key="setting.key" class="setting-item">
                         <div class="flex-1">
-                            <div class="setting-label">{{ setting.name|default:setting.key }}</div>
+                            <div class="setting-label">{{ setting.name || setting.key }}</div>
                             <div v-if="setting.description" class="setting-description">{{ setting.description }}</div>
                         </div>
                         <div class="setting-control">
@@ -246,7 +246,7 @@ createApp({
             accountSettings: [],
             globalSettings: [],
             message: null,
-            canManageAccount: {{ user.account_membership.can_manage_settings|yesno:'true,false' }},
+            canManageAccount: {{ can_manage_account|yesno:'true,false' }},
             isAdmin: {{ user.is_staff|yesno:'true,false' }},
             categories: [
                 { key: 'user', name: 'Pessoais', icon: 'fas fa-user' },

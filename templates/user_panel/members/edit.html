@@ -1,0 +1,153 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}Editar Membro - {{ membership.user.get_full_name|default:membership.user.email }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'user_panel:members_list' %}" class="mr-4 text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Editar Membro</h1>
+                <p class="mt-1 text-sm text-gray-500">
+                    Alterar papel de {{ membership.user.get_full_name|default:membership.user.email }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do membro -->
+    <div class="bg-white shadow sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    {% if membership.user.avatar %}
+                        <img class="h-12 w-12 rounded-full" src="{{ membership.user.avatar.url }}" alt="{{ membership.user.get_full_name }}">
+                    {% else %}
+                        <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-lg font-medium text-gray-700">
+                                {{ membership.user.get_full_name|default:membership.user.email|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        {{ membership.user.get_full_name|default:membership.user.email }}
+                    </h3>
+                    <p class="text-sm text-gray-500">{{ membership.user.email }}</p>
+                    {% if membership.user.phone %}
+                        <p class="text-xs text-gray-400">{{ membership.user.phone }}</p>
+                    {% endif %}
+                </div>
+                <div class="ml-auto">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        {% if membership.role == 'owner' %}bg-yellow-100 text-yellow-800
+                        {% elif membership.role == 'admin' %}bg-purple-100 text-purple-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        Papel atual: {{ membership.get_role_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de edição -->
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Novo papel -->
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700">
+                        Novo papel do membro
+                    </label>
+                    <div class="mt-1">
+                        <select name="role" 
+                                id="role" 
+                                class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            {% for value, label in role_choices %}
+                                {% if value != 'owner' %}
+                                    <option value="{{ value }}" {% if value == membership.role %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-500">
+                        <div class="space-y-1">
+                            <p><strong>Membro:</strong> Pode visualizar informações da conta</p>
+                            <p><strong>Administrador:</strong> Pode gerenciar membros e configurações</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações sobre a mudança -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">
+                                Atenção
+                            </h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <p>A alteração do papel será aplicada imediatamente e afetará as permissões do usuário na conta.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end space-x-3">
+                    <a href="{% url 'user_panel:members_list' %}" 
+                       class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Histórico do membro -->
+    <div class="mt-6 bg-gray-50 border border-gray-200 rounded-md p-4">
+        <h4 class="text-sm font-medium text-gray-900 mb-2">Informações do membro</h4>
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Membro desde</dt>
+                <dd class="text-sm text-gray-900">{{ membership.created_at|date:"d/m/Y H:i" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Última atualização</dt>
+                <dd class="text-sm text-gray-900">{{ membership.updated_at|date:"d/m/Y H:i" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="text-sm text-gray-900">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {{ membership.get_status_display }}
+                    </span>
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}

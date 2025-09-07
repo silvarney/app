@@ -1,0 +1,60 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Blog - Gerenciar{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Blog</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-blog text-red-600 text-xl"></i>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Gerenciar Blog</h1>
+                <p class="text-sm text-gray-500">Gerencie os posts do blog dos seus sites</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'user_panel:blog_create' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <i class="fas fa-plus mr-2"></i>
+                Novo Post
+            </a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Posts do Blog</h3>
+        </div>
+        
+        <div class="p-6">
+            <div class="text-center py-12">
+                <i class="fas fa-blog text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum post encontrado</h3>
+                <p class="text-gray-500 mb-6">Comece criando seu primeiro post para o blog.</p>
+                <a href="{% url 'user_panel:blog_create' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    <i class="fas fa-plus mr-2"></i>
+                    Criar Primeiro Post
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

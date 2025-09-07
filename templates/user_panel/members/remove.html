@@ -1,0 +1,196 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}Remover Membro - {{ membership.user.get_full_name|default:membership.user.email }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'user_panel:members_list' %}" class="mr-4 text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Remover Membro</h1>
+                <p class="mt-1 text-sm text-gray-500">
+                    Confirmar remoção de {{ membership.user.get_full_name|default:membership.user.email }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aviso de confirmação -->
+    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                    Ação irreversível
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                    <p>Esta ação não pode ser desfeita. O membro perderá acesso imediato à conta e todos os dados associados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do membro -->
+    <div class="bg-white shadow sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    {% if membership.user.avatar %}
+                        <img class="h-12 w-12 rounded-full" src="{{ membership.user.avatar.url }}" alt="{{ membership.user.get_full_name }}">
+                    {% else %}
+                        <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-lg font-medium text-gray-700">
+                                {{ membership.user.get_full_name|default:membership.user.email|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        {{ membership.user.get_full_name|default:membership.user.email }}
+                    </h3>
+                    <p class="text-sm text-gray-500">{{ membership.user.email }}</p>
+                    {% if membership.user.phone %}
+                        <p class="text-xs text-gray-400">{{ membership.user.phone }}</p>
+                    {% endif %}
+                </div>
+                <div class="ml-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        {% if membership.role == 'admin' %}bg-purple-100 text-purple-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ membership.get_role_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Detalhes do membro -->
+            <div class="mt-4 border-t border-gray-200 pt-4">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-3">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Membro desde</dt>
+                        <dd class="text-sm text-gray-900">{{ membership.created_at|date:"d/m/Y" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Tempo na conta</dt>
+                        <dd class="text-sm text-gray-900">{{ membership.created_at|timesince }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Status atual</dt>
+                        <dd class="text-sm text-gray-900">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {{ membership.get_status_display }}
+                            </span>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consequências da remoção -->
+    <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-6">
+        <h4 class="text-sm font-medium text-gray-900 mb-3">O que acontecerá após a remoção:</h4>
+        <ul class="text-sm text-gray-700 space-y-2">
+            <li class="flex items-start">
+                <svg class="flex-shrink-0 h-4 w-4 text-gray-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                O usuário perderá acesso imediato à conta
+            </li>
+            <li class="flex items-start">
+                <svg class="flex-shrink-0 h-4 w-4 text-gray-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                O status do membro será alterado para "Inativo"
+            </li>
+            <li class="flex items-start">
+                <svg class="flex-shrink-0 h-4 w-4 text-gray-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                O usuário pode ser convidado novamente no futuro
+            </li>
+            <li class="flex items-start">
+                <svg class="flex-shrink-0 h-4 w-4 text-gray-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                O histórico de participação será mantido
+            </li>
+        </ul>
+    </div>
+
+    <!-- Formulário de confirmação -->
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="text-center">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    Tem certeza que deseja remover este membro?
+                </h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    Digite "REMOVER" no campo abaixo para confirmar a remoção.
+                </p>
+                
+                <form method="post" class="space-y-4" onsubmit="return confirmRemoval()">
+                    {% csrf_token %}
+                    
+                    <div class="max-w-xs mx-auto">
+                        <input type="text" 
+                               id="confirmation" 
+                               placeholder="Digite REMOVER"
+                               class="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-gray-300 rounded-md text-center"
+                               required>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-3">
+                        <a href="{% url 'user_panel:members_list' %}" 
+                           class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                id="removeButton"
+                                disabled
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Remover Membro
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Habilitar botão apenas quando "REMOVER" for digitado
+document.getElementById('confirmation').addEventListener('input', function() {
+    const button = document.getElementById('removeButton');
+    if (this.value === 'REMOVER') {
+        button.disabled = false;
+    } else {
+        button.disabled = true;
+    }
+});
+
+// Confirmação adicional
+function confirmRemoval() {
+    const confirmation = document.getElementById('confirmation').value;
+    if (confirmation !== 'REMOVER') {
+        alert('Por favor, digite "REMOVER" para confirmar.');
+        return false;
+    }
+    return confirm('Esta ação é irreversível. Tem certeza que deseja continuar?');
+}
+</script>
+{% endblock %}

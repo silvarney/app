@@ -1,0 +1,189 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'user_panel:items_list' %}" 
+               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Voltar para Itens
+            </a>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">{{ page_title }}</h1>
+        <p class="mt-2 text-sm text-gray-700">
+            Crie um novo item que pode ser incluído nos planos
+        </p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <form method="post" class="space-y-6 p-6">
+            {% csrf_token %}
+            
+            <!-- Título -->
+            <div>
+                <label for="id_title" class="block text-sm font-medium text-gray-700">
+                    Título *
+                </label>
+                <div class="mt-1">
+                    <input type="text" 
+                           name="title" 
+                           id="id_title" 
+                           value="{{ form.title.value|default:'' }}"
+                           required
+                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                           placeholder="Ex: Domínio personalizado">
+                </div>
+                {% if form.title.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {{ form.title.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Descrição -->
+            <div>
+                <label for="id_description" class="block text-sm font-medium text-gray-700">
+                    Descrição *
+                </label>
+                <div class="mt-1">
+                    <textarea name="description" 
+                              id="id_description" 
+                              rows="4"
+                              required
+                              class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                              placeholder="Descreva detalhadamente o que este item oferece...">{{ form.description.value|default:'' }}</textarea>
+                </div>
+                {% if form.description.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {{ form.description.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Valor -->
+            <div>
+                <label for="id_value" class="block text-sm font-medium text-gray-700">
+                    Valor (R$) *
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">R$</span>
+                    </div>
+                    <input type="number" 
+                           name="value" 
+                           id="id_value" 
+                           value="{{ form.value.value|default:'' }}"
+                           step="0.01"
+                           min="0"
+                           required
+                           class="block w-full pl-12 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                           placeholder="0,00">
+                </div>
+                {% if form.value.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {{ form.value.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Status -->
+            <div>
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="is_active" 
+                           id="id_is_active" 
+                           {% if form.is_active.value %}checked{% endif %}
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="id_is_active" class="ml-2 block text-sm text-gray-900">
+                        Item ativo
+                    </label>
+                </div>
+                <p class="mt-1 text-sm text-gray-500">
+                    Itens ativos podem ser incluídos nos planos
+                </p>
+                {% if form.is_active.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {{ form.is_active.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Categoria de Template -->
+            <div>
+                <label for="id_template_category" class="block text-sm font-medium text-gray-700">
+                    Categoria de Template
+                </label>
+                <div class="mt-1">
+                    <select name="template_category" 
+                            id="id_template_category"
+                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                        <option value="">Selecione uma categoria (opcional)</option>
+                        {% for category in template_categories %}
+                            <option value="{{ category.id }}" 
+                                    {% if form.template_category.value == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <p class="mt-1 text-sm text-gray-500">
+                    Associe este item a uma categoria de template específica (opcional)
+                </p>
+                {% if form.template_category.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {{ form.template_category.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'user_panel:items_list' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Criar Item
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Informações Adicionais -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">
+                    Dicas para criar um bom item
+                </h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Use um título claro e descritivo</li>
+                        <li>Detalhe bem os benefícios na descrição</li>
+                        <li>Defina um valor justo baseado no valor agregado</li>
+                        <li>Associe a uma categoria quando aplicável</li>
+                        <li>Mantenha apenas itens ativos que estão sendo oferecidos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

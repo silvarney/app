@@ -46,16 +46,24 @@ def sites_list(request):
     """Lista de sites do usuário"""
     user = request.user
     
-    # Buscar contas do usuário
-    user_accounts = Account.objects.filter(
-        memberships__user=user,
-        memberships__status='active'
-    ).distinct()
+    # Detectar se está sendo acessado pelo admin_panel
+    is_admin_panel = '/admin-panel/' in request.path
     
-    # Buscar sites das contas do usuário
-    sites = Site.objects.filter(
-        account__in=user_accounts
-    ).select_related('account', 'plan_type').order_by('-created_at')
+    # Para admin_panel, permitir acesso a todos os sites se for staff
+    if is_admin_panel and user.is_staff:
+        user_accounts = Account.objects.filter(status='active')
+        sites = Site.objects.all().select_related('account', 'plan_type').order_by('-created_at')
+    else:
+        # Buscar contas do usuário
+        user_accounts = Account.objects.filter(
+            memberships__user=user,
+            memberships__status='active'
+        ).distinct()
+        
+        # Buscar sites das contas do usuário
+        sites = Site.objects.filter(
+            account__in=user_accounts
+        ).select_related('account', 'plan_type').order_by('-created_at')
     
     # Filtros
     search = request.GET.get('search', '')
@@ -64,7 +72,6 @@ def sites_list(request):
     
     if search:
         sites = sites.filter(
-            Q(name__icontains=search) |
             Q(domain__icontains=search) |
             Q(account__name__icontains=search)
         )

@@ -1,0 +1,111 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Excluir CTA{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{% url 'user_panel:cta_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">CTA</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <span class="ml-1 text-sm font-medium text-gray-500">Excluir CTA</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'user_panel:cta_list' %}" 
+               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar para CTA
+            </a>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Excluir CTA</h1>
+        <p class="mt-2 text-sm text-gray-700">
+            Confirme a exclusão do Call-to-Action
+        </p>
+    </div>
+
+    <!-- Confirmação -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="p-6">
+            <div class="flex items-center mb-6">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Confirmar Exclusão
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Esta ação não pode ser desfeita. O CTA será permanentemente removido.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Detalhes do CTA -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 class="text-sm font-medium text-gray-900 mb-2">CTA a ser excluído:</h4>
+                <div class="space-y-2">
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">Título:</span>
+                        <span class="text-sm text-gray-900 ml-2">{{ cta.title }}</span>
+                    </div>
+                    {% if cta.description %}
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">Descrição:</span>
+                        <span class="text-sm text-gray-900 ml-2">{{ cta.description }}</span>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">Texto do Botão:</span>
+                        <span class="text-sm text-gray-900 ml-2">{{ cta.button_text }}</span>
+                    </div>
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">URL:</span>
+                        <span class="text-sm text-gray-900 ml-2">{{ cta.link_url }}</span>
+                    </div>
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">Status:</span>
+                        <span class="text-sm ml-2">
+                            {% if cta.is_active %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Ativo
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    Inativo
+                                </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Confirmação -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="flex justify-end space-x-3">
+                    <a href="{% url 'user_panel:cta_list' %}" 
+                       class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Confirmar Exclusão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

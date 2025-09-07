@@ -38,6 +38,19 @@
         .dark #loading {
             background-color: rgba(17, 24, 39, 0.75);
         }
+        
+        /* Global Dynamic Colors */
+        :root {
+            --primary-color: {% if global_primary_color %}{{ global_primary_color }}{% else %}#3b82f6{% endif %};
+            --secondary-color: {% if global_secondary_color %}{{ global_secondary_color }}{% else %}#6b7280{% endif %};
+        }
+        
+        /* Override Tailwind primary colors with dynamic values - Only if variables are available */
+        {% if global_primary_color %}
+        .bg-primary-600 { background-color: var(--primary-color) !important; }
+        .text-primary-600 { color: var(--primary-color) !important; }
+        .border-primary-600 { border-color: var(--primary-color) !important; }
+        {% endif %}
     </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased" x-data="{ sidebarOpen: false }">

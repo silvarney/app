@@ -1,4 +1,4 @@
-{% extends 'user_panel/base.html' %}
+{% extends 'admin_panel/base_admin.html' %}
 {% load static %}
 
 {% block user_title %}{{ site.domain }} - Detalhes{% endblock %}
@@ -128,7 +128,7 @@
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Conta</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            <a href="{% url 'user_panel:account_detail' site.account.id %}" class="text-indigo-600 hover:text-indigo-900">
+                            <a href="{% url 'admin_panel:account_detail' site.account.id %}" class="text-indigo-600 hover:text-indigo-900">
                                 {{ site.account.name }}
                             </a>
                         </dd>

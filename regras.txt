@@ -2,3 +2,8 @@ Regras que devem ser seguidas a risca!
 1. o resumo dos ajustes não pode passar de um paragrafo.
 2. se o mesmo problema surgir mais de uma vez, sempre mude a abordagem.
 3. nunca altere estruturas fora do escopo do problema ou implementação.
+4. Se não entender a solicitação, pergunte ao usuário.
+5. Os ajustes devem ser especificos ao que foi solicitado e aos arquivos.
+6. Só altere o necessário. Se não houver nada a ser alterado, não faça nada.
+7. remoção, inclusão ou ajustes precisa validar que também foi ajustado em todos os pontos que tem essa referência.
+8. Antes de confirma que o problema foi resolvido, verificar o terminal para analisar se não tem problema.

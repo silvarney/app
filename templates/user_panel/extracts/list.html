@@ -1,0 +1,184 @@
+{% extends 'user_panel/page_base.html' %}
+{% load static %}
+
+{% block title %}Extratos{% endblock %}
+{% block page_title %}Extratos{% endblock %}
+
+{% block page_main_title %}Extratos{% endblock %}
+{% block page_description %}Visualize e gerencie seus extratos financeiros{% endblock %}
+
+{% block breadcrumb_current %}Extratos{% endblock %}
+
+{% block page_actions %}
+<button type="button" class="page-action-button">
+    <i class="fas fa-download mr-2"></i>
+    Exportar
+</button>
+{% endblock %}
+
+{% block page_filters %}
+<div class="page-filter-card">
+    <div class="page-filter-content">
+        <form method="get" class="page-form-grid">
+            <div class="page-form-field">
+                <label for="date_from" class="page-form-label">Data Inicial</label>
+                <input type="date" id="date_from" name="date_from" value="{{ request.GET.date_from }}"
+                       class="page-form-input">
+            </div>
+            <div class="page-form-field">
+                <label for="date_to" class="page-form-label">Data Final</label>
+                <input type="date" id="date_to" name="date_to" value="{{ request.GET.date_to }}"
+                       class="page-form-input">
+            </div>
+            <div class="page-form-field">
+                <label for="type" class="page-form-label">Tipo</label>
+                <select id="type" name="type" class="page-form-select">
+                    <option value="">Todos</option>
+                    <option value="credit" {% if request.GET.type == 'credit' %}selected{% endif %}>Crédito</option>
+                    <option value="debit" {% if request.GET.type == 'debit' %}selected{% endif %}>Débito</option>
+                </select>
+            </div>
+            <div class="page-form-field">
+                <label class="page-form-label">&nbsp;</label>
+                <button type="submit" class="page-primary-button w-full">
+                    <i class="fas fa-search mr-2"></i>
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="page-card">
+    <div class="page-card-header">
+        <h2 class="text-lg font-medium text-gray-900">Lista de Extratos</h2>
+    </div>
+        
+    {% if extracts %}
+        <div class="overflow-x-auto">
+            <table class="page-table">
+                <thead class="page-table-header">
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="page-table-body">
+                    {% for extract in extracts %}
+                    <tr class="page-table-row">
+                        <td class="page-table-cell">
+                            {{ extract.created_at|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="page-table-cell">
+                            {{ extract.description|default:"-" }}
+                        </td>
+                        <td class="page-table-cell">
+                            {% if extract.type == 'credit' %}
+                                <span class="page-status-badge page-status-success">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    Crédito
+                                </span>
+                            {% else %}
+                                <span class="page-status-badge page-status-error">
+                                    <i class="fas fa-arrow-down mr-1"></i>
+                                    Débito
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="page-table-cell font-medium">
+                            {% if extract.type == 'credit' %}
+                                <span class="text-green-600">+ R$ {{ extract.amount|floatformat:2 }}</span>
+                            {% else %}
+                                <span class="text-red-600">- R$ {{ extract.amount|floatformat:2 }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="page-table-cell">
+                            {% if extract.status == 'completed' %}
+                                <span class="page-status-badge page-status-success">
+                                    Concluído
+                                </span>
+                            {% elif extract.status == 'pending' %}
+                                <span class="page-status-badge page-status-warning">
+                                    Pendente
+                                </span>
+                            {% else %}
+                                <span class="page-status-badge page-status-error">
+                                    Cancelado
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="page-table-cell text-right">
+                            <button type="button" 
+                               class="text-primary-600 hover:text-primary-900 mr-3">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="page-pagination">
+                <div class="page-pagination-mobile">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" class="page-pagination-btn">
+                            Anterior
+                        </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" class="page-pagination-btn">
+                            Próximo
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="page-pagination-desktop">
+                    <div class="page-pagination-info">
+                        <p>Mostrando <span class="font-medium">{{ page_obj.start_index }}</span> a <span class="font-medium">{{ page_obj.end_index }}</span> de <span class="font-medium">{{ paginator.count }}</span> resultados</p>
+                    </div>
+                    <div class="page-pagination-nav">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" class="page-pagination-arrow">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-pagination-current">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" class="page-pagination-number">
+                                    {{ num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" class="page-pagination-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="page-empty-state">
+                <div class="page-empty-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h3 class="page-empty-title">Nenhum extrato encontrado</h3>
+                <p class="page-empty-description">Não há extratos para exibir no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

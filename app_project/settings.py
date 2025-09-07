@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-e#4rszncp$nx#^f@=oceq
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Configuração de ALLOWED_HOSTS para desenvolvimento local e produção
-allowed_hosts_env = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,0.0.0.0')
+allowed_hosts_env = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,0.0.0.0,testserver')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -83,6 +83,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'app_project.middleware.AdminRedirectMiddleware',  # Redireciona staff para admin-panel
     'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'permissions.middleware.PermissionDeniedMiddleware',
@@ -102,6 +103,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app_project.context_processors.appearance_settings',
             ],
         },
     },
@@ -403,6 +405,11 @@ LOGGING = {
         'saas_project': {
             'handlers': ['console', 'file'] if not DEBUG else ['console'],
             'level': config('LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'app_project.middleware': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },
