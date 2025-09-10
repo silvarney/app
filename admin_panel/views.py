@@ -19,6 +19,7 @@ from django.contrib.auth import authenticate
 from users.models import User
 from accounts.models import Account, AccountMembership, AccountInvitation
 from permissions.models import Permission, Role, UserRole
+from permissions.decorators import admin_required
 from content.models import Content, Category, Tag
 from domains.models import Domain
 
@@ -28,12 +29,9 @@ def admin_login_redirect(request):
     return redirect('/')
 
 
-@login_required
+@admin_required
 def dashboard(request):
     """Dashboard principal do painel administrativo"""
-    # Verificar se o usuário é staff
-    if not request.user.is_staff:
-        raise PermissionDenied('Você não tem permissão para acessar o painel administrativo.')
     # Estatísticas gerais
     total_users = User.objects.count()
     active_users = User.objects.filter(is_active=True).count()
@@ -69,7 +67,7 @@ def dashboard(request):
     return render(request, 'admin_panel/dashboard.html', context)
 
 
-@login_required
+@admin_required
 def users_list(request):
     """Lista de usuários com filtros e paginação"""
     # Verificar se o usuário é staff
@@ -134,7 +132,7 @@ def users_list(request):
     return render(request, 'admin_panel/users/list.html', context)
 
 
-@login_required
+@admin_required
 def user_detail(request, user_id):
     """Detalhes de um usuário específico"""
     # Verificar se o usuário é staff
@@ -164,7 +162,7 @@ def user_detail(request, user_id):
     return render(request, 'admin_panel/users/detail.html', context)
 
 
-@login_required
+@admin_required
 def accounts_list(request):
     """Lista de contas com filtros e paginação"""
     # Verificar se o usuário é staff
@@ -207,7 +205,7 @@ def accounts_list(request):
     return render(request, 'admin_panel/accounts/list.html', context)
 
 
-@login_required
+@admin_required
 def account_detail(request, account_id):
     """Detalhes de uma conta específica"""
     # Verificar se o usuário é staff
@@ -237,7 +235,7 @@ def account_detail(request, account_id):
     return render(request, 'admin_panel/accounts/detail.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def toggle_user_status(request, user_id):
     """Ativar/desativar usuário via AJAX"""
@@ -258,7 +256,7 @@ def toggle_user_status(request, user_id):
     })
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def toggle_account_status(request, account_id):
     """Alterar status da conta via AJAX"""
@@ -300,7 +298,7 @@ def toggle_account_status(request, account_id):
         }, status=500)
 
 
-@login_required
+@admin_required
 def permission_detail(request, permission_id):
     """Detalhes de uma permissão específica"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -323,7 +321,7 @@ def permission_detail(request, permission_id):
     return render(request, 'admin_panel/permissions/detail.html', context)
 
 
-@login_required
+@admin_required
 def permission_create(request):
     """Criar nova permissão"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -348,7 +346,7 @@ def permission_create(request):
     return render(request, 'admin_panel/permissions/form.html', context)
 
 
-@login_required
+@admin_required
 def permission_edit(request, permission_id):
     """Editar permissão existente"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -380,7 +378,7 @@ def permission_edit(request, permission_id):
     return render(request, 'admin_panel/permissions/form.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def permission_delete(request, permission_id):
     """Excluir permissão"""
@@ -422,7 +420,7 @@ def permission_delete(request, permission_id):
         })
 
 
-@login_required
+@admin_required
 def roles_list(request):
     """Lista de roles do sistema"""
     # Verificar se o usuário é staff
@@ -464,7 +462,7 @@ def roles_list(request):
     return render(request, 'admin_panel/roles/list.html', context)
 
 
-@login_required
+@admin_required
 def permissions_list(request):
     """Lista de permissões do sistema"""
     # Verificar se o usuário é staff
@@ -510,7 +508,7 @@ def permissions_list(request):
     return render(request, 'admin_panel/permissions/list.html', context)
 
 
-@login_required
+@admin_required
 def role_detail(request, role_id):
     """Detalhes de uma role específica"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -533,7 +531,7 @@ def role_detail(request, role_id):
     return render(request, 'admin_panel/roles/detail.html', context)
 
 
-@login_required
+@admin_required
 def role_create(request):
     """Criar nova role"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -558,7 +556,7 @@ def role_create(request):
     return render(request, 'admin_panel/roles/form.html', context)
 
 
-@login_required
+@admin_required
 def role_edit(request, role_id):
     """Editar role existente"""
     if not (request.user.is_staff or request.user.is_superuser):
@@ -590,7 +588,7 @@ def role_edit(request, role_id):
     return render(request, 'admin_panel/roles/form.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def role_delete(request, role_id):
     """Excluir role"""
@@ -842,7 +840,7 @@ class UserForm(forms.ModelForm):
         return cleaned_data
 
 
-@login_required
+@admin_required
 def user_create(request):
     """Criar novo usuário"""
     # Verificar se o usuário é staff ou superuser
@@ -876,7 +874,7 @@ def user_create(request):
     return render(request, 'admin_panel/users/form.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def account_delete(request, account_id):
     """Excluir conta - apenas proprietários podem excluir suas próprias contas"""
@@ -913,7 +911,7 @@ def account_delete(request, account_id):
     return redirect('admin_panel:accounts_list')
 
 
-@login_required
+@admin_required
 def user_edit(request, user_id):
     """Editar usuário existente"""
     # Verificar se o usuário é staff ou superuser
@@ -954,7 +952,7 @@ def user_edit(request, user_id):
     return render(request, 'admin_panel/users/form.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def user_delete(request, user_id):
     """Excluir usuário com opções de soft delete e hard delete"""
@@ -1071,7 +1069,7 @@ def user_delete(request, user_id):
         })
 
 
-@login_required
+@admin_required
 @require_http_methods(["GET"])
 def check_user_accounts(request, user_id):
     """Verificar contas associadas a um usuário e retornar usuários disponíveis para transferência"""
@@ -1119,7 +1117,7 @@ def check_user_accounts(request, user_id):
     })
 
 
-@login_required
+@admin_required
 def analytics_dashboard(request):
     """Dashboard de análises avançadas"""
     # Verificar se o usuário é staff
@@ -1180,7 +1178,7 @@ def analytics_dashboard(request):
     return render(request, 'admin_panel/analytics/dashboard.html', context)
 
 
-@login_required
+@admin_required
 def export_users(request):
     """Exportar lista de usuários em CSV"""
     # Verificar se o usuário é staff
@@ -1215,7 +1213,7 @@ def export_users(request):
     return response
 
 
-@login_required
+@admin_required
 def export_accounts(request):
     """Exportar lista de contas em CSV"""
     # Verificar se o usuário é staff
@@ -1251,7 +1249,7 @@ def export_accounts(request):
     return response
 
 
-@login_required
+@admin_required
 def system_health(request):
     """Verificação de saúde do sistema"""
     # Verificar se o usuário é staff
@@ -1329,7 +1327,7 @@ def system_health(request):
 
 # ===== CONTENT MANAGEMENT VIEWS =====
 
-@login_required
+@admin_required
 def content_list(request):
     """Lista de conteúdos com filtros e paginação"""
     if not request.user.is_staff:
@@ -1382,7 +1380,7 @@ def content_list(request):
     return render(request, 'admin_panel/content/list.html', context)
 
 
-@login_required
+@admin_required
 def content_detail(request, content_id):
     """Detalhes de um conteúdo específico"""
     if not request.user.is_staff:
@@ -1397,7 +1395,7 @@ def content_detail(request, content_id):
     return render(request, 'admin_panel/content/detail.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def content_toggle_status(request, content_id):
     """Alterna o status de um conteúdo (publicado/rascunho)"""
@@ -1423,7 +1421,7 @@ def content_toggle_status(request, content_id):
     })
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def content_delete(request, content_id):
     """Exclui um conteúdo"""
@@ -1442,7 +1440,7 @@ def content_delete(request, content_id):
     })
 
 
-@login_required
+@admin_required
 def categories_list(request):
     """Lista de categorias com filtros e paginação"""
     if not request.user.is_staff:
@@ -1483,7 +1481,7 @@ def categories_list(request):
     return render(request, 'admin_panel/categories/list.html', context)
 
 
-@login_required
+@admin_required
 def category_detail(request, category_id):
     """Detalhes de uma categoria específica"""
     if not request.user.is_staff:
@@ -1503,7 +1501,7 @@ def category_detail(request, category_id):
     return render(request, 'admin_panel/categories/detail.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def category_delete(request, category_id):
     """Exclui uma categoria"""
@@ -1530,7 +1528,7 @@ def category_delete(request, category_id):
     })
 
 
-@login_required
+@admin_required
 def tags_list(request):
     """Lista de tags com filtros e paginação"""
     if not request.user.is_staff:
@@ -1568,7 +1566,7 @@ def tags_list(request):
     return render(request, 'admin_panel/tags/list.html', context)
 
 
-@login_required
+@admin_required
 def tag_detail(request, tag_id):
     """Detalhes de uma tag específica"""
     if not request.user.is_staff:
@@ -1588,7 +1586,7 @@ def tag_detail(request, tag_id):
     return render(request, 'admin_panel/tags/detail.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def tag_delete(request, tag_id):
     """Exclui uma tag"""
@@ -1607,7 +1605,7 @@ def tag_delete(request, tag_id):
     })
 
 
-@login_required
+@admin_required
 def domains_list(request):
     """Lista de domínios com filtros e paginação"""
     if not request.user.is_staff:
@@ -1652,7 +1650,7 @@ def domains_list(request):
     return render(request, 'admin_panel/domains/list.html', context)
 
 
-@login_required
+@admin_required
 def domain_detail(request, domain_id):
     """Detalhes de um domínio específico"""
     if not request.user.is_staff:
@@ -1667,7 +1665,7 @@ def domain_detail(request, domain_id):
     return render(request, 'admin_panel/domains/detail.html', context)
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def domain_verify(request, domain_id):
     """Força a verificação de um domínio"""
@@ -1690,7 +1688,7 @@ def domain_verify(request, domain_id):
     })
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def domain_delete(request, domain_id):
     """Exclui um domínio"""
@@ -1709,7 +1707,7 @@ def domain_delete(request, domain_id):
     })
 
 
-@login_required
+@admin_required
 def admin_settings_general(request):
     """Configurações gerais do sistema"""
     if not request.user.is_staff:
@@ -1804,7 +1802,7 @@ def admin_settings_general(request):
     return render(request, 'admin_panel/settings/general.html', context)
 
 
-@login_required
+@admin_required
 def admin_settings_security(request):
     """Configurações de segurança do sistema"""
     if not request.user.is_staff:
@@ -1813,7 +1811,7 @@ def admin_settings_security(request):
     return render(request, 'admin_panel/settings/security.html')
 
 
-@login_required
+@admin_required
 def admin_settings_notifications(request):
     """Configurações de notificações do sistema"""
     if not request.user.is_staff:
@@ -1822,7 +1820,7 @@ def admin_settings_notifications(request):
     return render(request, 'admin_panel/settings/notifications.html')
 
 
-@login_required
+@admin_required
 def admin_settings_appearance(request):
     """Configurações de aparência do sistema"""
     if not request.user.is_staff:
@@ -1959,7 +1957,7 @@ class AccountForm(forms.ModelForm):
         }
 
 
-@login_required
+@admin_required
 def account_create(request):
     """Criar nova conta"""
     if not request.user.is_staff:
@@ -2012,7 +2010,7 @@ def account_create(request):
     })
 
 
-@login_required
+@admin_required
 def account_edit(request, account_id):
     """Editar conta existente"""
     if not request.user.is_staff:
@@ -2039,7 +2037,7 @@ def account_edit(request, account_id):
     })
 
 
-@login_required
+@admin_required
 def account_members(request, account_id):
     """Gerenciar membros da conta"""
     if not request.user.is_staff:
@@ -2095,7 +2093,7 @@ def account_members(request, account_id):
     })
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def add_member(request, account_id):
     """Adicionar membro à conta"""
@@ -2147,7 +2145,7 @@ def add_member(request, account_id):
         return JsonResponse({'success': False, 'message': f'Erro interno: {str(e)}'})
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def remove_member(request, account_id, membership_id):
     """Remover membro da conta"""
@@ -2174,7 +2172,7 @@ def remove_member(request, account_id, membership_id):
         return JsonResponse({'success': False, 'message': f'Erro ao remover membro: {str(e)}'})
 
 
-@login_required
+@admin_required
 @require_http_methods(["POST"])
 def toggle_member_status(request, account_id, membership_id):
     """Alternar status do membro (ativo/inativo)"""
@@ -2208,7 +2206,7 @@ def toggle_member_status(request, account_id, membership_id):
         return JsonResponse({'success': False, 'message': f'Erro ao alterar status: {str(e)}'})
 
 
-@login_required
+@admin_required
 def all_members(request):
     """Listar todas as contas com seus membros"""
     if not request.user.is_staff:
@@ -2284,7 +2282,7 @@ def all_members(request):
     return render(request, 'admin_panel/members/all_members.html', context)
 
 
-@login_required
+@admin_required
 def add_member_to_account(request):
     """Adicionar membro a uma conta específica"""
     if not request.user.is_staff:

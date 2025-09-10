@@ -2,9 +2,41 @@ from functools import wraps
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from .models import Permission, UserPermission, UserRole
 from accounts.models import Account
+
+
+def admin_required(view_func):
+    """
+    Decorator para garantir que apenas usuários staff acessem views do admin panel.
+    """
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if not (request.user.is_staff or request.user.is_superuser):
+            # Se não for staff, redireciona para o painel do usuário
+            if request.path.startswith('/admin-panel/'):
+                return redirect('user_panel:dashboard')
+            raise PermissionDenied('Você não tem permissão para acessar o painel administrativo.')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+def user_panel_required(view_func):
+    """
+    Decorator para garantir que usuários staff não acessem views do user panel 
+    (exceto se especificamente permitido).
+    """
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        # Staff pode acessar user panel se necessário, mas por padrão redireciona para admin
+        if request.user.is_staff and not request.GET.get('force_user_panel'):
+            if request.path.startswith('/user-panel/'):
+                return redirect('admin_panel:dashboard')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 
 def permission_required(permission_codename, account_required=True):

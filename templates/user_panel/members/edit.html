@@ -1,9 +1,9 @@
 {% extends 'user_panel/base.html' %}
 {% load static %}
 
-{% block title %}Editar Membro - {{ membership.user.get_full_name|default:membership.user.email }}{% endblock %}
+{% block user_title %}Editar Membro - {{ membership.user.get_full_name|default:membership.user.email }}{% endblock %}
 
-{% block content %}
+{% block user_content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="mb-8">

@@ -23,7 +23,7 @@ from django.db import connection
 def home_redirect(request):
     """Redireciona para o painel apropriado baseado no usuário"""
     if request.user.is_authenticated:
-        if request.user.is_staff:
+        if request.user.is_staff or request.user.is_superuser:
             return redirect('admin_panel:dashboard')
         else:
             return redirect('user_panel:dashboard')
@@ -62,6 +62,4 @@ urlpatterns = [
     path('api/settings/', include('settings.urls')),  # Configurações API
     path('payments/', include('payments.urls')),      # Pagamentos
     path('accounts-management/', include('accounts.urls')),  # Gerenciamento de Contas
-    path('sites/', include('site_management.urls')),  # Gerenciamento de Sites (compatibilidade)
-    path('admin-panel/sites/', include('site_management.urls')),  # Gerenciamento de Sites (Admin)
 ]

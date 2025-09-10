@@ -123,6 +123,8 @@ urlpatterns = [
     path('banners/<int:banner_id>/edit/', views.banners_edit, name='banners_edit'),
     path('banners/<int:banner_id>/delete/', views.banners_delete, name='banners_delete'),
     
-    # Gerenciamento de Sites
-    path('sites/', include('site_management.urls')),
+    # Gerenciamento de Sites - Views diretas para evitar conflitos de namespace
+    path('sites/', views.sites_list, name='sites_list'),
+    path('sites/create/', views.site_create, name='site_create'),
+    path('sites/<uuid:site_id>/', views.site_detail, name='site_detail'),
 ]

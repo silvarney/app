@@ -125,13 +125,13 @@
                 <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 transform transition-transform" :class="{ 'rotate-90': open }"></i>
             </button>
             <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
-                <a href="{% url 'site_management:sites_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="/admin-panel/sites/" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-list mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
                     Sites
                 </a>
-                <a href="{% url 'user_panel:bio_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
+                <a href="{% url 'admin_panel:users_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-user mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>
-                    Bio
+                    Usuários
                 </a>
                 <a href="{% url 'user_panel:categories_list' %}" class="nav-item group flex items-center px-2 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">
                     <i class="fas fa-tags mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 text-xs"></i>

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from accounts.models import Account, AccountMembership
@@ -17,8 +18,10 @@ from django.db.models import Avg, Sum
 from datetime import datetime
 from collections import defaultdict
 from permissions.models import Permission, Role, UserRole
+from permissions.decorators import user_panel_required
 from content.models import Content, Category, Tag
 from site_management.models import Item, PlanType, TemplateCategory
+from site_management import views as site_views
 from domains.models import Domain
 
 
@@ -1544,7 +1547,7 @@ def settings(request):
     return render(request, 'user_panel/settings.html', context)
 
 
-@login_required
+@user_panel_required
 def members_list(request):
     """Lista todos os membros das contas do usuário"""
     user = request.user
@@ -1589,17 +1592,29 @@ def members_list(request):
     })
 
 
-@login_required
+@user_panel_required
 def invite_member(request):
     """Convidar novo membro para a conta"""
     user = request.user
     
-    # Verificar se o usuário pode convidar membros
-    current_account = getattr(user, 'current_account', None)
+    # Buscar conta ativa do usuário
+    current_account = None
+    try:
+        user_membership = AccountMembership.objects.filter(
+            user=user,
+            status='active'
+        ).select_related('account').first()
+        
+        if user_membership:
+            current_account = user_membership.account
+    except Exception:
+        pass
+    
     if not current_account:
         messages.error(request, 'Você precisa estar em uma conta para convidar membros.')
         return redirect('user_panel:members_list')
     
+    # Verificar se o usuário pode convidar membros
     try:
         user_membership = AccountMembership.objects.get(
             account=current_account,
@@ -1667,7 +1682,7 @@ def invite_member(request):
     })
 
 
-@login_required
+@user_panel_required
 def edit_member(request, membership_id):
     """Editar papel de um membro"""
     user = request.user
@@ -1722,7 +1737,7 @@ def edit_member(request, membership_id):
     })
 
 
-@login_required
+@user_panel_required
 def remove_member(request, membership_id):
     """Remover membro da conta"""
     user = request.user
@@ -2059,7 +2074,7 @@ def subscription_manage(request):
 
 # ===== VIEWS DE ASSINATURAS =====
 
-@login_required
+@user_panel_required
 def subscriptions_list(request):
     """Lista todas as assinaturas"""
     from site_management.models import Subscription
@@ -2105,7 +2120,7 @@ def subscriptions_list(request):
     return render(request, 'user_panel/subscriptions/list.html', context)
 
 
-@login_required
+@user_panel_required
 def subscriptions_create(request):
     """Criar nova assinatura"""
     from site_management.models import Subscription, Site, PlanType
@@ -2127,7 +2142,7 @@ def subscriptions_create(request):
     return render(request, 'user_panel/subscriptions/form.html', context)
 
 
-@login_required
+@user_panel_required
 def subscriptions_edit(request, subscription_id):
     """Editar assinatura"""
     from site_management.models import Subscription
@@ -2152,7 +2167,7 @@ def subscriptions_edit(request, subscription_id):
     return render(request, 'user_panel/subscriptions/form.html', context)
 
 
-@login_required
+@user_panel_required
 def subscriptions_delete(request, subscription_id):
     """Deletar assinatura"""
     from site_management.models import Subscription
@@ -2173,7 +2188,7 @@ def subscriptions_delete(request, subscription_id):
 
 # ===== VIEWS DE PAGAMENTOS =====
 
-@login_required
+@user_panel_required
 def payments_list(request):
     """Lista todos os pagamentos"""
     from site_management.models import Payment
@@ -2231,7 +2246,7 @@ def payments_list(request):
     return render(request, 'user_panel/payments/list.html', context)
 
 
-@login_required
+@user_panel_required
 def payments_create(request):
     """Criar novo pagamento"""
     from site_management.models import Payment
@@ -2253,7 +2268,7 @@ def payments_create(request):
     return render(request, 'user_panel/payments/form.html', context)
 
 
-@login_required
+@user_panel_required
 def payments_edit(request, payment_id):
     """Editar pagamento"""
     from site_management.models import Payment
@@ -2278,7 +2293,7 @@ def payments_edit(request, payment_id):
     return render(request, 'user_panel/payments/form.html', context)
 
 
-@login_required
+@user_panel_required
 def payments_delete(request, payment_id):
     """Deletar pagamento"""
     from site_management.models import Payment
@@ -2295,3 +2310,76 @@ def payments_delete(request, payment_id):
         'page_title': 'Remover Pagamento'
     }
     return render(request, 'user_panel/payments/delete.html', context)
+
+
+# Views de Sites - Para o contexto do User Panel
+@login_required
+def sites_list(request):
+    """Lista de sites do usuário"""
+    from site_management.models import Site
+    
+    # Filtrar sites do usuário (através das contas que ele tem acesso)
+    user_accounts = Account.objects.filter(
+        memberships__user=request.user,
+        memberships__status='active'
+    )
+    
+    sites = Site.objects.filter(account__in=user_accounts).order_by('-created_at')
+    
+    # Paginação
+    paginator = Paginator(sites, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'sites': page_obj,
+        'total_sites': sites.count(),
+        'page_title': 'Meus Sites'
+    }
+    return render(request, 'user_panel/sites/list.html', context)
+
+@login_required  
+def site_create(request):
+    """Criação de site no contexto do user panel"""
+    from site_management.forms import SiteForm
+    from site_management.models import TemplateCategory, PlanType
+    
+    if request.method == 'POST':
+        form = SiteForm(request.POST)
+        if form.is_valid():
+            site = form.save()
+            messages.success(request, f'Site "{site.domain}" criado com sucesso!')
+            return redirect('user_panel:sites_list')
+    else:
+        form = SiteForm()
+        # Filtrar apenas contas que o usuário tem acesso
+        user_accounts = Account.objects.filter(
+            memberships__user=request.user,
+            memberships__status='active'
+        )
+        form.fields['account'].queryset = user_accounts
+    
+    context = {
+        'form': form,
+        'page_title': 'Criar Novo Site'
+    }
+    return render(request, 'user_panel/sites/create.html', context)
+
+@login_required
+def site_detail(request, site_id):
+    """Detalhes do site no contexto do user panel"""
+    from site_management.models import Site
+    
+    # Verificar se o usuário tem acesso ao site
+    user_accounts = Account.objects.filter(
+        memberships__user=request.user,
+        memberships__status='active'
+    )
+    
+    site = get_object_or_404(Site, id=site_id, account__in=user_accounts)
+    
+    context = {
+        'site': site,
+        'page_title': f'Site: {site.domain}'
+    }
+    return render(request, 'user_panel/sites/detail.html', context)

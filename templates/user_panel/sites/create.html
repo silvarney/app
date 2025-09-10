@@ -1,0 +1,209 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Criar Novo Site{% endblock %}
+
+{% block user_content %}
+<!-- Breadcrumb -->
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home w-4 h-4 mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <a href="{% url 'user_panel:sites_list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Sites</a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-500 dark:text-gray-400">Criar Site</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+
+<div class="mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Criar Novo Site</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mt-2">Configure as informações básicas do seu novo site</p>
+        </div>
+        <div>
+            <a href="{% url 'user_panel:sites_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar para Sites
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Formulário de Criação -->
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Informações do Site</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Preencha os dados básicos para criar seu novo site</p>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Mensagens de Erro -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-2"></i>
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Erro no formulário</h3>
+                    </div>
+                    <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                        {{ form.non_field_errors }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Grid de Campos -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Domínio do Site -->
+                <div class="lg:col-span-2">
+                    <label for="{{ form.domain.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-globe mr-2"></i>
+                        Domínio do Site
+                    </label>
+                    {{ form.domain }}
+                    {% if form.domain.errors %}
+                        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.domain.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Digite o domínio completo do seu site (ex: meusite.com)
+                    </p>
+                </div>
+                
+                <!-- Conta -->
+                <div>
+                    <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-building mr-2"></i>
+                        Conta
+                    </label>
+                    {{ form.account }}
+                    {% if form.account.errors %}
+                        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.account.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Selecione a conta para o site
+                    </p>
+                </div>
+                
+                <!-- Status -->
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-toggle-on mr-2"></i>
+                        Status
+                    </label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.status.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Defina se o site estará ativo ou inativo
+                    </p>
+                </div>
+                
+                <!-- Categoria do Template -->
+                {% if form.template_category %}
+                <div>
+                    <label for="{{ form.template_category.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-tags mr-2"></i>
+                        Categoria do Template
+                    </label>
+                    {{ form.template_category }}
+                    {% if form.template_category.errors %}
+                        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.template_category.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Escolha a categoria do template (opcional)
+                    </p>
+                </div>
+                {% endif %}
+                
+                <!-- Tipo de Plano -->
+                {% if form.plan_type %}
+                <div>
+                    <label for="{{ form.plan_type.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Tipo de Plano
+                    </label>
+                    {{ form.plan_type }}
+                    {% if form.plan_type.errors %}
+                        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.plan_type.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Selecione o tipo de plano (opcional)
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Campos Ocultos -->
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            
+            <!-- Botões de Ação -->
+            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'user_panel:sites_list' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Criar Site
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Dicas e Informações -->
+    <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-3"></i>
+            <div>
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Dicas para criar seu site</h3>
+                <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                    <li>• Use um domínio único e fácil de lembrar</li>
+                    <li>• Verifique se o domínio está disponível antes de criar</li>
+                    <li>• Escolha a conta correta para organizar seus sites</li>
+                    <li>• Você pode alterar o status e outras configurações depois</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

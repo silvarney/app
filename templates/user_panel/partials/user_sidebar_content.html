@@ -36,7 +36,7 @@
             <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sites</h3>
         </div>
         
-        <a href="{% url 'site_management:sites_list' %}" 
+        <a href="{% url 'user_panel:sites_list' %}" 
            class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'sites_list' %}nav-item-active{% endif %}">
             <i class="fas fa-globe mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
             Sites

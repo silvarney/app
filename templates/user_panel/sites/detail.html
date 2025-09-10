@@ -1,0 +1,204 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}{{ page_title }}{% endblock %}
+
+{% block user_content %}
+<!-- Breadcrumb -->
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{% url 'user_panel:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-home w-4 h-4 mr-2"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <a href="{% url 'user_panel:sites_list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Sites</a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-500 dark:text-gray-400">{{ site.domain }}</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+
+<div class="mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ site.domain }}</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mt-2">Detalhes e configurações do site</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{{ site.domain }}" 
+               target="_blank"
+               class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Visitar Site
+            </a>
+            <a href="{% url 'user_panel:sites_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Status e Informações Principais -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Card de Status -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Status</h3>
+            {% if site.status == 'active' %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Ativo
+                </span>
+            {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                    <i class="fas fa-pause-circle mr-2"></i>
+                    Inativo
+                </span>
+            {% endif %}
+        </div>
+        <div class="space-y-3">
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">URL do Site</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.domain }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Criado em</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.created_at|date:"d/m/Y às H:i" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card de Conta -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Conta</h3>
+        <div class="space-y-3">
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Nome da Conta</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.account.name }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Proprietário</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.account.owner.email }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card de Template -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Template</h3>
+        <div class="space-y-3">
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Categoria</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.template_category.name|default:"Não definida" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Plano</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ site.plan_type.name|default:"Não definido" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seções de Configuração -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Bio do Site -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Bio do Site</h3>
+                {% if site.sitebio %}
+                    <span class="text-sm text-green-600 dark:text-green-400">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Configurada
+                    </span>
+                {% else %}
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        Não configurada
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="p-6">
+            {% if site.sitebio %}
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Título</p>
+                        <p class="text-gray-900 dark:text-white">{{ site.sitebio.title|default:"Não definido" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Descrição</p>
+                        <p class="text-gray-900 dark:text-white">{{ site.sitebio.description|default:"Não definida"|truncatewords:20 }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400 text-center py-8">
+                    <i class="fas fa-info-circle text-2xl mb-2"></i><br>
+                    Bio do site não configurada ainda
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Ações Rápidas -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ações Rápidas</h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-3">
+                <a href="{{ site.domain }}" 
+                   target="_blank"
+                   class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-external-link-alt text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">Visitar Site</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Abrir site em nova aba</p>
+                    </div>
+                    <div class="ml-auto">
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </div>
+                </a>
+                
+                <div class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">Editar Site</p>
+                        <p class="text-sm">Em breve...</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">Analytics</p>
+                        <p class="text-sm">Em breve...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

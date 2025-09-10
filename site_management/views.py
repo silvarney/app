@@ -87,6 +87,10 @@ def sites_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Estatísticas para o contexto
+    active_sites = sites.filter(status='active').count()
+    inactive_sites = sites.filter(status='inactive').count()
+    
     context = {
         'sites': page_obj,
         'user_accounts': user_accounts,
@@ -94,9 +98,17 @@ def sites_list(request):
         'account_filter': account_filter,
         'status_filter': status_filter,
         'total_sites': sites.count(),
+        'active_sites': active_sites,
+        'inactive_sites': inactive_sites,
     }
     
-    return render(request, 'site_management/sites/list.html', context)
+    # Detectar se está sendo acessado via user panel
+    if '/user-panel/' in request.path:
+        template = 'user_panel/sites/list.html'
+    else:
+        template = 'site_management/sites/list.html'
+    
+    return render(request, template, context)
 
 
 @login_required
