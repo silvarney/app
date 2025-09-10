@@ -241,6 +241,10 @@ class UserProfile(models.Model):
         _('Notificações push'), 
         default=True
     )
+    dark_theme = models.BooleanField(
+        _('Tema escuro'), 
+        default=False
+    )
     
     created_at = models.DateTimeField(_('Criado em'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)

@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from accounts.models import Account, AccountMembership
-from users.models import User
+from users.models import User, UserProfile
 from django.http import HttpResponse
 import csv
 import json
@@ -662,7 +662,7 @@ def items_delete(request, item_id):
 
 # ===== VIEWS DE RELATÓRIOS =====
 
-@login_required
+@user_panel_required
 def reports_dashboard(request):
     """Dashboard principal de relatórios"""
     user = request.user
@@ -704,7 +704,7 @@ def reports_dashboard(request):
     return render(request, 'user_panel/reports/dashboard.html', context)
 
 
-@login_required
+@user_panel_required
 def reports_accounts(request):
     """Relatório detalhado de contas"""
     user = request.user
@@ -762,7 +762,7 @@ def reports_accounts(request):
     return render(request, 'user_panel/reports/accounts.html', context)
 
 
-@login_required
+@user_panel_required
 def reports_members(request):
     """Relatório detalhado de membros"""
     user = request.user
@@ -825,7 +825,7 @@ def reports_members(request):
     return render(request, 'user_panel/reports/members.html', context)
 
 
-@login_required
+@user_panel_required
 def reports_activity(request):
     """Relatório de atividades"""
     user = request.user
@@ -881,7 +881,7 @@ def reports_activity(request):
     return render(request, 'user_panel/reports/activity.html', context)
 
 
-@login_required
+@user_panel_required
 def reports_export(request):
     """Exportar relatórios em CSV"""
     user = request.user
@@ -1516,10 +1516,13 @@ def extracts_export(request):
     return response
 
 
-@login_required
+@user_panel_required
 def settings(request):
     """Página de configurações do usuário"""
     user = request.user
+    
+    # Garantir que o usuário tenha um perfil
+    profile, created = UserProfile.objects.get_or_create(user=user)
     
     # Verificar se o usuário tem permissão para gerenciar configurações da conta
     can_manage_account = False
@@ -1536,6 +1539,22 @@ def settings(request):
             can_manage_account = account_membership.role in ['owner', 'admin']
     except Exception:
         pass
+    
+    if request.method == 'POST':
+        from django.contrib import messages
+        
+        try:
+            # Atualizar configurações pessoais
+            profile.email_notifications = request.POST.get('email_notifications') == 'on'
+            profile.dark_theme = request.POST.get('dark_theme') == 'on'
+            profile.language = request.POST.get('language', 'pt-BR')
+            profile.save()
+            
+            messages.success(request, 'Configurações salvas com sucesso!')
+        except Exception as e:
+            messages.error(request, f'Erro ao salvar configurações: {str(e)}')
+        
+        return redirect('user_panel:settings')
     
     context = {
         'user': user,
