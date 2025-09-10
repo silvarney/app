@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from accounts.models import Account
-from .models import Site, TemplateCategory, PlanType, Subscription, Payment
+from .models import Site, SiteBio, TemplateCategory, PlanType, Subscription, Payment
 
 
 class SiteForm(forms.ModelForm):
@@ -234,3 +234,108 @@ class PaymentForm(forms.ModelForm):
                 cleaned_data['total_value'] = calculated_total
         
         return cleaned_data
+
+
+class SiteBioForm(forms.ModelForm):
+    """Formulário para criação e edição de Bio de sites"""
+    
+    class Meta:
+        model = SiteBio
+        fields = ['site', 'title', 'description', 'favicon', 'logo', 'share_image', 'email', 'whatsapp', 'phone', 'address', 'google_maps']
+        widgets = {
+            'site': forms.Select(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm'
+            }),
+            'title': forms.TextInput(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'placeholder': 'Título do site'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'rows': 4,
+                'placeholder': 'Descrição detalhada do site...'
+            }),
+            'favicon': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100',
+                'accept': 'image/*'
+            }),
+            'logo': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100',
+                'accept': 'image/*'
+            }),
+            'share_image': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100',
+                'accept': 'image/*'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'placeholder': 'contato@exemplo.com'
+            }),
+            'whatsapp': forms.TextInput(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'placeholder': '(11) 99999-9999'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'placeholder': '(11) 3333-3333'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'rows': 3,
+                'placeholder': 'Endereço completo...'
+            }),
+            'google_maps': forms.URLInput(attrs={
+                'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm',
+                'placeholder': 'https://maps.google.com/...'
+            })
+        }
+        labels = {
+            'site': 'Site',
+            'title': 'Título do Site',
+            'description': 'Descrição',
+            'favicon': 'Favicon',
+            'logo': 'Logo',
+            'share_image': 'Imagem de Compartilhamento',
+            'email': 'E-mail',
+            'whatsapp': 'WhatsApp',
+            'phone': 'Telefone',
+            'address': 'Endereço',
+            'google_maps': 'Google Maps'
+        }
+        help_texts = {
+            'site': 'Site ao qual esta bio pertence',
+            'title': 'Título principal do site',
+            'description': 'Descrição detalhada sobre o site',
+            'favicon': 'Ícone pequeno que aparece na aba do navegador (16x16 ou 32x32 pixels)',
+            'logo': 'Logo principal do site',
+            'share_image': 'Imagem que aparece quando o site é compartilhado nas redes sociais',
+            'email': 'E-mail de contato principal',
+            'whatsapp': 'Número do WhatsApp para contato',
+            'phone': 'Telefone para contato',
+            'address': 'Endereço físico completo',
+            'google_maps': 'Link do Google Maps para localização'
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filtrar sites do usuário
+        if user:
+            from accounts.models import AccountMembership
+            user_sites = Site.objects.filter(
+                account__memberships__user=user,
+                account__memberships__status='active',
+                status='active'
+            ).distinct()
+            self.fields['site'].queryset = user_sites
+        
+        # Tornar alguns campos opcionais
+        self.fields['favicon'].required = False
+        self.fields['logo'].required = False
+        self.fields['share_image'].required = False
+        self.fields['email'].required = False
+        self.fields['whatsapp'].required = False
+        self.fields['phone'].required = False
+        self.fields['address'].required = False
+        self.fields['google_maps'].required = False

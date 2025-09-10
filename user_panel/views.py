@@ -8,6 +8,8 @@ from django.utils import timezone
 from datetime import timedelta
 from accounts.models import Account, AccountMembership
 from users.models import User, UserProfile
+from site_management.models import Site, SiteBio
+from site_management.forms import SiteBioForm
 from django.http import HttpResponse
 import csv
 import json
@@ -1811,37 +1813,130 @@ def remove_member(request, membership_id):
 @login_required
 def bio_list(request):
     """Lista de bios do usuário"""
-    messages.info(request, 'Sistema de Bio em desenvolvimento')
+    # Buscar sites do usuário
+    user_sites = Site.objects.filter(
+        account__memberships__user=request.user,
+        account__memberships__status='active',
+        status='active'
+    ).distinct()
+    
+    # Buscar bios dos sites do usuário
+    bios = SiteBio.objects.filter(site__in=user_sites).select_related('site')
+    
+    # Paginação
+    paginator = Paginator(bios, 10)
+    page = request.GET.get('page')
+    bios = paginator.get_page(page)
+    
     context = {
         'title': 'Bio',
-        'breadcrumb': 'Bio'
+        'breadcrumb': 'Bio',
+        'bios': bios,
+        'user_sites': user_sites
     }
     return render(request, 'user_panel/bio/list.html', context)
 
 @login_required
 def bio_create(request):
     """Criar nova bio"""
-    messages.info(request, 'Sistema de Bio em desenvolvimento')
+    if request.method == 'POST':
+        form = SiteBioForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            # Verificar se o usuário tem permissão no site selecionado
+            site = form.cleaned_data['site']
+            user_has_permission = AccountMembership.objects.filter(
+                user=request.user,
+                account=site.account,
+                status='active',
+                role__in=['owner', 'admin']
+            ).exists()
+            
+            if not user_has_permission:
+                messages.error(request, 'Você não tem permissão para criar bio neste site.')
+                return redirect('user_panel:bio_create')
+            
+            # Verificar se já existe bio para este site
+            if SiteBio.objects.filter(site=site).exists():
+                messages.error(request, 'Este site já possui uma bio. Edite a bio existente.')
+                return redirect('user_panel:bio_list')
+            
+            bio = form.save()
+            messages.success(request, f'Bio criada com sucesso para o site {bio.site.domain}!')
+            return redirect('user_panel:bio_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{form.fields[field].label}: {error}')
+    else:
+        form = SiteBioForm(user=request.user)
+    
     context = {
         'title': 'Criar Bio',
-        'breadcrumb': 'Bio > Criar'
+        'breadcrumb': 'Bio > Criar',
+        'form': form
     }
     return render(request, 'user_panel/bio/create.html', context)
 
 @login_required
 def bio_edit(request, bio_id):
     """Editar bio"""
-    messages.info(request, 'Sistema de Bio em desenvolvimento')
+    bio = get_object_or_404(SiteBio, id=bio_id)
+    
+    # Verificar permissão do usuário
+    user_has_permission = AccountMembership.objects.filter(
+        user=request.user,
+        account=bio.site.account,
+        status='active',
+        role__in=['owner', 'admin']
+    ).exists()
+    
+    if not user_has_permission:
+        messages.error(request, 'Você não tem permissão para editar esta bio.')
+        return redirect('user_panel:bio_list')
+    
+    if request.method == 'POST':
+        form = SiteBioForm(request.POST, request.FILES, instance=bio, user=request.user)
+        if form.is_valid():
+            bio = form.save()
+            messages.success(request, f'Bio atualizada com sucesso para o site {bio.site.domain}!')
+            return redirect('user_panel:bio_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{form.fields[field].label}: {error}')
+    else:
+        form = SiteBioForm(instance=bio, user=request.user)
+    
     context = {
         'title': 'Editar Bio',
-        'breadcrumb': 'Bio > Editar'
+        'breadcrumb': 'Bio > Editar',
+        'form': form,
+        'bio': bio
     }
     return render(request, 'user_panel/bio/edit.html', context)
 
 @login_required
 def bio_delete(request, bio_id):
     """Deletar bio"""
-    messages.info(request, 'Sistema de Bio em desenvolvimento')
+    bio = get_object_or_404(SiteBio, id=bio_id)
+    
+    # Verificar permissão do usuário
+    user_has_permission = AccountMembership.objects.filter(
+        user=request.user,
+        account=bio.site.account,
+        status='active',
+        role__in=['owner', 'admin']
+    ).exists()
+    
+    if not user_has_permission:
+        messages.error(request, 'Você não tem permissão para deletar esta bio.')
+        return redirect('user_panel:bio_list')
+    
+    if request.method == 'POST':
+        site_domain = bio.site.domain
+        bio.delete()
+        messages.success(request, f'Bio do site {site_domain} foi deletada com sucesso!')
+    
     return redirect('user_panel:bio_list')
 
 
@@ -2402,3 +2497,40 @@ def site_detail(request, site_id):
         'page_title': f'Site: {site.domain}'
     }
     return render(request, 'user_panel/sites/detail.html', context)
+
+
+@user_panel_required
+def site_edit(request, site_id):
+    """Editar site no contexto do user panel"""
+    from site_management.forms import SiteForm
+    from site_management.models import Site
+    
+    # Verificar se o usuário tem acesso ao site
+    user_accounts = Account.objects.filter(
+        memberships__user=request.user,
+        memberships__status='active'
+    )
+    
+    site = get_object_or_404(Site, id=site_id, account__in=user_accounts)
+    
+    if request.method == 'POST':
+        form = SiteForm(request.POST, instance=site)
+        if form.is_valid():
+            site = form.save()
+            messages.success(request, f'Site "{site.domain}" atualizado com sucesso!')
+            return redirect('user_panel:site_detail', site_id=site.id)
+    else:
+        form = SiteForm(instance=site)
+        # Filtrar apenas contas que o usuário tem acesso
+        user_accounts = Account.objects.filter(
+            memberships__user=request.user,
+            memberships__status='active'
+        )
+        form.fields['account'].queryset = user_accounts
+    
+    context = {
+        'form': form,
+        'site': site,
+        'page_title': f'Editar Site: {site.domain}'
+    }
+    return render(request, 'user_panel/sites/edit.html', context)

@@ -46,9 +46,18 @@ def user_context(request):
         except Exception:
             pass
         
+        # Buscar configuração de tema do usuário
+        user_dark_theme = False
+        try:
+            if hasattr(request.user, 'profile') and request.user.profile:
+                user_dark_theme = request.user.profile.dark_theme
+        except Exception:
+            pass
+        
         context.update({
             'can_manage_account': can_manage_account,
             'current_account': current_account,
+            'user_dark_theme': user_dark_theme,
         })
     
     return context

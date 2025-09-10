@@ -31,7 +31,7 @@
         </div>
         <h1 class="text-2xl font-bold text-gray-900">Nova Bio</h1>
         <p class="mt-2 text-sm text-gray-700">
-            Crie uma nova biografia para seus sites
+            Crie uma nova biografia para um dos seus sites
         </p>
     </div>
 
@@ -40,61 +40,153 @@
         <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
             {% csrf_token %}
             
-            <!-- Título -->
+            <!-- Site -->
             <div>
-                <label for="id_title" class="block text-sm font-medium text-gray-700">
-                    Título *
+                <label for="{{ form.site.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.site.label }} *
                 </label>
                 <div class="mt-1">
-                    <input type="text" 
-                           name="title" 
-                           id="id_title" 
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="Ex: Sobre Mim"
-                           required>
+                    {{ form.site }}
                 </div>
+                {% if form.site.help_text %}
+                    <p class="mt-2 text-sm text-gray-500">{{ form.site.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Título -->
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.title.label }} *
+                </label>
+                <div class="mt-1">
+                    {{ form.title }}
+                </div>
+                {% if form.title.help_text %}
+                    <p class="mt-2 text-sm text-gray-500">{{ form.title.help_text }}</p>
+                {% endif %}
             </div>
 
             <!-- Descrição -->
             <div>
-                <label for="id_description" class="block text-sm font-medium text-gray-700">
-                    Descrição *
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.description.label }} *
                 </label>
                 <div class="mt-1">
-                    <textarea name="description" 
-                              id="id_description" 
-                              rows="4"
-                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Descreva sua biografia..."
-                              required></textarea>
+                    {{ form.description }}
+                </div>
+                {% if form.description.help_text %}
+                    <p class="mt-2 text-sm text-gray-500">{{ form.description.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Seção de Imagens -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-medium text-gray-900">Imagens</h3>
+                
+                <!-- Favicon -->
+                <div>
+                    <label for="{{ form.favicon.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.favicon.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.favicon }}
+                        <div id="favicon-preview" class="mt-2 hidden">
+                            <img class="h-8 w-8 object-cover rounded" alt="Preview Favicon">
+                        </div>
+                    </div>
+                    {% if form.favicon.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.favicon.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Logo -->
+                <div>
+                    <label for="{{ form.logo.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.logo.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.logo }}
+                        <div id="logo-preview" class="mt-2 hidden">
+                            <img class="h-20 w-auto object-cover rounded" alt="Preview Logo">
+                        </div>
+                    </div>
+                    {% if form.logo.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.logo.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Imagem de Compartilhamento -->
+                <div>
+                    <label for="{{ form.share_image.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.share_image.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.share_image }}
+                        <div id="share-image-preview" class="mt-2 hidden">
+                            <img class="h-32 w-auto object-cover rounded" alt="Preview Imagem de Compartilhamento">
+                        </div>
+                    </div>
+                    {% if form.share_image.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.share_image.help_text }}</p>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Imagem de Perfil -->
-            <div>
-                <label for="id_profile_image" class="block text-sm font-medium text-gray-700">
-                    Imagem de Perfil
-                </label>
-                <div class="mt-1">
-                    <input type="file" 
-                           name="profile_image" 
-                           id="id_profile_image" 
-                           accept="image/*"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <p class="mt-2 text-sm text-gray-500">Formatos aceitos: JPG, PNG, GIF (máx. 2MB)</p>
-            </div>
+            <!-- Seção de Contato -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-medium text-gray-900">Informações de Contato</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- E-mail -->
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.email.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.email }}
+                        </div>
+                    </div>
 
-            <!-- Ativo -->
-            <div class="flex items-center">
-                <input type="checkbox" 
-                       name="is_active" 
-                       id="id_is_active" 
-                       checked
-                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="id_is_active" class="ml-2 block text-sm text-gray-900">
-                    Ativo
-                </label>
+                    <!-- WhatsApp -->
+                    <div>
+                        <label for="{{ form.whatsapp.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.whatsapp.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.whatsapp }}
+                        </div>
+                    </div>
+
+                    <!-- Telefone -->
+                    <div>
+                        <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.phone.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <!-- Google Maps -->
+                    <div>
+                        <label for="{{ form.google_maps.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.google_maps.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.google_maps }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                <div>
+                    <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.address.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.address }}
+                    </div>
+                </div>
             </div>
 
             <!-- Botões -->
@@ -111,4 +203,34 @@
         </form>
     </div>
 </div>
+
+<script>
+// Preview de imagens
+function setupImagePreview(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    
+    if (input && preview) {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = preview.querySelector('img');
+                    img.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.classList.add('hidden');
+            }
+        });
+    }
+}
+
+// Configurar previews
+setupImagePreview('{{ form.favicon.id_for_label }}', 'favicon-preview');
+setupImagePreview('{{ form.logo.id_for_label }}', 'logo-preview');
+setupImagePreview('{{ form.share_image.id_for_label }}', 'share-image-preview');
+</script>
 {% endblock %}

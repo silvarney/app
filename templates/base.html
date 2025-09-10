@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-gray-50" :class="{ 'dark': $store.theme.isDark }">
+<html lang="pt-BR" class="h-full bg-gray-50" {% if user.is_authenticated and user_dark_theme %}data-theme="dark"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -323,6 +323,18 @@
                 });
             }
         }
+        
+        // Theme management
+        document.addEventListener('DOMContentLoaded', function() {
+            const html = document.documentElement;
+            const isDarkTheme = html.getAttribute('data-theme') === 'dark';
+            
+            if (isDarkTheme) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        });
     </script>
     
     {% block extra_js %}{% endblock %}

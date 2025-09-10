@@ -126,5 +126,6 @@ urlpatterns = [
     # Gerenciamento de Sites - Views diretas para evitar conflitos de namespace
     path('sites/', views.sites_list, name='sites_list'),
     path('sites/create/', views.site_create, name='site_create'),
-    path('sites/<uuid:site_id>/', views.site_detail, name='site_detail'),
+    path('sites/<int:site_id>/', views.site_detail, name='site_detail'),
+    path('sites/<int:site_id>/edit/', views.site_edit, name='site_edit'),
 ]
