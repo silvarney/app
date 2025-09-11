@@ -3,6 +3,7 @@
 
 {% block user_title %}Blog - Gerenciar{% endblock %}
 
+
 {% block breadcrumb_items %}
 <li>
     <div class="flex items-center">
@@ -47,27 +48,44 @@
             </form>
         </div>
         
-                <div class="p-6">
-                        {% if posts %}
-                        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {% for post in posts %}
-                            <div class="border rounded-lg p-4 hover:shadow flex flex-col">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 mb-1">{{ post.title }}</h4>
-                                    <p class="text-xs text-gray-500 mb-2">{{ post.site.name|default:post.site.domain }}{% if post.category %} • {{ post.category.name }}{% endif %}</p>
-                                    <p class="text-sm text-gray-600 line-clamp-3">{{ post.content|truncatechars:120 }}</p>
-                                </div>
-                                <div class="mt-4 flex items-center justify-between">
-                                    <span class="text-xs {% if post.is_published %}text-green-600{% else %}text-gray-500{% endif %}">{% if post.is_published %}Publicado{% else %}Rascunho{% endif %}</span>
-                                    <div class="space-x-2 text-xs">
-                                        <a href="{% url 'user_panel:blog_edit' post.id %}" class="text-indigo-600 hover:underline">Editar</a>
-                                        <a href="{% url 'user_panel:blog_delete' post.id %}" class="text-red-600 hover:underline">Excluir</a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
+        <div class="overflow-x-auto">
+            {% if posts %}
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for post in posts %}
+                    <tr class="{% cycle 'bg-white' 'bg-gray-50' %}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ post.title }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">{% if post.category %}{{ post.category.name }}{% else %}-{% endif %}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">{{ post.site.domain }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if post.is_published %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {% if post.is_published %}Publicado{% else %}Rascunho{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'user_panel:blog_edit' post.id %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
+                            <a href="{% url 'user_panel:blog_delete' post.id %}" class="text-red-600 hover:text-red-900">Excluir</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
                         <div class="text-center py-12">
                                 <i class="fas fa-blog text-gray-300 text-6xl mb-4"></i>
                                 <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum post encontrado</h3>
@@ -78,8 +96,8 @@
                                         Criar Primeiro Post
                                 </a>
                         </div>
-                        {% endif %}
-                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

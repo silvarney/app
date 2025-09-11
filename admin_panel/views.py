@@ -331,16 +331,29 @@ def toggle_user_status(request, user_id):
 
 @admin_required
 @require_http_methods(["POST"])
+@require_http_methods(["POST"])
 def toggle_account_status(request, account_id):
     """Alterar status da conta via AJAX"""
     # Verificar se o usuário é staff
     if not request.user.is_staff:
-        raise PermissionDenied('Você não tem permissão para acessar o painel administrativo.')
-    account = get_object_or_404(Account, id=account_id)
+        return JsonResponse({
+            'success': False,
+            'message': 'Você não tem permissão para acessar o painel administrativo.'
+        }, status=403)
+    
+    try:
+        account = get_object_or_404(Account, id=account_id)
+    except Exception as e:
+        print(f"Erro ao encontrar conta com ID {account_id}: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': f'Conta não encontrada. Erro: {str(e)}'
+        }, status=404)
     
     try:
         data = json.loads(request.body)
         new_status = data.get('status')
+        print(f"Dados recebidos: {data}")
         
         if new_status in dict(Account.STATUS_CHOICES):
             account.status = new_status
@@ -357,7 +370,7 @@ def toggle_account_status(request, account_id):
         else:
             return JsonResponse({
                 'success': False,
-                'message': 'Status inválido.'
+                'message': f'Status inválido: {new_status}'
             }, status=400)
     except json.JSONDecodeError:
         return JsonResponse({

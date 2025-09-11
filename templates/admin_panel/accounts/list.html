@@ -5,6 +5,14 @@
 {% block page_title %}Gerenciar Contas{% endblock %}
 
 {% block breadcrumb %}
+<!-- Spinner de carregamento (hidden por padrão) -->
+<div id="loading-spinner" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 items-center justify-center z-50 hidden">
+    <div class="bg-white p-5 rounded-lg shadow-lg">
+        <div class="w-12 h-12 border-4 border-t-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-2 text-gray-700">Processando...</p>
+    </div>
+</div>
+
 <nav class="flex" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
@@ -223,7 +231,7 @@
                                             <div class="py-1">
                                                 {% for value, label in status_choices %}
                                                 {% if value != account.status %}
-                                                <button onclick="changeAccountStatus({{ account.id }}, '{{ value }}')" 
+                                                <button onclick="changeAccountStatus('{{ account.id }}', '{{ value }}')" 
                                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
                                                     Alterar para {{ label }}
                                                 </button>
@@ -315,14 +323,73 @@
 
 {% block extra_js %}
 <script>
+// Função para obter o valor de um cookie
+function getCookie(name) {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='));
+    return cookieValue ? cookieValue.split('=')[1] : '';
+}
+
+// Funções para mostrar/esconder o spinner de carregamento
+function showSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.remove('hidden');
+        spinner.classList.add('flex');
+    }
+}
+
+function hideSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+        spinner.classList.remove('flex');
+    }
+}
+
+// Função para exibir mensagens de toast
+function showToast(message, type = 'info') {
+    // Criar elemento toast se não existir
+    let toast = document.getElementById('status-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'status-toast';
+        toast.classList.add('fixed', 'bottom-5', 'right-5', 'py-2', 'px-4', 'rounded', 'shadow-lg', 'transition-opacity', 'duration-500');
+        document.body.appendChild(toast);
+    }
+    
+    // Definir estilo baseado no tipo
+    toast.className = 'fixed bottom-5 right-5 py-2 px-4 rounded shadow-lg transition-opacity duration-500';
+    if (type === 'success') {
+        toast.classList.add('bg-green-500', 'text-white');
+    } else if (type === 'error') {
+        toast.classList.add('bg-red-500', 'text-white');
+    } else {
+        toast.classList.add('bg-blue-500', 'text-white');
+    }
+    
+    toast.textContent = message;
+    toast.classList.remove('opacity-0');
+    
+    // Esconder após 3 segundos
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}
+
 function changeAccountStatus(accountId, newStatus) {
     if (!confirm('Tem certeza que deseja alterar o status desta conta?')) {
         return;
     }
     
+    console.log('Alterando status da conta', accountId, 'para', newStatus);
     showSpinner();
     
-    fetch(`/admin/accounts/${accountId}/toggle-status/`, {
+    fetch(`/admin-panel/accounts/${accountId}/toggle-status/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
@@ -332,7 +399,12 @@ function changeAccountStatus(accountId, newStatus) {
             status: newStatus
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         hideSpinner();
         
@@ -374,7 +446,7 @@ function changeAccountStatus(accountId, newStatus) {
     .catch(error => {
         hideSpinner();
         console.error('Error:', error);
-        showToast('Erro ao alterar status da conta', 'error');
+        showToast('Erro ao alterar status da conta. Veja o console para mais detalhes.', 'error');
     });
 }
 </script>

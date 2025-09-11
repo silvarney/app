@@ -65,7 +65,16 @@ def login_view(request):
 
 def logout_view(request):
     """View de logout"""
+    # Armazenar temporariamente a mensagem de sucesso
+    storage = messages.get_messages(request)
+    
+    # Limpar todas as mensagens existentes
+    storage.used = True
+    
+    # Fazer logout
     logout(request)
+    
+    # Adicionar somente a mensagem de logout após limpar todas as anteriores
     messages.success(request, 'Você foi desconectado com sucesso.')
     return redirect('/')
 
