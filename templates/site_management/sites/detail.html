@@ -29,7 +29,7 @@
             <div class="flex items-center space-x-4">
                 <p class="text-sm text-gray-500">{{ site.domain }}</p>
                 {% if site.is_active %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <i class="fas fa-check-circle mr-1"></i>
                         Ativo
                     </span>
@@ -69,7 +69,7 @@
                 <div class="py-1">
                     <a href="{% url 'site_management:site_toggle_status' site.id %}" 
                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        {% if site.is_active %}
+                            {% if site.status == 'active' %}
                             <i class="fas fa-pause mr-3 text-orange-500"></i>
                             Desativar Site
                         {% else %}
@@ -136,7 +136,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Tipo de Plano</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ site.plan_type.name }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ site.plan_type.title }}</dd>
                     </div>
                     
                     <div>
@@ -259,7 +259,15 @@
                     <a href="#" 
                        class="flex items-center w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 rounded-md">
                         <i class="fas fa-mouse-pointer text-orange-500 mr-3"></i>
-                        Gerenciar CTAs
+                                Gerenciar CTAs
+                          </a>
+                          <a href="{% url 'site_management:cta_list' site.id %}" 
+                              class="hidden"></a>
+                          <script>document.currentScript.previousElementSibling.previousElementSibling.href = "{% url 'site_management:cta_list' site.id %}";</script>
+                          <a href="#" 
+                              class="flex items-center w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 rounded-md">
+                                <i class="fas fa-key text-yellow-600 mr-3"></i>
+                                Chaves de API
                     </a>
                     
                     <a href="#" 

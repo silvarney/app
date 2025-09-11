@@ -4,6 +4,9 @@ from accounts.models import Account
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import uuid
+import secrets
+import hashlib
+
 
 
 class TemplateCategory(models.Model):
@@ -245,6 +248,7 @@ class SiteCategory(models.Model):
     icon = models.CharField(max_length=50, blank=True, verbose_name='Ícone')
     image = models.ImageField(upload_to='sites/categories/', blank=True, verbose_name='Imagem')
     order = models.PositiveIntegerField(default=0, verbose_name='Ordem')
+    is_blog = models.BooleanField(default=False, verbose_name='Categoria de Blog')
     is_active = models.BooleanField(default=True, verbose_name='Ativo')
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -266,7 +270,12 @@ class Service(models.Model):
     category = models.ForeignKey(SiteCategory, on_delete=models.CASCADE, related_name='services', verbose_name='Categoria')
     title = models.CharField(max_length=200, verbose_name='Título')
     description = models.TextField(blank=True, verbose_name='Descrição')
+    # Campo opcional (DB pode ter constraint antiga NOT NULL) - garantimos preenchimento automático
+    subtitle = models.CharField(max_length=255, blank=True, null=True, verbose_name='Subtítulo')
     image = models.ImageField(upload_to='sites/services/', blank=True, verbose_name='Imagem')
+    # Campo 'link' estava presente no banco (constraint NOT NULL) mas ausente no modelo, causando IntegrityError.
+    # Mantemos null=False (padrão) e blank=True para permitir form vazio e gerar automaticamente.
+    link = models.CharField(max_length=255, blank=True, verbose_name='Link')
     value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name='Valor')
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='Desconto (%)')
     order = models.PositiveIntegerField(default=0, verbose_name='Ordem')
@@ -290,16 +299,41 @@ class Service(models.Model):
             return self.value - (self.value * self.discount / 100)
         return self.value
 
+    def save(self, *args, **kwargs):
+        from django.utils.text import slugify
+        # Ordem automática apenas na criação quando não informada
+        if not self.pk and self.order == 0:
+            current_max = Service.objects.filter(site=self.site).aggregate(m=models.Max('order'))['m'] or 0
+            self.order = current_max + 1
+        # Gera link único automático se vazio
+        if not self.link:
+            base = slugify(self.title)[:50] or 'servico'
+            candidate = f"/{base}/"
+            idx = 2
+            while Service.objects.filter(site=self.site, link=candidate).exclude(pk=self.pk).exists():
+                candidate = f"/{base}-{idx}/"
+                idx += 1
+            self.link = candidate
+        # Garante subtítulo não vazio se banco exigir
+        if not self.subtitle:
+            self.subtitle = self.title[:255]
+        super().save(*args, **kwargs)
+
 
 class BlogPost(models.Model):
-    """Posts do blog do site"""
+    """Posts do blog do site
+
+    OBS: Campo category deve referenciar SiteCategory (categorias internas do site) e não content.Category.
+    Corrige FK incorreta anterior (detectada via erro de integridade ao salvar usando categoria recém criada).
+    """
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='blog_posts', verbose_name='Site')
     title = models.CharField(max_length=200, blank=True, verbose_name='Título')
     image = models.ImageField(upload_to='sites/blog/', blank=True, verbose_name='Imagem')
     video_url = models.URLField(blank=True, verbose_name='URL do Vídeo')
     content = models.TextField(blank=True, verbose_name='Texto')
     link = models.URLField(blank=True, verbose_name='Link')
-    category = models.ForeignKey(SiteCategory, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Categoria')
+    # Corrigido: garante relacionamento com SiteCategory
+    category = models.ForeignKey('site_management.SiteCategory', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Categoria')
     tags = models.CharField(max_length=500, blank=True, verbose_name='Tags', help_text='Separar por vírgulas')
     is_published = models.BooleanField(default=False, verbose_name='Publicado')
     published_at = models.DateTimeField(blank=True, null=True, verbose_name='Data de Publicação')
@@ -408,3 +442,58 @@ class Payment(models.Model):
     
     def __str__(self):
         return f"Pagamento {self.payment_month}/{self.payment_year} - {self.subscription.site.domain}"
+
+
+# -------------------------------------------------------------
+# API Key para acesso público autenticado ao endpoint agregado do Site
+# -------------------------------------------------------------
+class SiteAPIKey(models.Model):
+    """Chave de API vinculada a um Site.
+
+    Armazena somente hash seguro da chave completa. O formato da chave entregue
+    ao cliente é: <prefixo>.<token> onde prefixo = 8 chars aleatórios.
+    """
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='api_keys', verbose_name='Site')
+    key_prefix = models.CharField(max_length=16, db_index=True, verbose_name='Prefixo')
+    key_hash = models.CharField(max_length=128, unique=True, verbose_name='Hash')
+    name = models.CharField(max_length=100, blank=True, verbose_name='Nome de Referência')
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
+    last_used_at = models.DateTimeField(null=True, blank=True, verbose_name='Último Uso')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Chave de API do Site'
+        verbose_name_plural = 'Chaves de API dos Sites'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"APIKey {self.key_prefix}... ({'ativa' if self.is_active else 'inativa'})"
+
+    @staticmethod
+    def generate_key():
+        """Gera chave completa (prefixo + token) e retorna (prefixo, token, full, hash)."""
+        prefix = secrets.token_hex(4)  # 8 chars hex
+        token = secrets.token_urlsafe(40)
+        full = f"{prefix}.{token}"
+        key_hash = hashlib.sha256(full.encode()).hexdigest()
+        return prefix, token, full, key_hash
+
+    @classmethod
+    def create_key(cls, site: Site, name: str = ''):
+        prefix, token, full, key_hash = cls.generate_key()
+        instance = cls.objects.create(site=site, key_prefix=prefix, key_hash=key_hash, name=name)
+        # full retorna para exibição única
+        return instance, full
+
+    def verify(self, presented_key: str) -> bool:
+        try:
+            candidate_hash = hashlib.sha256(presented_key.encode()).hexdigest()
+        except Exception:
+            return False
+        return secrets.compare_digest(candidate_hash, self.key_hash)
+
+    def mark_used(self):
+        from django.utils import timezone as _tz
+        self.last_used_at = _tz.now()
+        self.save(update_fields=['last_used_at'])

@@ -210,6 +210,13 @@
             <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sistema</h3>
         </div>
 
+        <!-- API Keys -->
+    <a href="{% url 'admin_panel:api_keys_list' %}" 
+       class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'api_keys_list' or request.resolver_match.url_name == 'api_key_create' %}nav-item-active{% endif %}">
+            <i class="fas fa-key mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"></i>
+            API Keys
+        </a>
+
         <!-- System Health -->
         <a href="{% url 'admin_panel:system_health' %}" 
            class="nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'system_health' %}nav-item-active{% endif %}">

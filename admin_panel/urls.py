@@ -88,4 +88,9 @@ urlpatterns = [
     
     # Gerenciamento de Sites
     path('sites/', include('site_management.urls')),
+
+    # Chaves de API dos Sites (Admin Panel custom)
+    path('api-keys/', views.api_keys_list, name='api_keys_list'),
+    path('api-keys/create/', views.api_key_create, name='api_key_create'),
+    path('api-keys/<int:key_id>/revoke/', views.api_key_revoke, name='api_key_revoke'),
 ]

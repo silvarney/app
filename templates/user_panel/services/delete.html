@@ -1,0 +1,33 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Remover Serviço{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+  <div class="flex items-center">
+    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+    <a href="{% url 'user_panel:services_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Serviços</a>
+  </div>
+</li>
+<li>
+  <div class="flex items-center">
+    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+    <span class="ml-1 text-sm font-medium text-gray-500">Remover</span>
+  </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-xl mx-auto">
+  <div class="bg-white shadow rounded-lg p-6">
+    <h1 class="text-xl font-bold mb-4">Confirmar Remoção</h1>
+    <p class="text-sm text-gray-600 mb-6">Tem certeza que deseja remover o serviço <strong>{{ service.title }}</strong>? Esta ação não pode ser desfeita.</p>
+    <form method="post" class="flex justify-end space-x-3">
+      {% csrf_token %}
+      <a href="{% url 'user_panel:services_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+      <button class="px-4 py-2 text-sm rounded-md bg-red-600 text-white">Remover</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

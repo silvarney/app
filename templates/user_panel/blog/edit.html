@@ -36,159 +36,109 @@
     </div>
 
     <!-- Formulário -->
-    <div class="bg-white shadow rounded-lg">
-        <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
-            {% csrf_token %}
-            
-            <!-- Título -->
-            <div>
-                <label for="id_title" class="block text-sm font-medium text-gray-700">
-                    Título *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="title" 
-                           id="id_title"
-                           value="{{ post.title|default:'' }}"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="Digite o título do post"
-                           required>
-                </div>
-            </div>
-
-            <!-- Slug -->
-            <div>
-                <label for="id_slug" class="block text-sm font-medium text-gray-700">
-                    Slug *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="slug" 
-                           id="id_slug"
-                           value="{{ post.slug|default:'' }}"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="url-amigavel-do-post"
-                           required>
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    URL amigável para o post
-                </p>
-            </div>
-
-            <!-- Resumo -->
-            <div>
-                <label for="id_excerpt" class="block text-sm font-medium text-gray-700">
-                    Resumo
-                </label>
-                <div class="mt-1">
-                    <textarea name="excerpt" 
-                              id="id_excerpt"
-                              rows="3"
-                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Breve resumo do post">{{ post.excerpt|default:'' }}</textarea>
-                </div>
-            </div>
-
-            <!-- Conteúdo -->
-            <div>
-                <label for="id_content" class="block text-sm font-medium text-gray-700">
-                    Conteúdo *
-                </label>
-                <div class="mt-1">
-                    <textarea name="content" 
-                              id="id_content"
-                              rows="15"
-                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Escreva o conteúdo do post aqui..."
-                              required>{{ post.content|default:'' }}</textarea>
-                </div>
-            </div>
-
-            <!-- Imagem Destacada -->
-            <div>
-                <label for="id_featured_image" class="block text-sm font-medium text-gray-700">
-                    Imagem Destacada
-                </label>
-                {% if post.featured_image %}
-                <div class="mt-2 mb-3">
-                    <img src="{{ post.featured_image.url }}" alt="Imagem atual" class="h-32 w-auto rounded-lg border border-gray-300">
-                    <p class="text-sm text-gray-500 mt-1">Imagem atual</p>
-                </div>
-                {% endif %}
-                <div class="mt-1">
-                    <input type="file" 
-                           name="featured_image" 
-                           id="id_featured_image"
-                           accept="image/*"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    {% if post.featured_image %}Selecione uma nova imagem para substituir a atual{% else %}Imagem que será exibida como destaque do post{% endif %}
-                </p>
-            </div>
-
-            <!-- Tags -->
-            <div>
-                <label for="id_tags" class="block text-sm font-medium text-gray-700">
-                    Tags
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="tags" 
-                           id="id_tags"
-                           value="{{ post.tags|default:'' }}"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="tag1, tag2, tag3">
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    Separe as tags por vírgula
-                </p>
-            </div>
-
-            <!-- Status e Publicação -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Status -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                <div><label class="block text-sm font-medium">Site *</label>{{ form.site }}</div>
+                <div><label class="block text-sm font-medium">Título *</label>{{ form.title }}</div>
                 <div>
-                    <label for="id_status" class="block text-sm font-medium text-gray-700">
-                        Status
-                    </label>
-                    <div class="mt-1">
-                        <select name="status" 
-                                id="id_status"
-                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                            <option value="draft" {% if post.status == 'draft' %}selected{% endif %}>Rascunho</option>
-                            <option value="published" {% if post.status == 'published' %}selected{% endif %}>Publicado</option>
-                        </select>
+                    <label class="block text-sm font-medium">Imagem</label>
+                    <div id="imageUploadWrapper" class="space-y-2">
+                        <div id="imageDropArea" class="flex flex-col items-center justify-center w-full border-2 border-dashed rounded-md p-4 text-xs text-gray-500 cursor-pointer hover:border-indigo-400 transition">
+                            <span class="mb-1">Arraste & solte ou clique para escolher</span>
+                            <span class="text-[10px]">Tipos: JPG, PNG, WEBP • Máx: 2MB</span>
+                        </div>
+                        <div id="imagePreview" class="hidden space-y-2" data-existing-url="{% if form.instance.image %}{{ form.instance.image.url }}{% elif post.image %}{{ post.image.url }}{% endif %}">
+                            <img class="max-h-40 rounded-md border" alt="Pré-visualização" />
+                            <div class="text-xs text-gray-600" id="imageMeta"></div>
+                            <div class="flex gap-2">
+                                <button type="button" id="btnRemoveImage" class="px-2 py-1 text-xs rounded border bg-white hover:bg-gray-50">Remover</button>
+                            </div>
+                        </div>
+                        <div class="hidden">{{ form.image }}</div>
+                        <p id="imageError" class="hidden text-xs text-red-600"></p>
                     </div>
                 </div>
-
-                <!-- Data de Publicação -->
+                <div><label class="block text-sm font-medium">URL Vídeo</label>{{ form.video_url }}</div>
+                <div id="videoPreview" class="hidden"><label class="block text-xs font-medium text-gray-500 mb-1">Pré-visualização do Vídeo</label><div class="rounded-md overflow-hidden border p-2" id="videoPreviewContent"></div></div>
                 <div>
-                    <label for="id_published_at" class="block text-sm font-medium text-gray-700">
-                        Data de Publicação
-                    </label>
-                    <div class="mt-1">
-                        <input type="datetime-local" 
-                               name="published_at" 
-                               id="id_published_at"
-                               value="{% if post.published_at %}{{ post.published_at|date:'Y-m-d\TH:i' }}{% endif %}"
-                               class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                    </div>
+                    <label class="block text-sm font-medium">Texto</label>
+                    {{ form.content }}
+                    <p class="text-xs text-gray-500 mt-1">Editor rich text (HTML será salvo).</p>
                 </div>
-            </div>
-
-            <!-- Botões -->
-            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-                <a href="{% url 'user_panel:blog_list' %}" 
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Cancelar
-                </a>
-                <button type="submit" 
-                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Salvar Alterações
-                </button>
-            </div>
-        </form>
-    </div>
+                <div><label class="block text-sm font-medium">Link</label>{{ form.link }}</div>
+                <div><label class="block text-sm font-medium">Categoria</label>{{ form.category }}</div>
+                <div><label class="block text-sm font-medium">Tags</label>{{ form.tags }}</div>
+                <div class="flex items-center space-x-2">{{ form.is_published }} <span class="text-sm">Publicado</span></div>
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <a href="{% url 'user_panel:blog_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+                    <button class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white">Salvar</button>
+                </div>
+            </form>
+        </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+<script>
+(function(){
+    // Rich text com limpar formatação
+    const textarea = document.querySelector('textarea.js-richtext');
+    let quill=null;
+    if(textarea){
+        const wrapper=document.createElement('div');
+        wrapper.innerHTML='<div class="flex justify-between items-center mb-1"><span class="text-xs text-gray-500">Editor</span><button type="button" id="btnClearFormatting" class="text-xs text-indigo-600 hover:underline">Limpar formatação</button></div><div id="editor" class="bg-white border rounded-md"></div>';
+        textarea.parentNode.insertBefore(wrapper, textarea); wrapper.appendChild(textarea); textarea.style.display='none';
+        quill = new Quill('#editor',{theme:'snow',modules:{toolbar:[["bold","italic","underline"],[{list:'ordered'},{list:'bullet'}],["link","clean"]]}});
+        quill.root.innerHTML = textarea.value || '';
+        document.querySelector('form').addEventListener('submit',()=>{ textarea.value = quill.root.innerHTML; });
+        document.getElementById('btnClearFormatting').addEventListener('click', ()=>{ const plain=quill.getText(); quill.root.innerHTML=plain.replace(/</g,'&lt;'); });
+    }
+    // Upload avançado imagem
+    const fileInput=document.querySelector('input[type=file][name=image]');
+    const dropArea=document.getElementById('imageDropArea');
+    const previewWrap=document.getElementById('imagePreview');
+    const imageMeta=document.getElementById('imageMeta');
+    const imageError=document.getElementById('imageError');
+    const btnRemoveImage=document.getElementById('btnRemoveImage');
+    const MAX_SIZE=2*1024*1024; const ALLOWED=['image/jpeg','image/png','image/webp'];
+    if(fileInput){ fileInput.accept='.jpg,.jpeg,.png,.webp'; }
+    function resetImage(){ if(fileInput){fileInput.value='';} previewWrap.classList.add('hidden'); if(imageMeta) imageMeta.textContent=''; }
+    function showError(msg){ if(!imageError)return; imageError.textContent=msg; imageError.classList.remove('hidden'); }
+    function clearError(){ if(!imageError)return; imageError.classList.add('hidden'); imageError.textContent=''; }
+    function handleFile(f){ if(!f){ resetImage(); clearError(); return; } if(!ALLOWED.includes(f.type)){ showError('Tipo não permitido.'); resetImage(); return;} if(f.size>MAX_SIZE){ showError('Arquivo excede 2MB.'); resetImage(); return;} clearError(); const url=URL.createObjectURL(f); previewWrap.querySelector('img').src=url; previewWrap.classList.remove('hidden'); if(imageMeta) imageMeta.textContent=`${f.name} • ${(f.size/1024).toFixed(1)} KB`; }
+    // Inicializa metadados se já existe imagem salva
+    if(previewWrap && !previewWrap.classList.contains('hidden')){
+        const imgEl = previewWrap.querySelector('img');
+        if(imgEl && imageMeta){
+            try { const parts = imgEl.src.split('/'); imageMeta.textContent = parts[parts.length-1]; } catch(e){}
+        }
+    }
+    if(fileInput){ fileInput.addEventListener('change',()=> handleFile(fileInput.files[0])); }
+    // Inicialização de imagem existente
+    (function initExisting(){
+        if(!previewWrap) return; const existingUrl = previewWrap.getAttribute('data-existing-url');
+        if(existingUrl){
+            const imgEl = previewWrap.querySelector('img');
+            imgEl.src = existingUrl; previewWrap.classList.remove('hidden');
+            if(imageMeta){ try { imageMeta.textContent = existingUrl.split('/').pop(); } catch(e){} }
+        }
+    })();
+    if(btnRemoveImage){ btnRemoveImage.addEventListener('click', ()=>{ resetImage(); clearError(); }); }
+    if(dropArea){
+        dropArea.addEventListener('click', ()=> fileInput && fileInput.click());
+        ['dragenter','dragover'].forEach(ev=> dropArea.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); dropArea.classList.add('border-indigo-500','bg-indigo-50'); }));
+        ['dragleave','drop'].forEach(ev=> dropArea.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('border-indigo-500','bg-indigo-50'); }));
+        dropArea.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(fileInput && f){ fileInput.files=e.dataTransfer.files; handleFile(f);} });
+    }
+    // Preview vídeo
+    const videoInput=document.querySelector('input[name=video_url]');
+    const videoPreview=document.getElementById('videoPreview');
+    const videoPreviewContent=document.getElementById('videoPreviewContent');
+    function renderVideo(url){ if(!videoPreview||!videoPreviewContent){return;} if(!url){ videoPreview.classList.add('hidden'); videoPreviewContent.innerHTML=''; return;} let embed=''; const yt=url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/); const vimeo=url.match(/vimeo\.com\/(\d+)/); if(yt){ embed=`<iframe class='w-full aspect-video' src='https://www.youtube.com/embed/${yt[1]}' allowfullscreen></iframe>`;} else if(vimeo){ embed=`<iframe class='w-full aspect-video' src='https://player.vimeo.com/video/${vimeo[1]}' allowfullscreen></iframe>`;} else if(/\.mp4($|\?)/i.test(url)){ embed=`<video class='w-full max-h-60' controls src='${url}'></video>`;} if(embed){ videoPreviewContent.innerHTML=embed; videoPreview.classList.remove('hidden'); } else { videoPreviewContent.innerHTML=''; videoPreview.classList.add('hidden'); } }
+    if(videoInput){ videoInput.addEventListener('input', ()=> renderVideo(videoInput.value.trim())); renderVideo(videoInput.value.trim()); }
+})();
+</script>
 {% endblock %}

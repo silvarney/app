@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.db import connection
@@ -63,3 +65,6 @@ urlpatterns = [
     path('payments/', include('payments.urls')),      # Pagamentos
     path('accounts-management/', include('accounts.urls')),  # Gerenciamento de Contas
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

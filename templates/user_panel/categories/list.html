@@ -41,20 +41,62 @@
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Categorias Cadastradas</h3>
+            <form method="get" class="mt-3 flex space-x-2">
+                <input type="text" name="search" value="{{ search }}" placeholder="Buscar categoria ou site..." class="flex-1 border rounded-md px-3 py-2 text-sm" />
+                <button class="px-4 py-2 bg-purple-600 text-white text-sm rounded-md">Filtrar</button>
+                {% if search %}
+                <a href="?" class="px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-md">Limpar</a>
+                {% else %}
+                <button type="button" disabled class="px-3 py-2 bg-gray-100 text-gray-400 text-sm rounded-md cursor-not-allowed">Limpar</button>
+                {% endif %}
+            </form>
         </div>
         
-        <div class="p-6">
-            <div class="text-center py-12">
-                <i class="fas fa-tags text-gray-300 text-6xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma categoria encontrada</h3>
-                <p class="text-gray-500 mb-6">Comece criando sua primeira categoria para organizar o conteúdo.</p>
-                <a href="{% url 'user_panel:categories_create' %}" 
-                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700">
-                    <i class="fas fa-plus mr-2"></i>
-                    Criar Primeira Categoria
-                </a>
-            </div>
-        </div>
+                <div class="p-6">
+                        {% if categories %}
+                        <div class="overflow-x-auto -mx-6 -mt-6">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ativa</th>
+                                        <th class="px-6 py-3"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for c in categories %}
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 text-sm font-medium text-gray-900 flex items-center space-x-2">
+                                            {% if c.icon %}<i class="{{ c.icon }} text-purple-500"></i>{% endif %}
+                                            <span>{{ c.name }}</span>
+                                        </td>
+                                        <td class="px-6 py-3 text-sm text-gray-500">{{ c.site.name|default:c.site.domain }}</td>
+                                        <td class="px-6 py-3 text-sm">
+                                            {% if c.is_active %}<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sim</span>{% else %}<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Não</span>{% endif %}
+                                        </td>
+                                        <td class="px-6 py-3 text-sm text-right space-x-2">
+                                            <a href="{% url 'user_panel:categories_edit' c.id %}" class="text-indigo-600 hover:text-indigo-900 text-xs font-medium">Editar</a>
+                                            <a href="{% url 'user_panel:categories_delete' c.id %}" class="text-red-600 hover:text-red-900 text-xs font-medium">Excluir</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-12">
+                                <i class="fas fa-tags text-gray-300 text-6xl mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma categoria encontrada</h3>
+                                <p class="text-gray-500 mb-6">Comece criando sua primeira categoria para organizar o conteúdo.</p>
+                                <a href="{% url 'user_panel:categories_create' %}" 
+                                     class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Criar Primeira Categoria
+                                </a>
+                        </div>
+                        {% endif %}
+                </div>
     </div>
 </div>
 {% endblock %}

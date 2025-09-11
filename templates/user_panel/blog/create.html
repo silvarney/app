@@ -20,165 +20,204 @@
 
 {% block user_content %}
 <div class="max-w-4xl mx-auto">
-    <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center">
-            <a href="{% url 'user_panel:blog_list' %}" 
-               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Voltar para Blog
-            </a>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-900">Novo Post</h1>
-        <p class="mt-2 text-sm text-gray-700">
-            Crie um novo post para o blog dos seus sites
-        </p>
+        <a href="{% url 'user_panel:blog_list' %}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"><i class="fas fa-arrow-left mr-2"></i>Voltar</a>
+        <h1 class="mt-4 text-2xl font-bold">Novo Post</h1>
     </div>
-
-    <!-- Formulário -->
-    <div class="bg-white shadow rounded-lg">
-        <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6" id="blogPostForm">
             {% csrf_token %}
-            
-            <!-- Título -->
+            <div><label class="block text-sm font-medium">Site *</label>{{ form.site }}</div>
+            <div><label class="block text-sm font-medium">Título</label>{{ form.title }}</div>
             <div>
-                <label for="id_title" class="block text-sm font-medium text-gray-700">
-                    Título *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="title" 
-                           id="id_title"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="Digite o título do post"
-                           required>
-                </div>
-            </div>
-
-            <!-- Slug -->
-            <div>
-                <label for="id_slug" class="block text-sm font-medium text-gray-700">
-                    Slug *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="slug" 
-                           id="id_slug"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="url-amigavel-do-post"
-                           required>
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    URL amigável para o post (será gerada automaticamente se deixar em branco)
-                </p>
-            </div>
-
-            <!-- Resumo -->
-            <div>
-                <label for="id_excerpt" class="block text-sm font-medium text-gray-700">
-                    Resumo
-                </label>
-                <div class="mt-1">
-                    <textarea name="excerpt" 
-                              id="id_excerpt"
-                              rows="3"
-                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Breve resumo do post"></textarea>
-                </div>
-            </div>
-
-            <!-- Conteúdo -->
-            <div>
-                <label for="id_content" class="block text-sm font-medium text-gray-700">
-                    Conteúdo *
-                </label>
-                <div class="mt-1">
-                    <textarea name="content" 
-                              id="id_content"
-                              rows="15"
-                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Escreva o conteúdo do post aqui..."
-                              required></textarea>
-                </div>
-            </div>
-
-            <!-- Imagem Destacada -->
-            <div>
-                <label for="id_featured_image" class="block text-sm font-medium text-gray-700">
-                    Imagem Destacada
-                </label>
-                <div class="mt-1">
-                    <input type="file" 
-                           name="featured_image" 
-                           id="id_featured_image"
-                           accept="image/*"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    Imagem que será exibida como destaque do post
-                </p>
-            </div>
-
-            <!-- Tags -->
-            <div>
-                <label for="id_tags" class="block text-sm font-medium text-gray-700">
-                    Tags
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="tags" 
-                           id="id_tags"
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="tag1, tag2, tag3">
-                </div>
-                <p class="mt-1 text-sm text-gray-500">
-                    Separe as tags por vírgula
-                </p>
-            </div>
-
-            <!-- Status e Publicação -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Status -->
-                <div>
-                    <label for="id_status" class="block text-sm font-medium text-gray-700">
-                        Status
-                    </label>
-                    <div class="mt-1">
-                        <select name="status" 
-                                id="id_status"
-                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                            <option value="draft">Rascunho</option>
-                            <option value="published">Publicado</option>
-                        </select>
+                <label class="block text-sm font-medium">Imagem</label>
+                <div id="imageUploadWrapper" class="space-y-2">
+                    <div id="imageDropArea" class="flex flex-col items-center justify-center w-full border-2 border-dashed rounded-md p-4 text-xs text-gray-500 cursor-pointer hover:border-indigo-400 transition">
+                        <span class="mb-1">Arraste & solte ou clique para escolher</span>
+                        <span class="text-[10px]">Tipos: JPG, PNG, WEBP • Máx: 2MB</span>
                     </div>
-                </div>
-
-                <!-- Data de Publicação -->
-                <div>
-                    <label for="id_published_at" class="block text-sm font-medium text-gray-700">
-                        Data de Publicação
-                    </label>
-                    <div class="mt-1">
-                        <input type="datetime-local" 
-                               name="published_at" 
-                               id="id_published_at"
-                               class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                    <div id="imagePreview" class="hidden space-y-2">
+                        <img class="max-h-40 rounded-md border" alt="Pré-visualização" />
+                        <div class="text-xs text-gray-600" id="imageMeta"></div>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnRemoveImage" class="px-2 py-1 text-xs rounded border bg-white hover:bg-gray-50">Remover</button>
+                        </div>
                     </div>
+                    <div class="hidden">{{ form.image }}</div>
+                    <p id="imageError" class="hidden text-xs text-red-600"></p>
                 </div>
             </div>
-
-            <!-- Botões -->
-            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-                <a href="{% url 'user_panel:blog_list' %}" 
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Cancelar
-                </a>
-                <button type="submit" 
-                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Criar Post
-                </button>
+            <div><label class="block text-sm font-medium">URL Vídeo</label>{{ form.video_url }}</div>
+            <div id="videoPreview" class="hidden"><label class="block text-xs font-medium text-gray-500 mb-1">Pré-visualização do Vídeo</label><div class="rounded-md overflow-hidden border p-2" id="videoPreviewContent"></div></div>
+            <div>
+                <label class="block text-sm font-medium">Texto</label>
+                {{ form.content }}
+                <p class="text-xs text-gray-500 mt-1">Editor rich text (HTML será salvo).</p>
+            </div>
+            <div><label class="block text-sm font-medium">Link</label>{{ form.link }}</div>
+            <div>
+                <label class="block text-sm font-medium">Categoria</label>
+                <div class="flex space-x-2 items-start">
+                    {{ form.category }}
+                    <button type="button" id="addCategoryBtn" class="px-2 py-1 text-xs rounded-md border hover:bg-gray-50">+ Nova</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Tags</label>
+                {{ form.tags }}
+                <datalist id="tagsSuggestions"></datalist>
+                <p class="text-xs text-gray-500 mt-1">Separe por vírgulas. Digite para ver sugestões.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Status</label>
+                {{ form.is_published }}
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <a href="{% url 'user_panel:blog_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+                <button class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white">Salvar</button>
             </div>
         </form>
+        <!-- Modal Nova Categoria -->
+    <div id="modalCategory" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg w-full max-w-md p-6 space-y-4 shadow-lg">
+                <h3 class="text-lg font-semibold">Nova Categoria</h3>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium">Nome</label>
+                    <input type="text" id="newCategoryName" class="w-full border rounded-md px-3 py-2" placeholder="Ex: Notícias" />
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" class="px-3 py-2 text-sm border rounded-md" id="cancelCategoryBtn">Cancelar</button>
+                    <button type="button" class="px-3 py-2 text-sm rounded-md bg-indigo-600 text-white" id="saveCategoryBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+<script>
+(function(){
+    // Rich text avançado com botão limpar formatação
+    const textarea = document.querySelector('textarea.js-richtext');
+    let quill = null;
+    if(textarea){
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = '<div class="flex justify-between items-center mb-1"><span class="text-xs text-gray-500">Editor</span><button type="button" id="btnClearFormatting" class="text-xs text-indigo-600 hover:underline">Limpar formatação</button></div><div id="editor" class="bg-white border rounded-md"></div>';
+        textarea.parentNode.insertBefore(wrapper, textarea);
+        wrapper.appendChild(textarea); // mantém para submit
+        textarea.style.display='none';
+        quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: [["bold","italic","underline"],[{ 'list': 'ordered'}, { 'list': 'bullet' }],["link","clean"]] }});
+        quill.root.innerHTML = textarea.value || '';
+        document.getElementById('blogPostForm').addEventListener('submit', ()=>{ textarea.value = quill.root.innerHTML; });
+        document.getElementById('btnClearFormatting').addEventListener('click', ()=>{ const plain = quill.getText(); quill.root.innerHTML = plain.replace(/</g,'&lt;'); });
+    }
+
+  // Tags autocomplete (client side). Busca tags existentes via endpoint simples.
+    const tagsInput = document.querySelector('.js-tags-input');
+    const datalist = document.getElementById('tagsSuggestions');
+    const siteSelect = document.querySelector('select[name=site]');
+    function loadTagsSuggestions(){
+        if(!tagsInput || !datalist || !siteSelect || !siteSelect.value){ return; }
+        fetch('/api/blog-tags/?site=' + encodeURIComponent(siteSelect.value))
+            .then(r=> r.ok? r.json(): {tags:[]})
+            .then(data=> { datalist.innerHTML=''; (data.tags||[]).forEach(t=> { const o=document.createElement('option'); o.value=t; datalist.appendChild(o); }); tagsInput.setAttribute('list','tagsSuggestions'); })
+            .catch(()=>{});
+    }
+    if(siteSelect){ siteSelect.addEventListener('change', loadTagsSuggestions); }
+    // Carrega imediatamente apenas se já houver site pré-selecionado
+    loadTagsSuggestions();
+
+        // Carregamento dinâmico de categorias de blog por site
+        const categorySelect = document.querySelector('select[name=category]');
+        function loadBlogCategories(){
+                if(!categorySelect){return;}
+                const siteId = siteSelect && siteSelect.value; if(!siteId){ categorySelect.innerHTML='<option value="">Selecione um site primeiro</option>'; return; }
+                fetch('/api/blog-categories/?site=' + encodeURIComponent(siteId))
+                    .then(r=> r.ok? r.json(): {categories:[]})
+                    .then(data=> {
+                            const prevValue = categorySelect.value;
+                            categorySelect.innerHTML='';
+                            if(!data.categories || data.categories.length===0){ categorySelect.innerHTML='<option value="">Nenhuma categoria (crie nova)</option>'; return; }
+                            data.categories.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; categorySelect.appendChild(o); });
+                            // Restaura valor se ainda existir
+                            if(data.categories.some(c=> String(c.id)===prevValue)){ categorySelect.value=prevValue; }
+                    }).catch(()=>{});
+        }
+        if(siteSelect){ siteSelect.addEventListener('change', ()=>{ loadBlogCategories(); }); }
+        loadBlogCategories();
+
+  // Modal categoria
+  const modal = document.getElementById('modalCategory');
+  const btnAdd = document.getElementById('addCategoryBtn');
+  const btnCancel = document.getElementById('cancelCategoryBtn');
+  const btnSave = document.getElementById('saveCategoryBtn');
+  if(btnAdd){ btnAdd.addEventListener('click', ()=> modal.classList.remove('hidden')); }
+  if(btnCancel){ btnCancel.addEventListener('click', ()=> modal.classList.add('hidden')); }
+  if(btnSave){
+    btnSave.addEventListener('click', ()=>{
+      const name = document.getElementById('newCategoryName').value.trim();
+    const siteSelect = document.querySelector('select[name=site]');
+      if(!name || !siteSelect.value){return;}
+            fetch('/api/blog-categories/create-inline/', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')}, body: JSON.stringify({name, site: siteSelect.value})})
+                .then(r=>r.json())
+                .then(data=>{ if(data.id){
+                        const catSelect = document.querySelector('select[name=category]');
+                        const opt = document.createElement('option'); opt.value=data.id; opt.textContent=data.name; catSelect.appendChild(opt); catSelect.value=data.id; modal.classList.add('hidden'); document.getElementById('newCategoryName').value=''; }
+                });
+    });
+  }
+  function getCookie(name){ const v = document.cookie.match('(^|;) ?'+name+'=([^;]*)(;|$)'); return v? v[2] : null; }
+    // Upload avançado de imagem (drag & drop, validação, remover)
+    const fileInput = document.querySelector('input[type=file][name=image]');
+    const dropArea = document.getElementById('imageDropArea');
+    const previewWrap = document.getElementById('imagePreview');
+    const imageMeta = document.getElementById('imageMeta');
+    const imageError = document.getElementById('imageError');
+    const btnRemoveImage = document.getElementById('btnRemoveImage');
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+    const ALLOWED = ['image/jpeg','image/png','image/webp'];
+    if(fileInput){ fileInput.accept='.jpg,.jpeg,.png,.webp'; }
+    function resetImage(){ if(fileInput){fileInput.value='';} previewWrap.classList.add('hidden'); imageMeta.textContent=''; }
+    function showError(msg){ if(!imageError)return; imageError.textContent=msg; imageError.classList.remove('hidden'); }
+    function clearError(){ if(!imageError)return; imageError.classList.add('hidden'); imageError.textContent=''; }
+    function handleFile(f){
+        if(!f){ resetImage(); clearError(); return; }
+        if(!ALLOWED.includes(f.type)){ showError('Tipo não permitido.'); resetImage(); return; }
+        if(f.size > MAX_SIZE){ showError('Arquivo excede 2MB.'); resetImage(); return; }
+        clearError();
+        const url = URL.createObjectURL(f);
+        previewWrap.querySelector('img').src = url;
+        previewWrap.classList.remove('hidden');
+        imageMeta.textContent = `${f.name} • ${(f.size/1024).toFixed(1)} KB`;
+    }
+    if(fileInput){ fileInput.addEventListener('change', ()=> handleFile(fileInput.files[0])); }
+    if(btnRemoveImage){ btnRemoveImage.addEventListener('click', ()=>{ resetImage(); clearError(); }); }
+    if(dropArea){
+        dropArea.addEventListener('click', ()=> fileInput && fileInput.click());
+        ['dragenter','dragover'].forEach(ev=> dropArea.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); dropArea.classList.add('border-indigo-500','bg-indigo-50'); }));
+        ['dragleave','drop'].forEach(ev=> dropArea.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('border-indigo-500','bg-indigo-50'); }));
+        dropArea.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(fileInput && f){ fileInput.files = e.dataTransfer.files; handleFile(f); } });
+    }
+    // Preview de vídeo (YouTube / Vimeo / MP4 simples)
+    const videoInput = document.querySelector('input[name=video_url]');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoPreviewContent = document.getElementById('videoPreviewContent');
+    function renderVideo(url){
+        if(!videoPreview || !videoPreviewContent){return;}
+        if(!url){ videoPreview.classList.add('hidden'); videoPreviewContent.innerHTML=''; return; }
+        let embed='';
+        const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+        const vimeo = url.match(/vimeo\.com\/(\d+)/);
+        if(yt){ embed = `<iframe class='w-full aspect-video' src='https://www.youtube.com/embed/${yt[1]}' allowfullscreen></iframe>`; }
+        else if(vimeo){ embed = `<iframe class='w-full aspect-video' src='https://player.vimeo.com/video/${vimeo[1]}' allowfullscreen></iframe>`; }
+        else if(/\.mp4($|\?)/i.test(url)){ embed = `<video class='w-full max-h-60' controls src='${url}'></video>`; }
+        if(embed){ videoPreviewContent.innerHTML = embed; videoPreview.classList.remove('hidden'); }
+        else { videoPreviewContent.innerHTML=''; videoPreview.classList.add('hidden'); }
+    }
+    if(videoInput){ videoInput.addEventListener('input', ()=> renderVideo(videoInput.value.trim())); renderVideo(videoInput.value.trim()); }
+})();
+</script>
 {% endblock %}

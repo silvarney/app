@@ -7,6 +7,7 @@ from .models import (
     Banner, CTA, SiteCategory, Service, BlogPost, Subscription,
     SubscriptionItem, Payment
 )
+from .models import SiteAPIKey
 
 
 @admin.register(TemplateCategory)
@@ -157,6 +158,20 @@ class SiteAdmin(admin.ModelAdmin):
             )
         return 'Sem preview disponível'
     site_preview.short_description = 'Preview do Template'
+
+
+@admin.register(SiteAPIKey)
+class SiteAPIKeyAdmin(admin.ModelAdmin):
+    list_display = ('key_prefix', 'site', 'name', 'is_active', 'last_used_at', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('key_prefix', 'name', 'site__domain')
+    readonly_fields = ('key_prefix', 'key_hash', 'last_used_at', 'created_at', 'updated_at')
+    actions = ['revogar_chaves']
+
+    def revogar_chaves(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} chave(s) revogadas.")
+    revogar_chaves.short_description = 'Revogar chaves selecionadas'
 
 
 @admin.register(SiteCategory)

@@ -1,130 +1,28 @@
 {% extends 'user_panel/base.html' %}
-{% load static %}
-
-{% block user_title %}Novo Serviço{% endblock %}
-
-{% block breadcrumb_items %}
-<li>
-    <div class="flex items-center">
-        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-        <a href="{% url 'user_panel:services_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Serviços</a>
-    </div>
-</li>
-<li>
-    <div class="flex items-center">
-        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-        <span class="ml-1 text-sm font-medium text-gray-500">Novo Serviço</span>
-    </div>
-</li>
-{% endblock %}
-
 {% block user_content %}
 <div class="max-w-3xl mx-auto">
-    <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center">
-            <a href="{% url 'user_panel:services_list' %}" 
-               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Voltar para Serviços
-            </a>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-900">Novo Serviço</h1>
-        <p class="mt-2 text-sm text-gray-700">
-            Crie um novo serviço para oferecer aos clientes
-        </p>
+        <a href="{% url 'user_panel:services_list' %}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"><i class="fas fa-arrow-left mr-2"></i>Voltar</a>
+        <h1 class="mt-4 text-2xl font-bold">Novo Serviço</h1>
+        <p class="text-sm text-gray-600">Cadastre categoria, título, descrição, imagem, valor e desconto.</p>
     </div>
-
-    <!-- Formulário -->
-    <div class="bg-white shadow rounded-lg">
-        <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
-            
-            <!-- Nome -->
-            <div>
-                <label for="id_name" class="block text-sm font-medium text-gray-700">
-                    Nome *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="name" 
-                           id="id_name" 
-                           class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="Ex: Consultoria em TI"
-                           required>
-                </div>
+            <div><label class="block text-sm font-medium">Site *</label>{{ form.site }}</div>
+            <div><label class="block text-sm font-medium">Categoria *</label>{{ form.category }}</div>
+            <div><label class="block text-sm font-medium">Título *</label>{{ form.title }}</div>
+            <div><label class="block text-sm font-medium">Descrição</label>{{ form.description }}</div>
+            <div><label class="block text-sm font-medium">Imagem</label>{{ form.image }}</div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-sm font-medium">Valor</label>{{ form.value }}</div>
+                <div><label class="block text-sm font-medium">Desconto (%)</label>{{ form.discount }}</div>
             </div>
-
-            <!-- Descrição -->
-            <div>
-                <label for="id_description" class="block text-sm font-medium text-gray-700">
-                    Descrição *
-                </label>
-                <div class="mt-1">
-                    <textarea name="description" 
-                              id="id_description" 
-                              rows="4"
-                              class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Descreva o serviço oferecido..."
-                              required></textarea>
-                </div>
-            </div>
-
-            <!-- Preço -->
-            <div>
-                <label for="id_price" class="block text-sm font-medium text-gray-700">
-                    Preço (R$)
-                </label>
-                <div class="mt-1">
-                    <input type="number" 
-                           name="price" 
-                           id="id_price" 
-                           step="0.01"
-                           min="0"
-                           class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="0.00">
-                </div>
-            </div>
-
-            <!-- Imagem -->
-            <div>
-                <label for="id_image" class="block text-sm font-medium text-gray-700">
-                    Imagem do Serviço
-                </label>
-                <div class="mt-1">
-                    <input type="file" 
-                           name="image" 
-                           id="id_image" 
-                           accept="image/*"
-                           class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <p class="mt-2 text-sm text-gray-500">Formatos aceitos: JPG, PNG, GIF (máx. 2MB)</p>
-            </div>
-
-            <!-- Ativo -->
-            <div class="flex items-center">
-                <input type="checkbox" 
-                       name="is_active" 
-                       id="id_is_active" 
-                       checked
-                       class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
-                <label for="id_is_active" class="ml-2 block text-sm text-gray-900">
-                    Ativo
-                </label>
-            </div>
-
-            <!-- Botões -->
-            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-                <a href="{% url 'user_panel:services_list' %}" 
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Cancelar
-                </a>
-                <button type="submit" 
-                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Criar Serviço
-                </button>
+            <div class="flex items-center space-x-2">{{ form.is_active }} <span class="text-sm">Ativo</span></div>
+            <div class="flex justify-end space-x-3 border-t pt-4">
+                <a href="{% url 'user_panel:services_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+                <button class="px-4 py-2 text-sm rounded-md bg-green-600 text-white">Salvar</button>
             </div>
         </form>
     </div>
-</div>
 {% endblock %}

@@ -20,92 +20,48 @@
 
 {% block user_content %}
 <div class="max-w-3xl mx-auto">
-    <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center">
-            <a href="{% url 'user_panel:categories_list' %}" 
-               class="mr-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Voltar para Categorias
-            </a>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-900">Nova Categoria</h1>
-        <p class="mt-2 text-sm text-gray-700">
-            Crie uma nova categoria para organizar o conteúdo
-        </p>
+        <a href="{% url 'user_panel:categories_list' %}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar para Categorias
+        </a>
+        <h1 class="mt-4 text-2xl font-bold">Nova Categoria</h1>
+        <p class="text-sm text-gray-600">Crie uma nova categoria de serviços (Nome, Ícone, Imagem).</p>
     </div>
-
-    <!-- Formulário -->
-    <div class="bg-white shadow rounded-lg">
-        <form method="post" class="space-y-6 p-6">
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
-            
-            <!-- Nome -->
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded p-3">
+                <ul class="list-disc pl-4 space-y-1">
+                    {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
             <div>
-                <label for="id_name" class="block text-sm font-medium text-gray-700">
-                    Nome *
-                </label>
-                <div class="mt-1">
-                    <input type="text" 
-                           name="name" 
-                           id="id_name" 
-                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                           placeholder="Ex: Tecnologia"
-                           required>
-                </div>
+                <label class="block text-sm font-medium text-gray-700">Site *</label>
+                {{ form.site }}
+                {% if form.site.errors %}<p class="text-red-600 text-xs">{{ form.site.errors.0 }}</p>{% endif %}
             </div>
-
-            <!-- Descrição -->
             <div>
-                <label for="id_description" class="block text-sm font-medium text-gray-700">
-                    Descrição
-                </label>
-                <div class="mt-1">
-                    <textarea name="description" 
-                              id="id_description" 
-                              rows="3"
-                              class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="Descreva a categoria..."></textarea>
-                </div>
+                <label class="block text-sm font-medium text-gray-700">Nome *</label>
+                {{ form.name }}
+                {% if form.name.errors %}<p class="text-red-600 text-xs">{{ form.name.errors.0 }}</p>{% endif %}
             </div>
-
-            <!-- Cor -->
             <div>
-                <label for="id_color" class="block text-sm font-medium text-gray-700">
-                    Cor
-                </label>
-                <div class="mt-1">
-                    <input type="color" 
-                           name="color" 
-                           id="id_color" 
-                           value="#8B5CF6"
-                           class="h-10 w-20 border border-gray-300 rounded-md">
-                </div>
-                <p class="mt-2 text-sm text-gray-500">Escolha uma cor para identificar a categoria</p>
+                <label class="block text-sm font-medium text-gray-700">Ícone</label>
+                {{ form.icon }}
+                <p class="text-xs text-gray-500 mt-1">Classe ou identificador do ícone (opcional).</p>
             </div>
-
-            <!-- Ativo -->
-            <div class="flex items-center">
-                <input type="checkbox" 
-                       name="is_active" 
-                       id="id_is_active" 
-                       checked
-                       class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                <label for="id_is_active" class="ml-2 block text-sm text-gray-900">
-                    Ativo
-                </label>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Imagem</label>
+                {{ form.image }}
             </div>
-
-            <!-- Botões -->
-            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-                <a href="{% url 'user_panel:categories_list' %}" 
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                    Cancelar
-                </a>
-                <button type="submit" 
-                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                    Criar Categoria
-                </button>
+            <div class="flex items-center space-x-2">
+                {{ form.is_active }}<span class="text-sm">Ativo</span>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <a href="{% url 'user_panel:categories_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+                <button class="px-4 py-2 text-sm rounded-md bg-purple-600 text-white">Salvar</button>
             </div>
         </form>
     </div>

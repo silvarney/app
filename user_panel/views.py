@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -22,7 +23,10 @@ from collections import defaultdict
 from permissions.models import Permission, Role, UserRole
 from permissions.decorators import user_panel_required
 from content.models import Content, Category, Tag
-from site_management.models import Item, PlanType, TemplateCategory
+from site_management.models import Item, PlanType, TemplateCategory, SiteCategory, Service, SocialNetwork, CTA, BlogPost
+from .forms import (
+    SiteCategoryForm, ServiceForm, SocialNetworkForm, CTAForm, BlogPostForm
+)
 from site_management import views as site_views
 from domains.models import Domain
 
@@ -1940,194 +1944,303 @@ def bio_delete(request, bio_id):
     return redirect('user_panel:bio_list')
 
 
-# Categorias Views
 @login_required
 def categories_list(request):
-    """Lista de categorias"""
-    messages.info(request, 'Sistema de Categorias em desenvolvimento')
+    qs = SiteCategory.objects.filter(
+        site__account__memberships__user=request.user,
+        site__account__memberships__status='active'
+    ).select_related('site').order_by('site__domain', 'name')
+    search = request.GET.get('search', '')
+    if search:
+        qs = qs.filter(
+            Q(name__icontains=search) |
+            Q(site__domain__icontains=search) |
+            Q(site__account__name__icontains=search) |
+            Q(site__bio__title__icontains=search)
+        )
     context = {
         'title': 'Categorias',
-        'breadcrumb': 'Categorias'
+        'breadcrumb': 'Categorias',
+        'categories': qs,
+        'search': search,
     }
     return render(request, 'user_panel/categories/list.html', context)
 
 @login_required
 def categories_create(request):
-    """Criar nova categoria"""
-    messages.info(request, 'Sistema de Categorias em desenvolvimento')
-    context = {
-        'title': 'Criar Categoria',
-        'breadcrumb': 'Categorias > Criar'
-    }
-    return render(request, 'user_panel/categories/create.html', context)
+    if request.method == 'POST':
+        form = SiteCategoryForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            cat = form.save()
+            messages.success(request, f'Categoria "{cat.name}" criada com sucesso.')
+            return redirect('user_panel:categories_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+            # Exibir erros detalhados em toasts
+            for field, errors in form.errors.items():
+                for error in errors:
+                    label = form.fields[field].label if field in form.fields else field
+                    messages.error(request, f'{label}: {error}')
+            for error in form.non_field_errors():
+                messages.error(request, error)
+    else:
+        form = SiteCategoryForm(user=request.user)
+    return render(request, 'user_panel/categories/create.html', {'form': form, 'title': 'Criar Categoria'})
 
 @login_required
 def categories_edit(request, category_id):
-    """Editar categoria"""
-    messages.info(request, 'Sistema de Categorias em desenvolvimento')
-    context = {
-        'title': 'Editar Categoria',
-        'breadcrumb': 'Categorias > Editar'
-    }
-    return render(request, 'user_panel/categories/edit.html', context)
+    category = get_object_or_404(SiteCategory, id=category_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        form = SiteCategoryForm(request.POST, request.FILES, instance=category, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Categoria atualizada com sucesso.')
+            return redirect('user_panel:categories_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    label = form.fields[field].label if field in form.fields else field
+                    messages.error(request, f'{label}: {error}')
+            for error in form.non_field_errors():
+                messages.error(request, error)
+    else:
+        form = SiteCategoryForm(instance=category, user=request.user)
+    return render(request, 'user_panel/categories/edit.html', {'form': form, 'category': category, 'title': 'Editar Categoria'})
 
 @login_required
 def categories_delete(request, category_id):
-    """Deletar categoria"""
-    messages.info(request, 'Sistema de Categorias em desenvolvimento')
-    return redirect('user_panel:categories_list')
+    category = get_object_or_404(SiteCategory, id=category_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        name = category.name
+        category.delete()
+        messages.success(request, f'Categoria "{name}" removida.')
+        return redirect('user_panel:categories_list')
+    return render(request, 'user_panel/categories/delete.html', {'category': category, 'title': 'Remover Categoria'})
 
 
-# Serviços Views
 @login_required
 def services_list(request):
-    """Lista de serviços"""
-    messages.info(request, 'Sistema de Serviços em desenvolvimento')
+    qs = Service.objects.filter(
+        site__account__memberships__user=request.user,
+        site__account__memberships__status='active'
+    ).select_related('site', 'category').order_by('site__domain', 'order', 'title')
+    search = request.GET.get('search', '')
+    if search:
+        qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
     context = {
         'title': 'Serviços',
-        'breadcrumb': 'Serviços'
+        'breadcrumb': 'Serviços',
+        'services': qs,
+        'search': search,
     }
     return render(request, 'user_panel/services/list.html', context)
 
 @login_required
 def services_create(request):
-    """Criar novo serviço"""
-    messages.info(request, 'Sistema de Serviços em desenvolvimento')
-    context = {
-        'title': 'Criar Serviço',
-        'breadcrumb': 'Serviços > Criar'
-    }
-    return render(request, 'user_panel/services/create.html', context)
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            service = form.save()
+            messages.success(request, f'Serviço "{service.title}" criado com sucesso.')
+            return redirect('user_panel:services_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = ServiceForm(user=request.user)
+    return render(request, 'user_panel/services/create.html', {'form': form, 'title': 'Criar Serviço'})
 
 @login_required
 def services_edit(request, service_id):
-    """Editar serviço"""
-    messages.info(request, 'Sistema de Serviços em desenvolvimento')
-    context = {
-        'title': 'Editar Serviço',
-        'breadcrumb': 'Serviços > Editar'
-    }
-    return render(request, 'user_panel/services/edit.html', context)
+    service = get_object_or_404(Service, id=service_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES, instance=service, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Serviço atualizado com sucesso.')
+            return redirect('user_panel:services_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = ServiceForm(instance=service, user=request.user)
+    return render(request, 'user_panel/services/edit.html', {'form': form, 'service': service, 'title': 'Editar Serviço'})
 
 @login_required
 def services_delete(request, service_id):
-    """Deletar serviço"""
-    messages.info(request, 'Sistema de Serviços em desenvolvimento')
-    return redirect('user_panel:services_list')
+    service = get_object_or_404(Service, id=service_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        title = service.title
+        service.delete()
+        messages.success(request, f'Serviço "{title}" removido.')
+        return redirect('user_panel:services_list')
+    return render(request, 'user_panel/services/delete.html', {'service': service, 'title': 'Remover Serviço'})
 
 
-# Redes Sociais Views
 @login_required
 def social_networks_list(request):
-    """Lista de redes sociais"""
-    messages.info(request, 'Sistema de Redes Sociais em desenvolvimento')
+    qs = SocialNetwork.objects.filter(
+        site__account__memberships__user=request.user,
+        site__account__memberships__status='active'
+    ).select_related('site').order_by('site__domain', 'network_type')
+    search = request.GET.get('search', '')
+    if search:
+        qs = qs.filter(Q(url__icontains=search) | Q(network_type__icontains=search))
     context = {
         'title': 'Redes Sociais',
-        'breadcrumb': 'Redes Sociais'
+        'breadcrumb': 'Redes Sociais',
+        'social_networks': qs,
+        'search': search,
     }
     return render(request, 'user_panel/social_networks/list.html', context)
 
 @login_required
 def social_networks_create(request):
-    """Criar nova rede social"""
-    messages.info(request, 'Sistema de Redes Sociais em desenvolvimento')
-    context = {
-        'title': 'Criar Rede Social',
-        'breadcrumb': 'Redes Sociais > Criar'
-    }
-    return render(request, 'user_panel/social_networks/create.html', context)
+    if request.method == 'POST':
+        form = SocialNetworkForm(request.POST, user=request.user)
+        if form.is_valid():
+            sn = form.save()
+            messages.success(request, f'Rede social "{sn.get_network_type_display()}" adicionada.')
+            return redirect('user_panel:social_networks_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = SocialNetworkForm(user=request.user)
+    return render(request, 'user_panel/social_networks/create.html', {'form': form, 'title': 'Criar Rede Social'})
 
 @login_required
-def social_networks_edit(request, social_id):
-    """Editar rede social"""
-    messages.info(request, 'Sistema de Redes Sociais em desenvolvimento')
-    context = {
-        'title': 'Editar Rede Social',
-        'breadcrumb': 'Redes Sociais > Editar'
-    }
-    return render(request, 'user_panel/social_networks/edit.html', context)
+def social_networks_edit(request, network_id):
+    sn = get_object_or_404(SocialNetwork, id=network_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        form = SocialNetworkForm(request.POST, instance=sn, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Rede social atualizada.')
+            return redirect('user_panel:social_networks_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = SocialNetworkForm(instance=sn, user=request.user)
+    return render(request, 'user_panel/social_networks/edit.html', {'form': form, 'social': sn, 'title': 'Editar Rede Social'})
 
 @login_required
-def social_networks_delete(request, social_id):
-    """Deletar rede social"""
-    messages.info(request, 'Sistema de Redes Sociais em desenvolvimento')
-    return redirect('user_panel:social_networks_list')
+def social_networks_delete(request, network_id):
+    sn = get_object_or_404(SocialNetwork, id=network_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        display = sn.get_network_type_display()
+        sn.delete()
+        messages.success(request, f'Rede social "{display}" removida.')
+        return redirect('user_panel:social_networks_list')
+    return render(request, 'user_panel/social_networks/delete.html', {'social': sn, 'title': 'Remover Rede Social'})
 
 
-# CTA Views
 @login_required
 def cta_list(request):
-    """Lista de CTAs"""
-    messages.info(request, 'Sistema de CTA em desenvolvimento')
-    context = {
-        'title': 'CTA',
-        'breadcrumb': 'CTA'
-    }
-    return render(request, 'user_panel/cta/list.html', context)
+    qs = CTA.objects.filter(
+        site__account__memberships__user=request.user,
+        site__account__memberships__status='active'
+    ).select_related('site').order_by('site__domain', 'order')
+    search = request.GET.get('search', '')
+    if search:
+        qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
+    return render(request, 'user_panel/cta/list.html', {
+        'title': 'CTAs', 'breadcrumb': 'CTA', 'ctas': qs, 'search': search
+    })
 
 @login_required
 def cta_create(request):
-    """Criar novo CTA"""
-    messages.info(request, 'Sistema de CTA em desenvolvimento')
-    context = {
-        'title': 'Criar CTA',
-        'breadcrumb': 'CTA > Criar'
-    }
-    return render(request, 'user_panel/cta/create.html', context)
+    if request.method == 'POST':
+        form = CTAForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            cta = form.save()
+            messages.success(request, f'CTA "{cta.title or cta.id}" criado.')
+            return redirect('user_panel:cta_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = CTAForm(user=request.user)
+    return render(request, 'user_panel/cta/create.html', {'form': form, 'title': 'Criar CTA'})
 
 @login_required
 def cta_edit(request, cta_id):
-    """Editar CTA"""
-    messages.info(request, 'Sistema de CTA em desenvolvimento')
-    context = {
-        'title': 'Editar CTA',
-        'breadcrumb': 'CTA > Editar'
-    }
-    return render(request, 'user_panel/cta/edit.html', context)
+    cta = get_object_or_404(CTA, id=cta_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        form = CTAForm(request.POST, request.FILES, instance=cta, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'CTA atualizado.')
+            return redirect('user_panel:cta_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = CTAForm(instance=cta, user=request.user)
+    return render(request, 'user_panel/cta/edit.html', {'form': form, 'cta': cta, 'title': 'Editar CTA'})
 
 @login_required
 def cta_delete(request, cta_id):
-    """Deletar CTA"""
-    messages.info(request, 'Sistema de CTA em desenvolvimento')
-    return redirect('user_panel:cta_list')
+    cta = get_object_or_404(CTA, id=cta_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        title = cta.title or str(cta.id)
+        cta.delete()
+        messages.success(request, f'CTA "{title}" removido.')
+        return redirect('user_panel:cta_list')
+    return render(request, 'user_panel/cta/delete.html', {'cta': cta, 'title': 'Remover CTA'})
 
 
-# Blog Views
 @login_required
 def blog_list(request):
-    """Lista de posts do blog"""
-    messages.info(request, 'Sistema de Blog em desenvolvimento')
+    qs = BlogPost.objects.filter(
+        site__account__memberships__user=request.user,
+        site__account__memberships__status='active'
+    ).select_related('site', 'category').order_by('-published_at', '-created_at')
+    search = request.GET.get('search', '')
+    if search:
+        qs = qs.filter(Q(title__icontains=search) | Q(content__icontains=search))
     context = {
         'title': 'Blog',
-        'breadcrumb': 'Blog'
+        'breadcrumb': 'Blog',
+        'posts': qs,
+        'search': search,
     }
     return render(request, 'user_panel/blog/list.html', context)
 
 @login_required
 def blog_create(request):
-    """Criar novo post do blog"""
-    messages.info(request, 'Sistema de Blog em desenvolvimento')
-    context = {
-        'title': 'Criar Post',
-        'breadcrumb': 'Blog > Criar'
-    }
-    return render(request, 'user_panel/blog/create.html', context)
+    if request.method == 'POST':
+        form = BlogPostForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            post = form.save()
+            messages.success(request, f'Post "{post.title or post.id}" criado.')
+            return redirect('user_panel:blog_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = BlogPostForm(user=request.user)
+    return render(request, 'user_panel/blog/create.html', {'form': form, 'title': 'Criar Post'})
 
 @login_required
 def blog_edit(request, post_id):
-    """Editar post do blog"""
-    messages.info(request, 'Sistema de Blog em desenvolvimento')
-    context = {
-        'title': 'Editar Post',
-        'breadcrumb': 'Blog > Editar'
-    }
-    return render(request, 'user_panel/blog/edit.html', context)
+    post = get_object_or_404(BlogPost, id=post_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        form = BlogPostForm(request.POST, request.FILES, instance=post, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Post atualizado.')
+            return redirect('user_panel:blog_list')
+        else:
+            messages.error(request, 'Corrija os erros abaixo.')
+    else:
+        form = BlogPostForm(instance=post, user=request.user)
+    return render(request, 'user_panel/blog/edit.html', {'form': form, 'post': post, 'title': 'Editar Post'})
 
 @login_required
 def blog_delete(request, post_id):
-    """Deletar post do blog"""
-    messages.info(request, 'Sistema de Blog em desenvolvimento')
-    return redirect('user_panel:blog_list')
+    post = get_object_or_404(BlogPost, id=post_id, site__account__memberships__user=request.user)
+    if request.method == 'POST':
+        title = post.title or str(post.id)
+        post.delete()
+        messages.success(request, f'Post "{title}" removido.')
+        return redirect('user_panel:blog_list')
+    return render(request, 'user_panel/blog/delete.html', {'post': post, 'title': 'Remover Post'})
 
 
 # Banners Views

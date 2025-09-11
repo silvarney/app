@@ -248,3 +248,19 @@
     }
 </style>
 {% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{% if messages %}
+<script>
+(function(){
+    const map={success:'success',error:'error',warning:'warning',info:'info'};
+    {% for m in messages %}
+        if(window.utils && window.utils.showToast){
+            window.utils.showToast("{{ m|escapejs }}", map['{{ m.tags }}']||'info', 5000);
+        }
+    {% endfor %}
+})();
+</script>
+{% endif %}
+{% endblock %}

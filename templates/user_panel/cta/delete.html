@@ -38,58 +38,17 @@
     <!-- Confirmação -->
     <div class="bg-white shadow rounded-lg">
         <div class="p-6">
-            <div class="flex items-center mb-6">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900">
-                        Confirmar Exclusão
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-600">
-                        Esta ação não pode ser desfeita. O CTA será permanentemente removido.
-                    </p>
-                </div>
-            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirmar Exclusão</h3>
+            <p class="text-sm text-gray-600 mb-6">Esta ação não pode ser desfeita. O CTA será permanentemente removido.</p>
 
             <!-- Detalhes do CTA -->
-            <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                <h4 class="text-sm font-medium text-gray-900 mb-2">CTA a ser excluído:</h4>
-                <div class="space-y-2">
-                    <div>
-                        <span class="text-sm font-medium text-gray-700">Título:</span>
-                        <span class="text-sm text-gray-900 ml-2">{{ cta.title }}</span>
-                    </div>
-                    {% if cta.description %}
-                    <div>
-                        <span class="text-sm font-medium text-gray-700">Descrição:</span>
-                        <span class="text-sm text-gray-900 ml-2">{{ cta.description }}</span>
-                    </div>
-                    {% endif %}
-                    <div>
-                        <span class="text-sm font-medium text-gray-700">Texto do Botão:</span>
-                        <span class="text-sm text-gray-900 ml-2">{{ cta.button_text }}</span>
-                    </div>
-                    <div>
-                        <span class="text-sm font-medium text-gray-700">URL:</span>
-                        <span class="text-sm text-gray-900 ml-2">{{ cta.link_url }}</span>
-                    </div>
-                    <div>
-                        <span class="text-sm font-medium text-gray-700">Status:</span>
-                        <span class="text-sm ml-2">
-                            {% if cta.is_active %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Ativo
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Inativo
-                                </span>
-                            {% endif %}
-                        </span>
-                    </div>
-                </div>
-            </div>
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <p class="text-sm"><strong>Título:</strong> {{ cta.title|default:'(Sem título)' }}</p>
+                            {% if cta.description %}<p class="text-sm"><strong>Descrição:</strong> {{ cta.description }}</p>{% endif %}
+                            <p class="text-sm"><strong>Texto Botão:</strong> {{ cta.button_text }}</p>
+                            <p class="text-sm"><strong>Ação:</strong> {{ cta.get_action_type_display }}</p>
+                            <p class="text-sm"><strong>Status:</strong> {% if cta.is_active %}<span class="text-green-600">Ativo{% else %}<span class="text-gray-500">Inativo{% endif %}</span></p>
+                        </div>
 
             <!-- Formulário de Confirmação -->
             <form method="post">

@@ -1,3 +1,3 @@
-from django.db import models
+"""Modelos específicos da app api removidos (SiteAPIKey foi movido para site_management)."""
 
-# Create your models here.
+

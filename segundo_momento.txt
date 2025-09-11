@@ -152,7 +152,7 @@ Sites:
 3.6.1.1.1 - Desconto;
 
 3.7.1.1 - Blog
-3.2.1.1.1 - Titulo;
+3.2.1.1.1 - Titulo (obrigatório);
 3.2.1.1.2 - Imagem;
 3.2.1.1.3 - Url vídeo;
 3.2.1.1.4 - Texto;

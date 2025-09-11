@@ -126,14 +126,14 @@ def site_detail(request, site_id):
     ctas = site.ctas.all()
     categories = site.categories.all()
     services = site.services.all()[:6]  # Últimos 6 serviços
-    blog_posts = site.blog_posts.filter(is_active=True)[:6]  # Últimos 6 posts
+    blog_posts = site.blog_posts.filter(is_published=True)[:6]  # Últimos 6 posts
     
     # Estatísticas
     stats = {
         'total_services': site.services.count(),
         'active_services': site.services.filter(is_active=True).count(),
         'total_blog_posts': site.blog_posts.count(),
-        'active_blog_posts': site.blog_posts.filter(is_active=True).count(),
+    'active_blog_posts': site.blog_posts.filter(is_published=True).count(),
         'total_categories': categories.count(),
         'total_banners': banners.count(),
     }
@@ -358,6 +358,72 @@ def site_bio_edit(request, site_id):
     }
     
     return render(request, 'site_management/sites/bio_form.html', context)
+
+
+# ----------------------------- CTA CRUD -----------------------------
+from .forms import CTAForm
+
+@login_required
+def cta_list(request, site_id):
+    site = get_object_or_404(Site, id=site_id)
+    if not check_site_permission(request.user, site, 'admin'):
+        raise PermissionDenied
+    ctas = site.ctas.all().order_by('order', '-created_at')
+    return render(request, 'site_management/ctas/list.html', {'site': site, 'ctas': ctas})
+
+@login_required
+def cta_create(request, site_id):
+    site = get_object_or_404(Site, id=site_id)
+    if not check_site_permission(request.user, site, 'admin'):
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = CTAForm(request.POST, request.FILES, site_instance=site)
+        if form.is_valid():
+            cta = form.save()
+            messages.success(request, 'CTA criado com sucesso.')
+            return redirect('site_management:cta_list', site_id=site.id)
+    else:
+        form = CTAForm(site_instance=site)
+    return render(request, 'site_management/ctas/form.html', {'form': form, 'site': site, 'is_edit': False})
+
+@login_required
+def cta_edit(request, cta_id):
+    cta = get_object_or_404(CTA, id=cta_id)
+    site = cta.site
+    if not check_site_permission(request.user, site, 'admin'):
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = CTAForm(request.POST, request.FILES, instance=cta, site_instance=site)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'CTA atualizado com sucesso.')
+            return redirect('site_management:cta_list', site_id=site.id)
+    else:
+        form = CTAForm(instance=cta, site_instance=site)
+    return render(request, 'site_management/ctas/form.html', {'form': form, 'site': site, 'is_edit': True, 'cta': cta})
+
+@login_required
+@require_http_methods(["POST"])
+def cta_delete(request, cta_id):
+    cta = get_object_or_404(CTA, id=cta_id)
+    site = cta.site
+    if not check_site_permission(request.user, site, 'admin'):
+        raise PermissionDenied
+    cta.delete()
+    messages.success(request, 'CTA excluído.')
+    return redirect('site_management:cta_list', site_id=site.id)
+
+@login_required
+@require_http_methods(["POST"])
+def cta_toggle_status(request, cta_id):
+    cta = get_object_or_404(CTA, id=cta_id)
+    site = cta.site
+    if not check_site_permission(request.user, site, 'admin'):
+        raise PermissionDenied
+    cta.is_active = not cta.is_active
+    cta.save(update_fields=['is_active'])
+    messages.success(request, 'Status do CTA atualizado.')
+    return redirect('site_management:cta_list', site_id=site.id)
 
 
 # Views para Dashboard/Analytics

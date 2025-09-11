@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from accounts.models import Account
-from .models import Site, SiteBio, TemplateCategory, PlanType, Subscription, Payment
+from .models import Site, SiteBio, TemplateCategory, PlanType, Subscription, Payment, CTA
 
 
 class SiteForm(forms.ModelForm):
@@ -339,3 +339,47 @@ class SiteBioForm(forms.ModelForm):
         self.fields['phone'].required = False
         self.fields['address'].required = False
         self.fields['google_maps'].required = False
+
+
+class CTAForm(forms.ModelForm):
+    class Meta:
+        model = CTA
+        fields = ['site', 'image', 'title', 'description', 'action_type', 'button_text', 'order', 'is_active']
+        widgets = {
+            'site': forms.Select(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md'}),
+            'title': forms.TextInput(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md', 'placeholder': 'Título (opcional)'}),
+            'description': forms.Textarea(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md', 'rows': 3, 'placeholder': 'Descrição'}),
+            'action_type': forms.Select(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md'}),
+            'button_text': forms.TextInput(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md', 'placeholder': 'Texto do botão'}),
+            'order': forms.NumberInput(attrs={'class': 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md', 'min': '0'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'h-4 w-4 text-indigo-600 border-gray-300 rounded'}),
+        }
+        labels = {
+            'site': 'Site',
+            'image': 'Imagem',
+            'title': 'Título',
+            'description': 'Descrição',
+            'action_type': 'Ação',
+            'button_text': 'Texto do Botão',
+            'order': 'Ordem',
+            'is_active': 'Ativo'
+        }
+        help_texts = {
+            'order': 'Define a ordem de exibição (menor primeiro)'
+        }
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        site_instance = kwargs.pop('site_instance', None)
+        super().__init__(*args, **kwargs)
+        self.fields['image'].required = False
+        self.fields['title'].required = False
+        # Filtrar sites permitidos ao usuário (se fornecido)
+        if user:
+            self.fields['site'].queryset = Site.objects.filter(
+                account__memberships__user=user,
+                account__memberships__status='active'
+            ).distinct()
+        # Se site fixo for passado (ex: painel admin específico)
+        if site_instance:
+            self.fields['site'].initial = site_instance
+            self.fields['site'].widget = forms.HiddenInput()

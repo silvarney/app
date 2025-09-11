@@ -19,6 +19,7 @@ from rest_framework import viewsets, status, permissions, generics, filters
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db import models
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
@@ -56,6 +57,13 @@ from .serializers import (
     # Domain Management Serializers
     DomainSerializer, DomainConfigurationSerializer, DomainVerificationLogSerializer
 )
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView, TokenVerifyView
+)
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.cache import cache
+from site_management.models import Site, SiteBio, SiteCategory, Service, SocialNetwork, CTA, BlogPost, Banner, SiteAPIKey
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -988,3 +996,260 @@ class DomainConfigurationViewSet(viewsets.ModelViewSet):
         # Filtrar por contas do usuário através do domínio
         user_accounts = user.memberships.values_list('account_id', flat=True)
         return DomainConfiguration.objects.filter(domain__account_id__in=user_accounts)
+
+
+# -------------------------------------------------------------
+# JWT Auth Endpoints (SimpleJWT) wrappers for descriptive responses
+# -------------------------------------------------------------
+class JWTTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):  # add friendly message
+        response = super().post(request, *args, **kwargs)
+        data = response.data
+        data['message'] = 'Tokens gerados com sucesso'
+        return Response(data, status=response.status_code)
+
+
+class JWTTokenRefreshView(TokenRefreshView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        data = response.data
+        data['message'] = 'Token atualizado'
+        return Response(data, status=response.status_code)
+
+
+class JWTTokenVerifyView(TokenVerifyView):
+    permission_classes = [AllowAny]
+
+
+# -------------------------------------------------------------
+# Public Site Aggregated Endpoint with caching
+# -------------------------------------------------------------
+class SiteDetailAPIView(APIView):
+    """Retorna todas as informações públicas do site de forma agregada.
+
+    Cache:
+        - Usa chave baseada em site pk e timestamp de última atualização agregada.
+        - TTL padrão 300s (5 min) – pode ser ajustado via ?ttl= param (máx 1800).
+    """
+    # Autenticação via header X-API-Key obrigatória (API Key do site)
+    permission_classes = [AllowAny]
+
+    CACHE_TTL_DEFAULT = 300
+    CACHE_TTL_MAX = 1800
+
+    def get_cache_key(self, site: Site):
+        # Considerar updated_at do site e dos relacionamentos principais
+        timestamps = [site.updated_at]
+        related_models = [
+            site.bio.updated_at if hasattr(site, 'bio') and site.bio else None,
+            site.categories.order_by('-updated_at').first().updated_at if site.categories.exists() else None,
+            site.services.order_by('-updated_at').first().updated_at if site.services.exists() else None,
+            site.social_networks.order_by('-updated_at').first().updated_at if site.social_networks.exists() else None,
+            site.ctas.order_by('-updated_at').first().updated_at if site.ctas.exists() else None,
+            site.blog_posts.order_by('-updated_at').first().updated_at if site.blog_posts.exists() else None,
+            site.banners.order_by('-updated_at').first().updated_at if site.banners.exists() else None,
+        ]
+        for ts in related_models:
+            if ts:
+                timestamps.append(ts)
+        last_ts = max(timestamps) if timestamps else site.updated_at
+        return f"site_full:{site.pk}:{int(last_ts.timestamp())}"
+
+    def _authenticate(self, request):
+        api_key_value = request.headers.get('X-API-Key') or request.META.get('HTTP_X_API_KEY')
+        if not api_key_value:
+            return None, Response({'detail': 'X-API-Key ausente'}, status=401)
+        # Formato esperado prefix.token (prefix = 8 chars)
+        parts = api_key_value.split('.')
+        if len(parts) < 2:
+            return None, Response({'detail': 'Formato de chave inválido'}, status=401)
+        prefix = parts[0]
+        # Buscar por prefix
+        candidates = SiteAPIKey.objects.filter(key_prefix=prefix, is_active=True).select_related('site')
+        for candidate in candidates:
+            if candidate.verify(api_key_value):
+                candidate.mark_used()
+                return candidate.site, None
+        return None, Response({'detail': 'Chave inválida ou inativa'}, status=401)
+
+    def get(self, request, *args, **kwargs):
+        site, error = self._authenticate(request)
+        if error:
+            return error
+        # Filtro opcional por domínio para validar correspondência (hard match se enviado)
+        domain = request.query_params.get('domain')
+        if domain and domain not in site.domain:
+            return Response({'detail': 'Domain não corresponde à chave'}, status=403)
+        if site.status != 'active':
+            return Response({'detail': 'Site inativo'}, status=403)
+
+        ttl_param = request.query_params.get('ttl')
+        try:
+            ttl = int(ttl_param) if ttl_param else self.CACHE_TTL_DEFAULT
+        except ValueError:
+            ttl = self.CACHE_TTL_DEFAULT
+        ttl = max(30, min(ttl, self.CACHE_TTL_MAX))
+
+        cache_key = self.get_cache_key(site)
+        cached = cache.get(cache_key)
+        if cached:
+            cached['cache'] = {'hit': True, 'ttl': ttl, 'key': cache_key}
+            return Response(cached)
+
+        # Montagem manual mínima (apenas o necessário conforme requisito)
+        def serialize_cat(c: SiteCategory):
+            return {
+                'id': c.id,
+                'name': c.name,
+                'icon': c.icon,
+                'image': c.image.url if c.image else None,
+                'order': c.order,
+                'is_active': c.is_active,
+            }
+        def serialize_service(s: Service):
+            return {
+                'id': s.id,
+                'category_id': s.category_id,
+                'title': s.title,
+                'description': s.description,
+                'image': s.image.url if s.image else None,
+                'value': str(s.value) if s.value is not None else None,
+                'discount': str(s.discount),
+                'final_value': str(s.final_value) if s.final_value is not None else None,
+                'order': s.order,
+                'is_active': s.is_active,
+            }
+        def serialize_social(sn: SocialNetwork):
+            return {
+                'id': sn.id,
+                'network_type': sn.network_type,
+                'url': sn.url,
+                'icon_style': sn.icon_style,
+            }
+        def serialize_cta(c: CTA):
+            return {
+                'id': c.id,
+                'title': c.title,
+                'description': c.description,
+                'action_type': c.action_type,
+                'button_text': c.button_text,
+                'image': c.image.url if c.image else None,
+                'order': c.order,
+            }
+        def serialize_post(p: BlogPost):
+            return {
+                'id': p.id,
+                'title': p.title,
+                'image': p.image.url if p.image else None,
+                'video_url': p.video_url,
+                'content': p.content,
+                'link': p.link,
+                'category_id': p.category_id,
+                'tags': p.tags,
+                'is_published': p.is_published,
+                'published_at': p.published_at.isoformat() if p.published_at else None,
+            }
+        def serialize_banner(b: Banner):
+            return {
+                'id': b.id,
+                'image': b.image.url if b.image else None,
+                'link': b.link,
+                'description': b.description,
+                'order': b.order,
+            }
+
+        bio = site.bio if hasattr(site, 'bio') else None
+        payload = {
+            'id': site.id,
+            'domain': site.domain,
+            'status': site.status,
+            'created_at': site.created_at.isoformat(),
+            'updated_at': site.updated_at.isoformat(),
+            'bio': {
+                'title': bio.title,
+                'description': bio.description,
+                'logo': bio.logo.url if bio and bio.logo else None,
+                'favicon': bio.favicon.url if bio and bio.favicon else None,
+                'email': bio.email,
+                'whatsapp': bio.whatsapp,
+                'phone': bio.phone,
+                'address': bio.address,
+                'google_maps': bio.google_maps,
+            } if bio else None,
+            'categories': [serialize_cat(c) for c in site.categories.all()],
+            'services': [serialize_service(s) for s in site.services.all()],
+            'social_networks': [serialize_social(sn) for sn in site.social_networks.filter(is_active=True)],
+            'ctas': [serialize_cta(c) for c in site.ctas.filter(is_active=True)],
+            'blog_posts': [serialize_post(p) for p in site.blog_posts.filter(is_published=True)],
+            'banners': [serialize_banner(b) for b in site.banners.filter(is_active=True)],
+        }
+        payload['cache'] = {'hit': False, 'ttl': ttl, 'key': cache_key}
+        cache.set(cache_key, payload, ttl)
+        return Response(payload)
+
+
+class BlogInlineCategoryCreateAPIView(APIView):
+    """Cria categoria de blog (SiteCategory) inline no painel.
+
+    Regras:
+    - Requer autenticação (JWT ou sessão) e que usuário tenha membership ativa no site.
+    - name obrigatório; evita duplicados case-insensitive por site.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        site_id = data.get('site')
+        name = (data.get('name') or '').strip()
+        if not site_id or not name:
+            return Response({'detail': 'site e name são obrigatórios'}, status=400)
+        try:
+            site = Site.objects.get(id=site_id, account__memberships__user=request.user, account__memberships__status='active')
+        except Site.DoesNotExist:
+            return Response({'detail': 'Site não encontrado ou acesso negado'}, status=404)
+        # Verificar duplicidade
+        if SiteCategory.objects.filter(site=site, name__iexact=name).exists():
+            existing = SiteCategory.objects.filter(site=site, name__iexact=name).first()
+            return Response({'id': existing.id, 'name': existing.name, 'duplicate': True}, status=200)
+        max_order = site.categories.aggregate(m=models.Max('order'))['m'] or 0
+        cat = SiteCategory.objects.create(site=site, name=name, order=max_order + 1, is_active=True, is_blog=True)
+        return Response({'id': cat.id, 'name': cat.name}, status=201)
+
+
+class BlogTagsSuggestionAPIView(APIView):
+    """Retorna lista de tags únicas existentes para um site (separadas por vírgula nos posts)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        site_id = request.query_params.get('site')
+        if not site_id:
+            return Response({'tags': []})
+        posts = BlogPost.objects.filter(site_id=site_id, site__account__memberships__user=request.user, site__account__memberships__status='active')
+        tags_set = set()
+        for p in posts:
+            if p.tags:
+                for t in p.tags.split(','):
+                    tt = t.strip()
+                    if tt:
+                        tags_set.add(tt)
+        return Response({'tags': sorted(tags_set)})
+
+
+class BlogCategoriesListAPIView(APIView):
+    """Lista categorias de blog (SiteCategory com is_blog=True) de um site específico."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        site_id = request.query_params.get('site')
+        if not site_id:
+            return Response({'categories': []})
+        try:
+            site = Site.objects.get(id=site_id, account__memberships__user=request.user, account__memberships__status='active')
+        except Site.DoesNotExist:
+            return Response({'categories': []}, status=200)
+        cats = SiteCategory.objects.filter(site=site, is_blog=True).order_by('order','name')
+        return Response({'categories': [{'id': c.id, 'name': c.name} for c in cats]})

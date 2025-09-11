@@ -1,0 +1,47 @@
+{% extends 'user_panel/base.html' %}
+{% load static %}
+
+{% block user_title %}Editar Serviço{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+  <div class="flex items-center">
+    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+    <a href="{% url 'user_panel:services_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700">Serviços</a>
+  </div>
+</li>
+<li>
+  <div class="flex items-center">
+    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+    <span class="ml-1 text-sm font-medium text-gray-500">Editar</span>
+  </div>
+</li>
+{% endblock %}
+
+{% block user_content %}
+<div class="max-w-3xl mx-auto">
+  <div class="mb-8">
+    <a href="{% url 'user_panel:services_list' %}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"><i class="fas fa-arrow-left mr-2"></i>Voltar</a>
+    <h1 class="mt-4 text-2xl font-bold">Editar Serviço</h1>
+  </div>
+  <div class="bg-white shadow rounded-lg p-6">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+      <div><label class="block text-sm font-medium">Site *</label>{{ form.site }}</div>
+      <div><label class="block text-sm font-medium">Categoria *</label>{{ form.category }}</div>
+      <div><label class="block text-sm font-medium">Título *</label>{{ form.title }}</div>
+      <div><label class="block text-sm font-medium">Descrição</label>{{ form.description }}</div>
+      <div><label class="block text-sm font-medium">Imagem</label>{{ form.image }}</div>
+      <div class="grid grid-cols-3 gap-4">
+                <div><label class="block text-sm font-medium">Valor</label>{{ form.value }}</div>
+                <div><label class="block text-sm font-medium">Desconto (%)</label>{{ form.discount }}</div>
+      </div>
+      <div class="flex items-center space-x-2">{{ form.is_active }} <span class="text-sm">Ativo</span></div>
+      <div class="flex justify-end space-x-3 border-t pt-4">
+        <a href="{% url 'user_panel:services_list' %}" class="px-4 py-2 text-sm border rounded-md">Cancelar</a>
+        <button class="px-4 py-2 text-sm rounded-md bg-green-600 text-white">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

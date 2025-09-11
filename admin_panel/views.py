@@ -22,6 +22,10 @@ from permissions.models import Permission, Role, UserRole
 from permissions.decorators import admin_required
 from content.models import Content, Category, Tag
 from domains.models import Domain
+from site_management.models import Site, SiteAPIKey
+from django.db import transaction
+import secrets
+import hashlib
 
 
 def admin_login_redirect(request):
@@ -65,6 +69,75 @@ def dashboard(request):
     }
     
     return render(request, 'admin_panel/dashboard.html', context)
+
+
+@admin_required
+def api_keys_list(request):
+    """Lista chaves de API agrupadas por site."""
+    keys = SiteAPIKey.objects.select_related('site').order_by('-created_at')
+    search = request.GET.get('search', '').strip()
+    status = request.GET.get('status', '').strip()  # '', 'active', 'revoked'
+    if search:
+        keys = keys.filter(
+            Q(key_prefix__icontains=search) |
+            Q(name__icontains=search) |
+            Q(site__domain__icontains=search)
+        )
+    if status == 'active':
+        keys = keys.filter(is_active=True)
+    elif status == 'revoked':
+        keys = keys.filter(is_active=False)
+    context = {
+        'keys': keys[:200],  # limitar exibição
+        'search': search,
+        'status': status,
+        'title': 'Chaves de API dos Sites'
+    }
+    return render(request, 'admin_panel/api_keys/list.html', context)
+
+
+class APIKeyCreateForm(forms.Form):
+    site = forms.ModelChoiceField(queryset=Site.objects.all(), label='Site')
+    name = forms.CharField(max_length=100, required=False, label='Nome descritivo')
+
+    def clean_site(self):
+        s = self.cleaned_data['site']
+        if s.status != 'active':
+            raise forms.ValidationError('Site precisa estar ativo.')
+        return s
+
+
+@admin_required
+@transaction.atomic
+def api_key_create(request):
+    """Gera uma nova chave e exibe a chave completa UMA vez."""
+    full_key = None
+    if request.method == 'POST':
+        form = APIKeyCreateForm(request.POST)
+        if form.is_valid():
+            site = form.cleaned_data['site']
+            name = form.cleaned_data.get('name') or ''
+            instance, full_key = SiteAPIKey.create_key(site=site, name=name)
+            messages.success(request, 'Chave criada. Copie agora – não será exibida novamente.')
+            # Limpar formulário após criação, conforme nova lógica solicitada
+            form = APIKeyCreateForm()
+    else:
+        form = APIKeyCreateForm()
+    return render(request, 'admin_panel/api_keys/create.html', {
+        'form': form,
+        'full_key': full_key,
+        'title': 'Gerar Nova Chave de API'
+    })
+
+
+@admin_required
+@require_http_methods(["POST"])
+def api_key_revoke(request, key_id):
+    key = get_object_or_404(SiteAPIKey, id=key_id)
+    key.is_active = False
+    key.save(update_fields=['is_active'])
+    messages.success(request, f'Chave {key.key_prefix} revogada.')
+    return redirect('admin_panel:api_keys_list')
 
 
 @admin_required

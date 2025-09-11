@@ -5,6 +5,7 @@ from permissions.models import Permission, Role, UserRole, UserPermission
 from payments.models import Plan, Subscription, Payment, Invoice
 from content.models import Category, Tag, Content, ContentAttachment
 from domains.models import Domain, DomainConfiguration, DomainVerificationLog
+from site_management.models import Site  # Mantemos apenas referência base para possíveis usos futuros
 
 User = get_user_model()
 
@@ -306,3 +307,11 @@ class DomainSerializer(serializers.ModelSerializer):
                 return 'expired'
             return 'active'
         return 'disabled'
+
+
+# -------------------------------------------------------------
+# Site Management (Public/Aggregated) Serializers
+# -------------------------------------------------------------
+
+"""Removidos serializers específicos do site para atender requisito de apenas um novo endpoint.
+O endpoint usará montagem manual dos dados (ver api.views.SiteDetailAPIView)."""

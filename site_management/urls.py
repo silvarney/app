@@ -14,4 +14,10 @@ urlpatterns = [
     
     # Bio do Site
     path('<uuid:site_id>/bio/edit/', views.site_bio_edit, name='site_bio_edit'),
+    # CTAs
+    path('<uuid:site_id>/ctas/', views.cta_list, name='cta_list'),
+    path('<uuid:site_id>/ctas/create/', views.cta_create, name='cta_create'),
+    path('ctas/<int:cta_id>/edit/', views.cta_edit, name='cta_edit'),
+    path('ctas/<int:cta_id>/delete/', views.cta_delete, name='cta_delete'),
+    path('ctas/<int:cta_id>/toggle/', views.cta_toggle_status, name='cta_toggle_status'),
 ]

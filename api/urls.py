@@ -36,6 +36,10 @@ urlpatterns = [
     path('auth/password-reset/', views.PasswordResetAPIView.as_view(), name='password_reset'),
     path('auth/password-reset-confirm/', views.PasswordResetConfirmAPIView.as_view(), name='password_reset_confirm'),
     path('auth/password-change/', views.PasswordChangeAPIView.as_view(), name='password_change'),
+    # JWT (SimpleJWT)
+    path('auth/jwt/token/', views.JWTTokenObtainPairView.as_view(), name='jwt_token_obtain_pair'),
+    path('auth/jwt/refresh/', views.JWTTokenRefreshView.as_view(), name='jwt_token_refresh'),
+    path('auth/jwt/verify/', views.JWTTokenVerifyView.as_view(), name='jwt_token_verify'),
     
     # Gerenciamento de Contas
     path('accounts/switch/', views.SwitchAccountAPIView.as_view(), name='switch_account'),
@@ -64,4 +68,12 @@ urlpatterns = [
     
     # Health Check
     path('health/', views.HealthCheckAPIView.as_view(), name='health_check'),
+
+    # Aggregated site detail (JWT + domain param)
+    path('site/full/', views.SiteDetailAPIView.as_view(), name='site_full_detail'),
+    # Blog helpers
+    # Sugestões de tags do blog (rota distinta para não conflitar com router 'tags')
+    path('blog-tags/', views.BlogTagsSuggestionAPIView.as_view(), name='blog_tags_suggestions'),
+    path('blog-categories/create-inline/', views.BlogInlineCategoryCreateAPIView.as_view(), name='blog_inline_category_create'),
+    path('blog-categories/', views.BlogCategoriesListAPIView.as_view(), name='blog_categories_list'),
 ]
