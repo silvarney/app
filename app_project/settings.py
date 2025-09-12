@@ -454,3 +454,9 @@ if 'django_extensions' in INSTALLED_APPS:
 
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# Importar configurações locais se existirem
+try:
+    from app_project.settings_local import *
+except ImportError:
+    pass

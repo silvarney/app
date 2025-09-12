@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 import os
+import uuid
 
 
 class UserManager(BaseUserManager):
@@ -46,6 +47,9 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     """Modelo de usuário customizado com campos adicionais"""
+    
+    # Definir UUID como chave primária
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     STATUS_CHOICES = [
         ('active', _('Ativo')),
@@ -205,6 +209,7 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     """Perfil estendido do usuário com informações adicionais"""
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(
         User, 
         on_delete=models.CASCADE, 

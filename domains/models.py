@@ -4,9 +4,11 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 import dns.resolver
 import socket
+import uuid
 
 
 class Domain(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     STATUS_CHOICES = [
         ('pending', 'Pendente'),
         ('verified', 'Verificado'),
@@ -158,6 +160,7 @@ class Domain(models.Model):
 
 
 class DomainVerificationLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='verification_logs')
     verification_method = models.CharField(max_length=20)
     status = models.CharField(max_length=20)
@@ -173,6 +176,7 @@ class DomainVerificationLog(models.Model):
 
 class DomainConfiguration(models.Model):
     """Configurações específicas por domínio"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     domain = models.OneToOneField(Domain, on_delete=models.CASCADE, related_name='configuration')
     
     # Configurações de cache

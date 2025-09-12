@@ -11,6 +11,7 @@ import hashlib
 
 class TemplateCategory(models.Model):
     """Categorias de layout para templates"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name='Nome')
     description = models.TextField(blank=True, verbose_name='Descrição')
     desktop_image = models.ImageField(upload_to='templates/desktop/', verbose_name='Imagem Desktop')
@@ -29,6 +30,7 @@ class TemplateCategory(models.Model):
 
 class Item(models.Model):
     """Itens que podem ser incluídos em planos"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200, verbose_name='Título')
     description = models.TextField(verbose_name='Descrição')
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Valor')
@@ -47,6 +49,7 @@ class Item(models.Model):
 
 class PlanType(models.Model):
     """Tipos de Planos"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200, verbose_name='Título')
     items = models.ManyToManyField(Item, verbose_name='Itens')
     description = models.TextField(verbose_name='Descrição')
@@ -80,6 +83,8 @@ class PlanType(models.Model):
 
 class Site(models.Model):
     """Sites das contas"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
     STATUS_CHOICES = [
         ('active', 'Ativo'),
         ('inactive', 'Inativo'),
@@ -135,6 +140,7 @@ class Site(models.Model):
 
 class SiteBio(models.Model):
     """Informações biográficas do site"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='bio', verbose_name='Site')
     title = models.CharField(max_length=200, verbose_name='Título do Site')
     description = models.TextField(blank=True, verbose_name='Descrição')
@@ -194,6 +200,7 @@ class SocialNetwork(models.Model):
 
 class Banner(models.Model):
     """Banners do site"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='banners', verbose_name='Site')
     image = models.ImageField(upload_to='sites/banners/', verbose_name='Imagem')
     link = models.URLField(blank=True, verbose_name='Link')
@@ -215,6 +222,7 @@ class Banner(models.Model):
 
 class CTA(models.Model):
     """Call to Action do site"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ACTION_TYPES = [
         ('whatsapp', 'Abrir WhatsApp'),
         ('contact_form', 'Preencher formulário de contato'),
@@ -243,6 +251,7 @@ class CTA(models.Model):
 
 class SiteCategory(models.Model):
     """Categorias de serviços do site"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='categories', verbose_name='Site')
     name = models.CharField(max_length=100, verbose_name='Nome')
     icon = models.CharField(max_length=50, blank=True, verbose_name='Ícone')
@@ -266,6 +275,7 @@ class SiteCategory(models.Model):
 
 class Service(models.Model):
     """Serviços do site"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='services', verbose_name='Site')
     category = models.ForeignKey(SiteCategory, on_delete=models.CASCADE, related_name='services', verbose_name='Categoria')
     title = models.CharField(max_length=200, verbose_name='Título')
@@ -326,6 +336,7 @@ class BlogPost(models.Model):
     OBS: Campo category deve referenciar SiteCategory (categorias internas do site) e não content.Category.
     Corrige FK incorreta anterior (detectada via erro de integridade ao salvar usando categoria recém criada).
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='blog_posts', verbose_name='Site')
     title = models.CharField(max_length=200, blank=True, verbose_name='Título')
     image = models.ImageField(upload_to='sites/blog/', blank=True, verbose_name='Imagem')
@@ -359,6 +370,7 @@ class BlogPost(models.Model):
 
 class Subscription(models.Model):
     """Assinaturas dos sites"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     STATUS_CHOICES = [
         ('active', 'Ativa'),
         ('inactive', 'Inativa'),
@@ -395,6 +407,7 @@ class Subscription(models.Model):
 
 class SubscriptionItem(models.Model):
     """Itens da assinatura"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name='subscription_items', verbose_name='Assinatura')
     item = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='Item')
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Valor do Item')
@@ -414,6 +427,7 @@ class SubscriptionItem(models.Model):
 
 class Payment(models.Model):
     """Pagamentos das assinaturas"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     STATUS_CHOICES = [
         ('pending', 'Pendente'),
         ('paid', 'Pago'),
@@ -453,6 +467,7 @@ class SiteAPIKey(models.Model):
     Armazena somente hash seguro da chave completa. O formato da chave entregue
     ao cliente é: <prefixo>.<token> onde prefixo = 8 chars aleatórios.
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='api_keys', verbose_name='Site')
     key_prefix = models.CharField(max_length=16, db_index=True, verbose_name='Prefixo')
     key_hash = models.CharField(max_length=128, unique=True, verbose_name='Hash')

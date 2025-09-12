@@ -3,12 +3,14 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from accounts.models import Account
 import json
+import uuid
 
 User = get_user_model()
 
 
 class GlobalSetting(models.Model):
     """Configurações globais do sistema"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     SETTING_TYPES = [
         ('string', 'String'),
         ('integer', 'Integer'),
@@ -59,6 +61,7 @@ class GlobalSetting(models.Model):
 
 class AccountSetting(models.Model):
     """Configurações específicas por conta"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     SETTING_TYPES = [
         ('string', 'String'),
         ('integer', 'Integer'),

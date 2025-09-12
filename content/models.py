@@ -2,9 +2,11 @@ from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 from django.urls import reverse
+import uuid
 
 
 class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(blank=True)
@@ -32,6 +34,7 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, blank=True)
     account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE)
@@ -51,6 +54,8 @@ class Tag(models.Model):
 
 
 class Content(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
     STATUS_CHOICES = [
         ('draft', 'Rascunho'),
         ('published', 'Publicado'),
@@ -139,6 +144,7 @@ class ContentAttachment(models.Model):
         ('other', 'Outro'),
     ]
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='attachments')
     file = models.FileField(upload_to='content/attachments/')
     file_type = models.CharField(max_length=20, choices=ATTACHMENT_TYPES)
